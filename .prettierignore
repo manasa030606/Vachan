@@ -1,0 +1,9 @@
+node_modules
+package-lock.json
+dist
+.next
+out
+build
+next-env.d.ts
+backend/src/generated
+*.docx

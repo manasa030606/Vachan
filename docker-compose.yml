@@ -1,0 +1,19 @@
+# Optional: a local PostgreSQL for development.
+# Start it with `npm run db:up` (requires Docker Desktop).
+# If you installed PostgreSQL another way (Postgres.app, Homebrew), you don't need this file.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vachan-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vachan
+      POSTGRES_PASSWORD: vachan_dev_password
+      POSTGRES_DB: vachan_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - vachan-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  vachan-postgres-data:

@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/*
+ * Phase 0: a plain system font stack.
+ * Phase 1 adds the Vachan visual system, including fonts that render
+ * Devanagari, Telugu, Tamil, Malayalam, Kannada and Bengali scripts correctly.
+ */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}

@@ -1,0 +1,16 @@
+// Prisma schema for Vachan.
+//
+// Phase 0: only the database connection and client generator are configured.
+// The data models (User, Language, Course, Unit, Lesson, ...) are added in Phase 2.
+//
+// The connection URL is NOT written here. It is read from DATABASE_URL
+// in backend/prisma.config.ts (for the Prisma CLI) and backend/src/lib/prisma.ts (for the app).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

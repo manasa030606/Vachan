@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Environment files (never commit real secrets — only the .env.example files)
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma generated client (re-created by `npm run db:generate`)
+backend/src/generated/
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,79 @@
+{
+  "info": {
+    "name": "Vachan API",
+    "description": "Postman collection for the Vachan backend. Phase 0 contains only the health check. Set the `baseUrl` collection variable if your backend runs on a different port.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Health check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Returns 200 when the API and PostgreSQL are both working. Returns 503 with status \"degraded\" when the API is running but PostgreSQL is not reachable."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"API status is ok\", () => pm.expect(body.status).to.eql(\"ok\"));",
+                  "pm.test(\"Service name is vachan-backend\", () => pm.expect(body.service).to.eql(\"vachan-backend\"));",
+                  "pm.test(\"Database is connected\", () => pm.expect(body.database.status).to.eql(\"connected\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Unknown route (404 example)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/does-not-exist",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "does-not-exist"]
+            },
+            "description": "Shows the JSON error format used for routes that do not exist."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Error code is NOT_FOUND\", () => pm.expect(pm.response.json().error.code).to.eql(\"NOT_FOUND\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
