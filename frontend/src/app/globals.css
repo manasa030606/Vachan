@@ -1,15 +1,143 @@
 @import "tailwindcss";
 
 /*
- * Phase 0: a plain system font stack.
- * Phase 1 adds the Vachan visual system, including fonts that render
- * Devanagari, Telugu, Tamil, Malayalam, Kannada and Bengali scripts correctly.
+ * ─────────────────────────────────────────────────────────────
+ * Vachan design tokens
+ * Every colour, font and radius used in the UI is defined here once.
+ * Use them in components as Tailwind classes, e.g. `bg-brand-600`,
+ * `text-marigold-500`, `font-display`, `rounded-card`.
+ * ─────────────────────────────────────────────────────────────
  */
 @theme {
+  /* Fonts: Nunito for Latin body text; the Baloo family (by Ek Type, an Indian
+     foundry) for headings and for all six Indian scripts. The browser picks the
+     first font in the list that contains each character. */
+  --font-indic:
+    "Baloo 2 Variable", "Baloo Tammudu 2 Variable", "Baloo Thambi 2 Variable",
+    "Baloo Chettan 2 Variable", "Baloo Tamma 2 Variable", "Baloo Da 2 Variable";
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    "Nunito Variable", var(--font-indic), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-display: var(--font-indic), "Nunito Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand — "Neel" (deep indigo) */
+  --color-brand-50: #f1efff;
+  --color-brand-100: #e4e0ff;
+  --color-brand-200: #cbc3ff;
+  --color-brand-300: #a99bff;
+  --color-brand-400: #8a74fb;
+  --color-brand-500: #6f52f2;
+  --color-brand-600: #5a3be0;
+  --color-brand-700: #4a2fbd;
+  --color-brand-800: #3c2896;
+  --color-brand-900: #2b1d6b;
+
+  /* Accent — Marigold (rewards, XP, highlights) */
+  --color-marigold-50: #fff8e6;
+  --color-marigold-100: #ffefc2;
+  --color-marigold-200: #ffe08a;
+  --color-marigold-300: #ffcd4d;
+  --color-marigold-400: #ffbb24;
+  --color-marigold-500: #f5a300;
+  --color-marigold-600: #d17f00;
+  --color-marigold-700: #a55d02;
+
+  /* Surfaces */
+  --color-paper: #fbf8f3; /* warm off-white page background */
+  --color-ink: #1d1838; /* main text colour */
+
+  /* Shape */
+  --radius-card: 1.5rem;
+
+  /* Motion */
+  --animate-pop: pop 0.35s ease-out;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shake: shake 0.4s ease-in-out;
+  --animate-confetti: confetti 2.4s ease-out forwards;
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.85);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.04);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-6px);
+    }
+    75% {
+      transform: translateX(6px);
+    }
+  }
+  @keyframes confetti {
+    0% {
+      transform: translateY(-10vh) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(80vh) rotate(540deg);
+      opacity: 0;
+    }
+  }
 }
 
-body {
-  font-family: var(--font-sans);
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* Clear keyboard focus ring everywhere (accessibility). */
+  :focus-visible {
+    outline: 3px solid var(--color-brand-400);
+    outline-offset: 2px;
+  }
+}
+
+/* Respect the "reduce motion" accessibility setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Subtle kolam-style dot pattern used behind hero sections. */
+.bg-kolam {
+  background-image: radial-gradient(var(--color-brand-200) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
 }

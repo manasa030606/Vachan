@@ -1,0 +1,46 @@
+"use client";
+
+import { Target } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { getDailyGoal } from "@/data/onboarding-options";
+import { MOCK_PROGRESS } from "@/data/mock-user";
+import { useLearnerPreferences } from "@/lib/learner-preferences";
+
+/** Today's XP compared with the learner's chosen daily goal. */
+export function DailyGoalCard({ compact = false }: { compact?: boolean }) {
+  const { dailyGoalId } = useLearnerPreferences();
+  const goal = getDailyGoal(dailyGoalId);
+  const done = Math.min(MOCK_PROGRESS.xpToday, goal.xp);
+  const isComplete = done >= goal.xp;
+
+  return (
+    <Card className={compact ? "p-4" : undefined}>
+      <div className="flex items-center gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-marigold-100">
+          <Target aria-hidden="true" className="size-6 text-marigold-600" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-lg font-bold">Daily goal</h2>
+            <span className="text-sm font-bold text-slate-600">
+              {done} / {goal.xp} XP
+            </span>
+          </div>
+          <ProgressBar
+            value={done}
+            max={goal.xp}
+            label="Daily goal progress"
+            colorClassName="bg-marigold-400"
+            className="mt-2"
+          />
+          <p className="mt-1.5 text-sm text-slate-500">
+            {isComplete
+              ? "Goal reached — great work today!"
+              : `${goal.xp - done} XP to go · ${goal.label} goal (${goal.minutes} min/day)`}
+          </p>
+        </div>
+      </div>
+    </Card>
+  );
+}

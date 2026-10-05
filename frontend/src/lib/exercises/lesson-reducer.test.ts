@@ -1,0 +1,70 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import type { Exercise } from "@/types/exercise";
+import {
+  createInitialLessonState,
+  getAccuracy,
+  lessonReducer,
+  type LessonState,
+} from "./lesson-reducer";
+
+const exercises: Exercise[] = ["e1", "e2"].map((id) => ({
+  id,
+  type: "multiple-choice",
+  instruction: "Pick",
+  prompt: id,
+  options: [
+    { id: "right", text: "Right" },
+    { id: "wrong", text: "Wrong" },
+  ],
+  correctOptionId: "right",
+}));
+
+function answer(state: LessonState, optionId: string): LessonState {
+  let next = lessonReducer(state, { type: "ANSWER_CHANGED", answer: { type: "choice", optionId } });
+  next = lessonReducer(next, { type: "CHECK" });
+  return lessonReducer(next, { type: "CONTINUE" });
+}
+
+describe("lessonReducer", () => {
+  it("completes a lesson when every answer is correct", () => {
+    let state = lessonReducer(createInitialLessonState(exercises, 5), { type: "START" });
+    state = answer(state, "right");
+    state = answer(state, "right");
+    assert.equal(state.phase, "complete");
+    assert.equal(state.hearts, 5);
+    assert.equal(getAccuracy(state), 100);
+  });
+
+  it("costs a heart and repeats the exercise after a mistake", () => {
+    let state = lessonReducer(createInitialLessonState(exercises, 5), { type: "START" });
+    state = answer(state, "wrong"); // e1 wrong → re-queued
+    assert.equal(state.hearts, 4);
+    assert.equal(state.queue.length, 3);
+    state = answer(state, "right"); // e2
+    state = answer(state, "right"); // e1 again
+    assert.equal(state.phase, "complete");
+    assert.deepEqual(state.mistakeIds, ["e1"]);
+    assert.equal(getAccuracy(state), 67);
+  });
+
+  it("ends the lesson when hearts run out", () => {
+    let state = lessonReducer(createInitialLessonState(exercises, 1), { type: "START" });
+    state = answer(state, "wrong");
+    assert.equal(state.phase, "out-of-hearts");
+  });
+
+  it("does not let the answer change after checking", () => {
+    let state = lessonReducer(createInitialLessonState(exercises, 5), { type: "START" });
+    state = lessonReducer(state, {
+      type: "ANSWER_CHANGED",
+      answer: { type: "choice", optionId: "right" },
+    });
+    state = lessonReducer(state, { type: "CHECK" });
+    const after = lessonReducer(state, {
+      type: "ANSWER_CHANGED",
+      answer: { type: "choice", optionId: "wrong" },
+    });
+    assert.equal(after, state);
+  });
+});
