@@ -52,7 +52,7 @@ export function SidebarNav() {
         </nav>
 
         <p className="mt-auto hidden px-2 text-xs text-slate-400 lg:block">
-          Phase 3 · real learning system
+          Phase 4 · placement &amp; gamification
         </p>
       </div>
     </aside>

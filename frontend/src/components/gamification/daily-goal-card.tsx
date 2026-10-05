@@ -1,18 +1,20 @@
 "use client";
 
 import { Target } from "lucide-react";
+import { useStats } from "@/components/session/stats-provider";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { getDailyGoal } from "@/data/onboarding-options";
-import { MOCK_PROGRESS } from "@/data/mock-user";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
 
-/** Today's XP compared with the learner's chosen daily goal. */
+/** Today's XP compared with the learner's daily goal (GET /api/stats → dailyGoal). */
 export function DailyGoalCard({ compact = false }: { compact?: boolean }) {
+  const { stats } = useStats();
   const { dailyGoalId } = useLearnerPreferences();
   const goal = getDailyGoal(dailyGoalId);
-  const done = Math.min(MOCK_PROGRESS.xpToday, goal.xp);
-  const isComplete = done >= goal.xp;
+  const target = stats?.dailyGoal.targetXp ?? goal.xp;
+  const earned = stats?.dailyGoal.earnedToday ?? 0;
+  const isComplete = stats?.dailyGoal.completed ?? false;
 
   return (
     <Card className={compact ? "p-4" : undefined}>
@@ -24,20 +26,20 @@ export function DailyGoalCard({ compact = false }: { compact?: boolean }) {
           <div className="flex items-baseline justify-between gap-2">
             <h2 className="text-lg font-bold">Daily goal</h2>
             <span className="text-sm font-bold text-slate-600">
-              {done} / {goal.xp} XP
+              {stats ? `${Math.min(earned, target)} / ${target} XP` : "…"}
             </span>
           </div>
           <ProgressBar
-            value={done}
-            max={goal.xp}
+            value={Math.min(earned, target)}
+            max={target}
             label="Daily goal progress"
             colorClassName="bg-marigold-400"
             className="mt-2"
           />
           <p className="mt-1.5 text-sm text-slate-500">
             {isComplete
-              ? "Goal reached — great work today!"
-              : `${goal.xp - done} XP to go · ${goal.label} goal (${goal.minutes} min/day)`}
+              ? `Goal reached — ${earned} XP today. Great work!`
+              : `${Math.max(0, target - earned)} XP to go · ${goal.label} goal (${goal.minutes} min/day)`}
           </p>
         </div>
       </div>

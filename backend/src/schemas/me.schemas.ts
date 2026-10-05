@@ -1,6 +1,17 @@
 import { z } from "zod";
+import { isValidTimeZone } from "../services/gamification/dates.ts";
 
 export const DAILY_GOALS = ["casual", "regular", "serious", "intense"] as const;
+
+/** The six self-assessment answers from the spec (section 3), as stored ids. */
+export const SELF_ASSESSMENTS = [
+  "new", // Completely new — I know nothing
+  "few-words", // I know a few words
+  "knows-script", // I know the alphabet/script but need practice
+  "basic-sentences", // I can understand basic sentences
+  "simple-conversations", // I can have simple conversations
+  "advanced", // I'm comfortable and want advanced practice
+] as const;
 
 /** PATCH /api/me — every field is optional; send only what changes. */
 export const updateMeSchema = z
@@ -9,10 +20,12 @@ export const updateMeSchema = z
     languageCode: z.string().trim().toLowerCase().length(2, "Use a 2-letter code like hi or te"),
     learningGoal: z.string().trim().max(40).nullable(),
     dailyGoal: z.enum(DAILY_GOALS),
-    selfAssessment: z.string().trim().max(40).nullable(),
+    selfAssessment: z.enum(SELF_ASSESSMENTS).nullable(),
     showRomanization: z.boolean(),
     soundEffects: z.boolean(),
     onboardingDone: z.boolean(),
+    /** IANA time zone from the browser, e.g. "Asia/Kolkata" (decides when a streak day starts). */
+    timeZone: z.string().trim().max(60).refine(isValidTimeZone, "Unknown time zone"),
   })
   .partial()
   .strict()

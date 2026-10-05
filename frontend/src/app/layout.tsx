@@ -10,6 +10,7 @@ import "@fontsource-variable/baloo-tamma-2"; // Kannada
 import "@fontsource-variable/baloo-da-2"; // Bengali
 import "./globals.css";
 import { SessionProvider } from "@/components/session/session-provider";
+import { StatsProvider } from "@/components/session/stats-provider";
 
 export const metadata: Metadata = {
   title: {
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
       <body className="min-h-dvh antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <StatsProvider>{children}</StatsProvider>
+        </SessionProvider>
       </body>
     </html>
   );

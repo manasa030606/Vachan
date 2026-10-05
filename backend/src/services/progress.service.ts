@@ -8,11 +8,15 @@
 //     The first finished run marks the lesson COMPLETED, which unlocks the next lesson.
 //   - Review answers are saved too, but do not change lesson counters; a correct review answer
 //     clears that exercise from the mistake list (see review.service.ts).
+//   - Every answer then updates XP, hearts, streak, daily goal and badges (stats.service.ts).
+//     With 0 hearts, lesson answers are refused (403 OUT_OF_HEARTS); review answers still work.
 import type { Prisma } from "../generated/prisma/client.ts";
 import { notFound } from "../lib/http-error.ts";
 import { prisma } from "../lib/prisma.ts";
 import type { AttemptAnswer, AttemptMode } from "../schemas/content.schemas.ts";
 import { checkAnswer } from "./answer-checker.ts";
+import { isOpenMistake } from "./review.service.ts";
+import { applyAnswerRewards, assertHasHearts } from "./stats.service.ts";
 import {
   EXERCISE_TYPE_NAMES,
   assertLessonUnlocked,
@@ -51,87 +55,125 @@ export async function submitAttempt(
   const lessonId = exercise.lesson.id;
   await assertLessonUnlocked({ id: lessonId, courseId: exercise.lesson.unit.courseId }, userId);
 
+  if (mode === "lesson") await assertHasHearts(prisma, userId);
   const result = checkAnswer(exercise, answer);
   const now = new Date();
   const totalExercises = exercise.lesson._count.exercises;
 
-  return prisma.$transaction(async (tx) => {
-    // Answering without calling /start first is allowed: the lesson is started implicitly.
-    const existing = await tx.userLessonProgress.findUnique({
-      where: { userId_lessonId: { userId, lessonId } },
-    });
-    const row =
-      existing ??
-      (await tx.userLessonProgress.create({
-        data: { userId, lessonId, startedAt: now, runStartedAt: now, lastActivityAt: now },
-      }));
-    const solvedBefore = await solvedInCurrentRun(tx, userId, lessonId, row.runStartedAt);
-
-    const attempt = await tx.userExerciseAttempt.create({
-      data: {
-        userId,
-        exerciseId,
-        lessonId,
-        answer: answer as Prisma.InputJsonValue,
-        isCorrect: result.isCorrect,
-        source: mode === "review" ? "REVIEW" : "LESSON",
-      },
-    });
-
-    let updated = row;
-    let solved = solvedBefore;
-    let runCompleted = false;
-
-    if (mode === "review") {
-      updated = await tx.userLessonProgress.update({
-        where: { id: row.id },
-        data: { lastActivityAt: now },
+  return prisma.$transaction(
+    async (tx) => {
+      // Answering without calling /start first is allowed: the lesson is started implicitly.
+      const existing = await tx.userLessonProgress.findUnique({
+        where: { userId_lessonId: { userId, lessonId } },
       });
-    } else {
-      const newlySolved = result.isCorrect && !solvedBefore.includes(exerciseId);
-      solved = newlySolved ? [...solvedBefore, exerciseId] : solvedBefore;
-      runCompleted = newlySolved && solved.length >= totalExercises;
+      const row =
+        existing ??
+        (await tx.userLessonProgress.create({
+          data: { userId, lessonId, startedAt: now, runStartedAt: now, lastActivityAt: now },
+        }));
+      const solvedBefore = await solvedInCurrentRun(tx, userId, lessonId, row.runStartedAt);
+      const clearedMistake =
+        mode === "review" && result.isCorrect && (await isOpenMistake(tx, userId, exerciseId));
 
-      const correct = row.correctAttempts + (result.isCorrect ? 1 : 0);
-      const incorrect = row.incorrectAttempts + (result.isCorrect ? 0 : 1);
-      updated = await tx.userLessonProgress.update({
-        where: { id: row.id },
+      const attempt = await tx.userExerciseAttempt.create({
         data: {
-          correctAttempts: correct,
-          incorrectAttempts: incorrect,
-          accuracy: accuracyOf(correct, correct + incorrect),
-          lastActivityAt: now,
-          ...(runCompleted
-            ? {
-                status: "COMPLETED",
-                timesCompleted: { increment: 1 },
-                // Keep the date of the FIRST completion.
-                completedAt: row.completedAt ?? now,
-              }
-            : {}),
+          userId,
+          exerciseId,
+          lessonId,
+          answer: answer as Prisma.InputJsonValue,
+          isCorrect: result.isCorrect,
+          source: mode === "review" ? "REVIEW" : "LESSON",
         },
       });
-    }
 
-    return {
-      attempt: {
-        id: attempt.id,
+      let updated = row;
+      let solved = solvedBefore;
+      let runCompleted = false;
+      let newlySolved = false;
+      let perfectRun = false;
+      // A lesson unlocked by the placement test counts as "first completion" when really finished.
+      const firstCompletion = row.status !== "COMPLETED" || row.placedOut;
+
+      if (mode === "review") {
+        updated = await tx.userLessonProgress.update({
+          where: { id: row.id },
+          data: { lastActivityAt: now },
+        });
+      } else {
+        newlySolved = result.isCorrect && !solvedBefore.includes(exerciseId);
+        solved = newlySolved ? [...solvedBefore, exerciseId] : solvedBefore;
+        runCompleted = newlySolved && solved.length >= totalExercises;
+        if (runCompleted) {
+          const mistakesThisRun = await tx.userExerciseAttempt.count({
+            where: {
+              userId,
+              lessonId,
+              source: "LESSON",
+              isCorrect: false,
+              createdAt: { gte: row.runStartedAt },
+            },
+          });
+          perfectRun = mistakesThisRun === 0;
+        }
+
+        const correct = row.correctAttempts + (result.isCorrect ? 1 : 0);
+        const incorrect = row.incorrectAttempts + (result.isCorrect ? 0 : 1);
+        updated = await tx.userLessonProgress.update({
+          where: { id: row.id },
+          data: {
+            correctAttempts: correct,
+            incorrectAttempts: incorrect,
+            accuracy: accuracyOf(correct, correct + incorrect),
+            lastActivityAt: now,
+            ...(runCompleted
+              ? {
+                  status: "COMPLETED",
+                  placedOut: false,
+                  timesCompleted: { increment: 1 },
+                  // Keep the date of the FIRST completion.
+                  completedAt: row.completedAt ?? now,
+                }
+              : {}),
+          },
+        });
+      }
+
+      const rewards = await applyAnswerRewards(tx, {
+        userId,
+        lessonId,
         exerciseId,
-        mode,
         isCorrect: result.isCorrect,
-        typoCorrection: result.typoCorrection,
-        correctAnswer: result.correctAnswer,
-        /** Teaching note for the feedback banner (sent only after answering). */
-        explanation: exercise.explanation,
-        createdAt: attempt.createdAt,
-      },
-      lessonProgress: {
-        ...toLessonProgressDto(lessonId, updated, solved, totalExercises),
-        /** True only for the answer that finished the run. */
-        justCompleted: runCompleted,
-      },
-    };
-  });
+        clearedMistake,
+        now,
+        outcome:
+          mode === "review"
+            ? { mode: "review", isCorrect: result.isCorrect }
+            : { mode: "lesson", newlySolved, runCompleted, firstCompletion, perfectRun },
+      });
+
+      return {
+        attempt: {
+          id: attempt.id,
+          exerciseId,
+          mode,
+          isCorrect: result.isCorrect,
+          typoCorrection: result.typoCorrection,
+          correctAnswer: result.correctAnswer,
+          /** Teaching note for the feedback banner (sent only after answering). */
+          explanation: exercise.explanation,
+          createdAt: attempt.createdAt,
+        },
+        lessonProgress: {
+          ...toLessonProgressDto(lessonId, updated, solved, totalExercises),
+          /** True only for the answer that finished the run. */
+          justCompleted: runCompleted,
+        },
+        /** XP, level, hearts, streak, daily goal and new badges after this answer. */
+        rewards,
+      };
+    },
+    { timeout: 15_000 },
+  );
 }
 
 export async function getProgressSummary(userId: string) {

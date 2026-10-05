@@ -1,11 +1,14 @@
 "use client";
 
-// Profile: account details (GET /api/me), learning progress (GET /api/progress) and settings.
+// Profile: account details (GET /api/me), learning progress (GET /api/progress),
+// XP / streak / level (GET /api/stats), badges (GET /api/achievements) and settings.
+import { Compass } from "lucide-react";
 import { useSession } from "@/components/session/session-provider";
+import { ButtonLink } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getLanguage } from "@/data/languages";
-import { MOCK_ACHIEVEMENTS } from "@/data/mock-user";
 import { useApi } from "@/hooks/use-api";
-import { getProgress } from "@/lib/api/endpoints";
+import { getAchievements, getProgress } from "@/lib/api/endpoints";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
 import { AchievementsGrid } from "./achievements-grid";
 import { LanguageCard } from "./language-card";
@@ -23,6 +26,10 @@ export function ProfileView() {
   const { displayName, languageCode } = useLearnerPreferences();
   const language = getLanguage(languageCode);
   const { data } = useApi(async () => (await getProgress()).progress, "progress");
+  const { data: badges } = useApi(
+    async () => (await getAchievements()).achievements,
+    "achievements",
+  );
   const courseProgress = data?.courses.find((course) => course.language.code === languageCode);
 
   return (
@@ -34,7 +41,7 @@ export function ProfileView() {
         language={language}
       />
       <ProfileStats progress={data} />
-      <AchievementsGrid achievements={MOCK_ACHIEVEMENTS} />
+      <AchievementsGrid achievements={badges} />
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <LanguageCard
           language={language}
@@ -46,6 +53,19 @@ export function ProfileView() {
         />
         <SettingsCard />
       </div>
+      <Card className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <Compass aria-hidden="true" className="size-10 shrink-0 text-brand-600" />
+        <div className="flex-1">
+          <h2 className="text-lg font-bold">Placement test</h2>
+          <p className="text-sm text-slate-600">
+            Already know some {language.name}? 12 questions recommend where to start. You decide
+            whether to skip ahead.
+          </p>
+        </div>
+        <ButtonLink href="/placement" variant="secondary">
+          Take the test
+        </ButtonLink>
+      </Card>
     </div>
   );
 }

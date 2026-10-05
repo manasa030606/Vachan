@@ -16,7 +16,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api/client";
-import { getMe, logOut } from "@/lib/api/endpoints";
+import { getMe, logOut, updateMe } from "@/lib/api/endpoints";
 import type { UserDto } from "@/lib/api/types";
 
 type SessionStatus = "loading" | "authenticated" | "guest";
@@ -75,6 +75,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [setUser]);
+
+  // Streak days follow the learner's own calendar: save the browser's time zone once it differs.
+  useEffect(() => {
+    const profile = user?.profile;
+    if (!profile) return;
+    const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!browserTimeZone || profile.timeZone === browserTimeZone) return;
+    updateMe({ timeZone: browserTimeZone })
+      .then(({ user: updated }) => setUserState(updated))
+      .catch(() => {
+        // Not critical: the server keeps using the previous time zone.
+      });
+  }, [user?.profile]);
 
   /** Logs out on the server (the old token stops working), then goes to the landing page. */
   const logout = useCallback(async () => {

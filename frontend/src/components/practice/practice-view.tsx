@@ -3,6 +3,7 @@
 // Practice screen: review session, open mistakes and everything learned so far,
 // for the learner's current language (GET /api/review?languageCode=…).
 import { LogoMark } from "@/components/brand/logo";
+import { RecommendationsCard } from "@/components/gamification/recommendations-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getLanguage } from "@/data/languages";
@@ -52,6 +53,7 @@ export function PracticeView() {
             openMistakes={data.openMistakes}
             resolvedMistakes={data.resolvedMistakes}
           />
+          <RecommendationsCard limit={5} />
           <MistakesList mistakes={data.mistakes} />
           <VocabularyList words={data.learnedVocabulary} showRomanization={showRomanization} />
         </>

@@ -91,7 +91,7 @@ async function statusesFor(course: CourseTree, userId: string | null) {
   const rows = userId
     ? await prisma.userLessonProgress.findMany({
         where: { userId, lessonId: { in: orderedLessonIds } },
-        select: { lessonId: true, status: true, lastActivityAt: true },
+        select: { lessonId: true, status: true, lastActivityAt: true, placedOut: true },
       })
     : [];
   const progress = new Map<string, LessonProgressInfo>(rows.map((row) => [row.lessonId, row]));
@@ -99,6 +99,7 @@ async function statusesFor(course: CourseTree, userId: string | null) {
   return {
     statuses,
     recommendedLessonId: pickRecommendedLesson(orderedLessonIds, statuses, progress),
+    placedOut: new Set(rows.filter((row) => row.placedOut).map((row) => row.lessonId)),
   };
 }
 
@@ -113,7 +114,7 @@ export async function getCourseDetail(courseId: string, userId: string | null) {
   const course = await loadCourseTree(courseId);
   if (!course) throw notFound("COURSE_NOT_FOUND", "Course not found");
 
-  const { statuses, recommendedLessonId } = await statusesFor(course, userId);
+  const { statuses, recommendedLessonId, placedOut } = await statusesFor(course, userId);
   const statusOf = (lessonId: string) => statuses.get(lessonId) ?? "locked";
   const allLessons = course.units.flatMap((unit) => unit.lessons);
   const count = (status: LessonStatus) =>
@@ -147,6 +148,8 @@ export async function getCourseDetail(courseId: string, userId: string | null) {
           kind: lesson.kind,
           exerciseCount: lesson._count.exercises,
           status: statusOf(lesson.id),
+          /** Unlocked by the placement test (not studied yet). */
+          placedOut: placedOut.has(lesson.id),
         })),
       };
     }),

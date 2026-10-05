@@ -14,6 +14,7 @@ import type {
   ExerciseType,
   LearningStage,
   LessonKind,
+  PlacementSkill,
   VocabularyKind,
 } from "../src/generated/prisma/client.ts";
 import {
@@ -78,12 +79,20 @@ export type UnitSeed = {
   lessons: LessonSeed[];
 };
 
+export type PlacementQuestionSeed = {
+  exerciseId: string;
+  unitNumber: number;
+  skill: PlacementSkill;
+};
+
 export type CourseSeed = {
   id: string;
   title: string;
   description: string;
   vocabulary: VocabularySeed[];
   units: UnitSeed[];
+  /** 3 questions per unit for the placement test (they re-use course exercises). */
+  placementQuestions: PlacementQuestionSeed[];
 };
 
 // ── Small helpers ────────────────────────────────────────────
@@ -813,5 +822,23 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
     description: `From your first ${language.scriptName} letters to simple everyday sentences.`,
     vocabulary,
     units: [unit1, unit2, unit3, unit4],
+    placementQuestions: [
+      // Unit 1 — vowels (script / character recognition)
+      { exerciseId: ex(u1[0], 3), unitNumber: 1, skill: "SCRIPT" },
+      { exerciseId: ex(u1[1], 2), unitNumber: 1, skill: "SCRIPT" },
+      { exerciseId: ex(u1[2], 2), unitNumber: 1, skill: "SCRIPT" },
+      // Unit 2 — consonants and vowel signs
+      { exerciseId: ex(u2[0], 1), unitNumber: 2, skill: "SCRIPT" },
+      { exerciseId: ex(u2[2], 3), unitNumber: 2, skill: "SCRIPT" },
+      { exerciseId: ex(u2[3], 2), unitNumber: 2, skill: "SCRIPT" },
+      // Unit 3 — vocabulary and translation
+      { exerciseId: ex(u3[0], 1), unitNumber: 3, skill: "VOCABULARY" },
+      { exerciseId: ex(u3[2], 2), unitNumber: 3, skill: "VOCABULARY" },
+      { exerciseId: ex(u3[0], 3), unitNumber: 3, skill: "TRANSLATION" },
+      // Unit 4 — sentence understanding and translation
+      { exerciseId: ex(u4[1], 1), unitNumber: 4, skill: "SENTENCE" },
+      { exerciseId: ex(u4[2], 1), unitNumber: 4, skill: "SENTENCE" },
+      { exerciseId: ex(u4[0], 4), unitNumber: 4, skill: "TRANSLATION" },
+    ],
   };
 }

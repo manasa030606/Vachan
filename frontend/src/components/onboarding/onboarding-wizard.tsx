@@ -80,7 +80,9 @@ export function OnboardingWizard() {
         selfAssessment: answers.selfAssessmentId,
         onboardingDone: true,
       });
-      router.push("/learn");
+      router.push(
+        answers.selfAssessmentId && answers.selfAssessmentId !== "new" ? "/placement" : "/learn",
+      );
     } catch (error) {
       setSaveError(
         error instanceof ApiError ? error.message : "Couldn't save your choices. Try again.",
@@ -160,7 +162,8 @@ export function OnboardingWizard() {
             goalLabel={goal?.label ?? "—"}
             dailyGoalLabel={`${dailyGoal.label} · ${dailyGoal.xp} XP`}
             levelLabel={level?.label ?? "—"}
-            startHint={level?.startHint ?? "Start from the script"}
+            startHint={level?.startHint ?? "You'll start at Unit 1"}
+            offersPlacement={answers.selfAssessmentId !== "new"}
           />
         )}
         {saveError && (
@@ -181,7 +184,13 @@ export function OnboardingWizard() {
             disabled={!canContinue}
             className="w-full sm:w-auto sm:min-w-44"
           >
-            {step !== "summary" ? "Continue" : isSaving ? "Saving…" : "Start learning"}
+            {step !== "summary"
+              ? "Continue"
+              : isSaving
+                ? "Saving…"
+                : answers.selfAssessmentId !== "new"
+                  ? "Continue to placement"
+                  : "Start learning"}
           </Button>
         </div>
       </div>

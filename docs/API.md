@@ -1,4 +1,4 @@
-# Vachan — API reference & Postman testing guide (Phase 3)
+# Vachan — API reference & Postman testing guide (Phase 4)
 
 Base URL: **`http://localhost:4000/api`** · All bodies are JSON · All errors look like:
 
@@ -10,25 +10,33 @@ Base URL: **`http://localhost:4000/api`** · All bodies are JSON · All errors l
 
 ## 1. Endpoint list
 
-| #   | Method | URL                          | Auth         | Purpose                                                                 |
-| --- | ------ | ---------------------------- | ------------ | ----------------------------------------------------------------------- |
-| 0   | GET    | `/api/health`                | none         | API + database status                                                   |
-| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                                         |
-| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                                                     |
-| 3   | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)                                       |
-| 4   | GET    | `/api/me`                    | **required** | Current user + profile                                                  |
-| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language)                         |
-| 6   | GET    | `/api/languages`             | none         | The six languages                                                       |
-| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)                              |
-| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status                                    |
-| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers) + my progress                           |
-| 10  | POST   | `/api/lessons/:id/start`     | **required** | **New** · start or resume a lesson                                      |
-| 11  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer (lesson or review); server checks it, returns feedback |
-| 12  | GET    | `/api/progress`              | **required** | My overall progress + resume point                                      |
-| 13  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson (per exercise)                                |
-| 14  | GET    | `/api/review`                | **required** | **New** · open mistakes + words learned                                 |
-| 15  | GET    | `/api/review/attempts`       | **required** | **New** · every incorrect answer                                        |
-| 16  | GET    | `/api/review/session`        | **required** | **New** · open mistakes as exercises to practise                        |
+| #   | Method | URL                          | Auth         | Purpose                                                                                 |
+| --- | ------ | ---------------------------- | ------------ | --------------------------------------------------------------------------------------- |
+| 0   | GET    | `/api/health`                | none         | API + database status                                                                   |
+| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                                                         |
+| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                                                                     |
+| 27  | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)                                                       |
+| 4   | GET    | `/api/me`                    | **required** | Current user + profile                                                                  |
+| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language)                                         |
+| 6   | GET    | `/api/languages`             | none         | The six languages                                                                       |
+| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)                                              |
+| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status                                                    |
+| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers) + my progress                                           |
+| 10  | POST   | `/api/lessons/:id/start`     | **required** | start or resume a lesson                                                                |
+| 11  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer (lesson or review); server checks it, returns feedback + rewards (§18) |
+| 12  | GET    | `/api/progress`              | **required** | My overall progress + resume point                                                      |
+| 13  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson (per exercise)                                                |
+| 14  | GET    | `/api/review`                | **required** | open mistakes + words learned                                                           |
+| 15  | GET    | `/api/review/attempts`       | **required** | every incorrect answer                                                                  |
+| 16  | GET    | `/api/review/session`        | **required** | Open mistakes as exercises to practise                                                  |
+| 19  | GET    | `/api/stats`                 | **required** | **Phase 4** · XP, level, streak, hearts, daily goal, recent badges                      |
+| 20  | GET    | `/api/streak`                | **required** | **Phase 4** · current/longest streak + last 7 days                                      |
+| 21  | GET    | `/api/achievements`          | **required** | **Phase 4** · all badges with progress                                                  |
+| 22  | GET    | `/api/recommendations`       | **required** | **Phase 4** · practice recommendations (transparent rules)                              |
+| 23  | POST   | `/api/placement/start`       | **required** | **Phase 4** · start a placement test                                                    |
+| 24  | POST   | `/api/placement/answer`      | **required** | **Phase 4** · answer one placement question                                             |
+| 25  | GET    | `/api/placement/result`      | **required** | **Phase 4** · score per unit + recommended unit                                         |
+| 26  | POST   | `/api/placement/decide`      | **required** | **Phase 4** · start at the recommended unit or Unit 1                                   |
 
 `PATCH /api/me` is from the spec's API table (section 11) and is needed so onboarding and settings are saved.
 
@@ -68,7 +76,7 @@ Logout ──► tokenVersion + 1  ──► every token issued before is now in
 4. The collection's **Authorization** tab is set to **Bearer Token → `{{token}}`**. Every request inherits it, except register/login/health/languages/courses, which use "No Auth".
 5. **You never copy the token by hand:** the **Register** and **Login** requests have a small _Tests_ script that saves `token` automatically.
 
-Run it all at once: right-click the collection → **Run collection** → **Run Vachan API**. All 56 requests should be green (121 tests).
+Run it all at once: right-click the collection → **Run collection** → **Run Vachan API**. All 87 requests should be green (190 tests).
 
 > If "Get me before logging in" returns 200 instead of 401: Postman kept a `vachan_token` cookie from an earlier run. Click **Cookies** (under the Send button) → `localhost` → delete `vachan_token`.
 
@@ -79,7 +87,8 @@ Run it all at once: right-click the collection → **Run collection** → **Run 
 ```
 0 Health → 1 Register / Login → 2 Me (pick Telugu) → 3 Languages & courses
 → 4 Lessons (locked 403, start te-u1-l1) → 5 Attempts (wrong → right → leave → resume → complete → unlock → practise again)
-→ 6 More lessons + typed answers → 7 Review (mistakes → review answer clears one) → 8 Progress → 9 Logout
+→ 6 More lessons + typed answers → 7 Review (mistakes → review answer clears one) → 8 Progress
+→ 9 XP / level / streak / hearts / daily goal → 10 Achievements & recommendations → 11 Placement test (Hindi) → 12 Logout
 ```
 
 Each folder builds on the one before (lessons unlock in order), so run them top to bottom. Starting again from scratch? Just run the whole collection again — Register creates a brand-new user each time. The rest of this guide follows that order. For every request: **Headers** = `Content-Type: application/json` (only when there is a body) and, for protected endpoints, `Authorization: Bearer {{token}}`.
@@ -191,11 +200,11 @@ Errors: `401 UNAUTHORIZED` — no token, expired token, tampered token, or logge
 }
 ```
 
-Other fields: `displayName` (2–60), `showRomanization` (true/false), `soundEffects` (true/false). `dailyGoal` is one of `casual | regular | serious | intense`. `languageCode` is one of `hi te ta ml kn bn`.
+Other fields: `displayName` (2–60), `showRomanization` (true/false), `soundEffects` (true/false), **`timeZone`** (IANA name like `"Asia/Kolkata"` — decides when a streak day starts; the website sends the browser's zone automatically). `selfAssessment` is one of `new · few-words · knows-script · basic-sentences · simple-conversations · advanced`. `dailyGoal` is one of `casual | regular | serious | intense`. `languageCode` is one of `hi te ta ml kn bn`.
 
 **Expected: `200`** → `{ "user": { … "currentLanguage": { "code": "te", "name": "Telugu", "nativeName": "తెలుగు" }, … } }`
 
-Errors: `400 UNKNOWN_LANGUAGE` (`"languageCode": "xx"`) · `400 VALIDATION_ERROR` (empty body, unknown field, wrong type) · `401`.
+Errors: `400 UNKNOWN_LANGUAGE` (`"languageCode": "xx"`) · `400 VALIDATION_ERROR` (empty body, unknown field, wrong type, unknown time zone like `"Mars/Olympus"`, self-assessment not in the list) · `401`.
 
 ---
 
@@ -494,6 +503,8 @@ Example — **wrong** answer to `te-u1-l1-e1` (the letter అ; option `o2` is "a
 }
 ```
 
+Since Phase 4 every attempt response also has **`rewards`** (XP, level, hearts, streak, daily goal, new badges) — see section 18. With **0 hearts** a lesson answer is refused: `403 OUT_OF_HEARTS` with `details.nextHeartAt` (review answers still work).
+
 Answering the **last missing exercise** completes the lesson (`justCompleted: true`, `status: COMPLETED`, the next lesson becomes `available`):
 
 ```json
@@ -775,7 +786,458 @@ Errors for 14–16: `401` without a token · `400 VALIDATION_ERROR` (`languageCo
 
 ---
 
-### 17 · Logout — `POST {{baseUrl}}/auth/logout`
+### 18 · Rewards after an answer (inside `POST /exercises/:id/attempt`)
+
+The answer that finishes a perfect first lesson (`te-u1-l1-e4`) returns:
+
+```json
+{
+  "rewards": {
+    "xpEarned": 17,
+    "awards": [
+      {
+        "reason": "EXERCISE_CORRECT",
+        "amount": 2
+      },
+      {
+        "reason": "LESSON_COMPLETED",
+        "amount": 10
+      },
+      {
+        "reason": "PERFECT_LESSON",
+        "amount": 5
+      }
+    ],
+    "totalXp": 23,
+    "level": {
+      "level": 1,
+      "levelStartXp": 0,
+      "nextLevelXp": 50,
+      "xpIntoLevel": 23,
+      "xpToNextLevel": 27,
+      "isMaxLevel": false
+    },
+    "leveledUp": false,
+    "hearts": {
+      "current": 5,
+      "max": 5,
+      "nextHeartAt": null,
+      "refillMinutes": 30
+    },
+    "streak": {
+      "current": 1,
+      "longest": 1,
+      "change": "same-day"
+    },
+    "dailyGoal": {
+      "targetXp": 20,
+      "earnedToday": 23,
+      "completed": true,
+      "justCompleted": true
+    },
+    "newAchievements": [
+      {
+        "code": "first-lesson",
+        "title": "First Lesson",
+        "description": "Complete your first lesson",
+        "icon": "🌱"
+      },
+      {
+        "code": "perfect-lesson",
+        "title": "Flawless",
+        "description": "Finish a lesson without a single mistake",
+        "icon": "💎"
+      },
+      {
+        "code": "goal-getter",
+        "title": "Goal Getter",
+        "description": "Reach your daily goal",
+        "icon": "🎯"
+      }
+    ]
+  }
+}
+```
+
+A wrong lesson answer: `xpEarned: 0`, `hearts.current` − 1 and `hearts.nextHeartAt` set. Rules: [GAMIFICATION.md](GAMIFICATION.md).
+
+---
+
+### 19 · Stats — `GET {{baseUrl}}/stats`
+
+- Auth: **Bearer token** · Body: none · **Expected: `200`** (week and badges shortened):
+
+```json
+{
+  "stats": {
+    "xp": {
+      "total": 23,
+      "today": 23,
+      "level": 1,
+      "levelStartXp": 0,
+      "nextLevelXp": 50,
+      "xpIntoLevel": 23,
+      "xpToNextLevel": 27,
+      "isMaxLevel": false
+    },
+    "streak": {
+      "current": 1,
+      "longest": 1,
+      "lastActiveDate": "2026-10-05",
+      "today": "2026-10-05",
+      "timeZone": "Asia/Kolkata",
+      "activeToday": true,
+      "week": [
+        {
+          "date": "2026-10-04",
+          "xpEarned": 0,
+          "active": false,
+          "goalMet": false
+        },
+        {
+          "date": "2026-10-05",
+          "xpEarned": 23,
+          "active": true,
+          "goalMet": true
+        }
+      ]
+    },
+    "hearts": {
+      "current": 4,
+      "max": 5,
+      "nextHeartAt": "2026-10-05T12:19:20.933Z",
+      "refillMinutes": 30
+    },
+    "dailyGoal": {
+      "date": "2026-10-05",
+      "targetXp": 20,
+      "earnedToday": 23,
+      "completed": true
+    },
+    "achievements": {
+      "unlockedCount": 3,
+      "total": 8,
+      "recent": [
+        {
+          "code": "first-lesson",
+          "title": "First Lesson",
+          "description": "Complete your first lesson",
+          "icon": "🌱",
+          "metric": "LESSONS_COMPLETED",
+          "threshold": 1,
+          "value": 1,
+          "progress": 1,
+          "unlocked": true,
+          "unlockedAt": "2026-10-05T11:49:20.843Z"
+        }
+      ]
+    },
+    "rules": {
+      "xp": {
+        "exerciseCorrect": 2,
+        "lessonCompleted": 10,
+        "lessonPracticed": 5,
+        "perfectLessonBonus": 5,
+        "reviewCorrect": 2
+      },
+      "hearts": {
+        "max": 5,
+        "initial": 5,
+        "lossPerMistake": 1,
+        "refillMinutes": 30,
+        "reviewRestore": 1
+      },
+      "levelThresholds": [0, 50, 120, 220, 350, 520, 750, 1050, 1450, 2000],
+      "dailyGoalXp": {
+        "CASUAL": 10,
+        "REGULAR": 20,
+        "SERIOUS": 30,
+        "INTENSE": 50
+      }
+    }
+  }
+}
+```
+
+Errors: `401` without a token.
+
+### 20 · Streak — `GET {{baseUrl}}/streak`
+
+```json
+{
+  "streak": {
+    "current": 1,
+    "longest": 1,
+    "lastActiveDate": "2026-10-05",
+    "today": "2026-10-05",
+    "timeZone": "Asia/Kolkata",
+    "activeToday": true,
+    "week": [
+      {
+        "date": "2026-10-04",
+        "xpEarned": 0,
+        "active": false,
+        "goalMet": false
+      },
+      {
+        "date": "2026-10-05",
+        "xpEarned": 23,
+        "active": true,
+        "goalMet": true
+      }
+    ]
+  }
+}
+```
+
+`current` is 0 when the last active day is before yesterday (missed day). `today` is the learner's local date in `timeZone`.
+
+### 21 · Achievements — `GET {{baseUrl}}/achievements`
+
+```json
+{
+  "unlockedCount": 3,
+  "total": 8,
+  "achievements": [
+    {
+      "code": "first-lesson",
+      "title": "First Lesson",
+      "description": "Complete your first lesson",
+      "icon": "🌱",
+      "metric": "LESSONS_COMPLETED",
+      "threshold": 1,
+      "value": 1,
+      "progress": 1,
+      "unlocked": true,
+      "unlockedAt": "2026-10-05T11:49:20.843Z"
+    },
+    {
+      "code": "xp-100",
+      "title": "First 100 XP",
+      "description": "Earn 100 XP",
+      "icon": "⚡",
+      "metric": "TOTAL_XP",
+      "threshold": 100,
+      "value": 23,
+      "progress": 0.23,
+      "unlocked": false,
+      "unlockedAt": null
+    }
+  ]
+}
+```
+
+### 22 · Recommendations — `GET {{baseUrl}}/recommendations?languageCode=te`
+
+```json
+{
+  "languageCode": "te",
+  "recommendations": [
+    {
+      "type": "unfinished-lesson",
+      "title": "Finish “Vowels: i and ii”",
+      "reason": "You started this lesson but haven't finished it yet.",
+      "action": {
+        "kind": "lesson",
+        "lessonId": "te-u1-l2"
+      }
+    },
+    {
+      "type": "review",
+      "title": "Review 1 mistake",
+      "reason": "1 mistake from your lessons is waiting to be fixed.",
+      "action": {
+        "kind": "review"
+      }
+    }
+  ],
+  "rules": [
+    "Out of hearts → review mistakes (each fixed mistake gives a heart back).",
+    "Repeated mistakes → open mistakes answered wrong 2+ times.",
+    "Unfinished lessons → lessons you started but didn't finish.",
+    "Weak topics → completed lessons with accuracy below 70% (after 4+ answers).",
+    "Other mistakes → the rest of your review list.",
+    "Next lesson → the next lesson on your path."
+  ]
+}
+```
+
+Errors: `400 NO_LANGUAGE` (no language chosen and no `languageCode`) · `404 COURSE_NOT_FOUND`.
+
+---
+
+### 23 · Placement start — `POST {{baseUrl}}/placement/start`
+
+- Auth: **Bearer token** · Body (optional): `{ "languageCode": "hi" }` (default: your current language)
+- **Expected: `201`** (shortened to 1 question):
+
+```json
+{
+  "test": {
+    "id": "cmuv6sz09000p597d23edkweh",
+    "status": "IN_PROGRESS",
+    "language": {
+      "code": "hi",
+      "name": "Hindi"
+    },
+    "selfAssessment": "knows-script",
+    "totalQuestions": 12
+  },
+  "questions": [
+    {
+      "id": "hi-pq1",
+      "unit": 1,
+      "skill": "SCRIPT",
+      "exercise": {
+        "id": "hi-u1-l1-e3",
+        "type": "character-recognition",
+        "instruction": "Select the letter for this sound",
+        "prompt": "aa",
+        "promptSubtext": "long “aa”, like the a in “father”",
+        "options": [
+          {
+            "id": "hi-u1-l1-e3-o1",
+            "text": "आ",
+            "subtext": null
+          },
+          {
+            "id": "hi-u1-l1-e3-o2",
+            "text": "अ",
+            "subtext": null
+          },
+          {
+            "id": "hi-u1-l1-e3-o3",
+            "text": "इ",
+            "subtext": null
+          }
+        ]
+      }
+    }
+  ],
+  "rules": [
+    "The test has 3 questions for each unit.",
+    "A unit is passed with at least 2 correct answers out of 3.",
+    "Units are checked in order: you start at the first unit you did not pass.",
+    "If you pass every unit, you start at the last unit.",
+    "You can always choose to start from Unit 1 instead."
+  ]
+}
+```
+
+Save `test.id`. Question ids are readable: `hi-pq1` … `hi-pq12`. Errors: `400 UNKNOWN_LANGUAGE` · `400 NO_LANGUAGE` · `404 PLACEMENT_NOT_AVAILABLE` (not seeded).
+
+### 24 · Placement answer — `POST {{baseUrl}}/placement/answer`
+
+```json
+{ "testId": "<test.id>", "questionId": "hi-pq1", "answer": { "optionId": "…" } }
+```
+
+`answer` has the same shapes as lesson answers. **Expected: `201`** — right/wrong is **not** revealed until the result:
+
+```json
+{
+  "testId": "cmuv6sz09000p597d23edkweh",
+  "answered": 1,
+  "total": 12,
+  "completed": false
+}
+```
+
+Errors: `404 PLACEMENT_NOT_FOUND` (not your test) · `404 QUESTION_NOT_FOUND` (other language) · `409 ALREADY_ANSWERED` · `409 PLACEMENT_FINISHED` · `400 INVALID_ANSWER_FORMAT` / `UNKNOWN_OPTION` / `VALIDATION_ERROR`.
+
+### 25 · Placement result — `GET {{baseUrl}}/placement/result?testId=<test.id>`
+
+`testId` optional (default: your latest test for your current language). With units 1, 2, 4 right and unit 3 wrong:
+
+```json
+{
+  "result": {
+    "testId": "cmuv6sz09000p597d23edkweh",
+    "status": "COMPLETED",
+    "language": {
+      "code": "hi",
+      "name": "Hindi"
+    },
+    "selfAssessment": {
+      "id": "knows-script",
+      "label": "I know the alphabet/script but need practice"
+    },
+    "correctCount": 9,
+    "totalQuestions": 12,
+    "units": [
+      {
+        "unit": 1,
+        "correct": 3,
+        "total": 3,
+        "passed": true,
+        "title": "Vowels",
+        "skills": ["SCRIPT"]
+      },
+      {
+        "unit": 2,
+        "correct": 3,
+        "total": 3,
+        "passed": true,
+        "title": "Consonants & sounds",
+        "skills": ["SCRIPT"]
+      },
+      {
+        "unit": 3,
+        "correct": 0,
+        "total": 3,
+        "passed": false,
+        "title": "First words",
+        "skills": ["VOCABULARY", "TRANSLATION"]
+      },
+      {
+        "unit": 4,
+        "correct": 3,
+        "total": 3,
+        "passed": true,
+        "title": "Basic sentences",
+        "skills": ["SENTENCE", "TRANSLATION"]
+      }
+    ],
+    "recommendedUnit": 3,
+    "recommendedUnitTitle": "First words",
+    "message": "You are ready for Unit 3 — First words.",
+    "chosenUnit": null,
+    "rules": [
+      "The test has 3 questions for each unit.",
+      "A unit is passed with at least 2 correct answers out of 3.",
+      "Units are checked in order: you start at the first unit you did not pass.",
+      "If you pass every unit, you start at the last unit.",
+      "You can always choose to start from Unit 1 instead."
+    ]
+  }
+}
+```
+
+Errors: `409 PLACEMENT_INCOMPLETE` (with `details.answered` / `details.total`) · `404 PLACEMENT_NOT_FOUND`.
+
+### 26 · Placement decision — `POST {{baseUrl}}/placement/decide`
+
+```json
+{ "testId": "<test.id>", "choice": "recommended" }
+```
+
+`choice`: `"recommended"` (start at the recommended unit — earlier lessons are unlocked as `placedOut`) or `"beginning"` (start from Unit 1). **Expected: `200`**:
+
+```json
+{
+  "testId": "cmuv6sz09000p597d23edkweh",
+  "status": "ACCEPTED",
+  "chosenUnit": 3,
+  "startLessonId": "hi-u3-l1",
+  "lessonsUnlocked": 8
+}
+```
+
+Errors: `409 PLACEMENT_INCOMPLETE` · `409 PLACEMENT_ALREADY_DECIDED` · `400 VALIDATION_ERROR` (e.g. `"choice": "unit7"`).
+
+---
+
+### 27 · Logout — `POST {{baseUrl}}/auth/logout`
 
 - Auth: **Bearer token** · Body: none · **Expected: `200`**
 
@@ -790,7 +1252,7 @@ Then **Get me** again → `401 UNAUTHORIZED` (the token is now invalid). Log in 
 ## 6. Automated version of this guide
 
 ```bash
-npm run test:api     # runs the same flow (19 steps) against your database
+npm run test:api     # 19 learning steps + 18 gamification/placement steps against your database
 ```
 
 ## 7. API troubleshooting

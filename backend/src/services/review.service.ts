@@ -43,6 +43,29 @@ const languageFilter = (languageCode?: string): Prisma.UserExerciseAttemptWhereI
     ? { exercise: { lesson: { unit: { course: { language: { code: languageCode } } } } } }
     : {};
 
+/** Is this exercise currently an open mistake for the learner? (checked before a review answer) */
+export async function isOpenMistake(
+  db: Prisma.TransactionClient | typeof prisma,
+  userId: string,
+  exerciseId: string,
+): Promise<boolean> {
+  const [lastWrong, lastReviewRight] = await Promise.all([
+    db.userExerciseAttempt.findFirst({
+      where: { userId, exerciseId, isCorrect: false },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
+    }),
+    db.userExerciseAttempt.findFirst({
+      where: { userId, exerciseId, isCorrect: true, source: "REVIEW" },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
+    }),
+  ]);
+  return (
+    lastWrong !== null && (!lastReviewRight || lastReviewRight.createdAt < lastWrong.createdAt)
+  );
+}
+
 /** Loads wrong answers + correct review answers and works out which mistakes are still open. */
 async function collectMistakes(userId: string, languageCode?: string) {
   const attempts = await prisma.userExerciseAttempt.findMany({

@@ -69,6 +69,7 @@ export function LessonNode({ lesson, lessonNumber, color, offsetX }: LessonNodeP
     locked: "locked",
   }[lesson.status];
   const bubble = lesson.status === "current" ? "Continue" : "Start";
+  const placedOutText = lesson.placedOut ? " (unlocked by the placement test)" : "";
 
   const tile = (
     <span className="relative flex flex-col items-center">
@@ -83,6 +84,7 @@ export function LessonNode({ lesson, lessonNumber, color, offsetX }: LessonNodeP
           "flex rotate-45 items-center justify-center rounded-[1.4rem] shadow-md transition",
           isCurrent ? "size-20 ring-8" : "size-16",
           isLocked ? "bg-slate-200 shadow-none" : colors.tile,
+          lesson.placedOut && "opacity-60",
           isCurrent && colors.ring,
           !isLocked && "group-hover:scale-105 group-active:scale-95",
         )}
@@ -104,11 +106,14 @@ export function LessonNode({ lesson, lessonNumber, color, offsetX }: LessonNodeP
         )}
       >
         {lesson.title}
+        {lesson.placedOut && (
+          <span className="mt-0.5 block text-xs font-bold text-slate-400">Placement</span>
+        )}
       </span>
     </span>
   );
 
-  const label = `Lesson ${lessonNumber}: ${lesson.title} — ${statusText}`;
+  const label = `Lesson ${lessonNumber}: ${lesson.title} — ${statusText}${placedOutText}`;
 
   return (
     <li className={cn("flex justify-center", isCurrent && "mt-10")}>

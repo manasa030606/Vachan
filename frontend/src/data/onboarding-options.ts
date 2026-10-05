@@ -50,29 +50,36 @@ export function getDailyGoal(id: DailyGoalId) {
   return DAILY_GOALS.find((goal) => goal.id === id) ?? DAILY_GOALS[1];
 }
 
-/** Self-assessment levels — the six statements from the spec (section 3). */
+/**
+ * Self-assessment levels — the six statements from the spec (section 3). Stored in the profile.
+ * Everyone except "new" is offered the placement test after onboarding (it can be skipped).
+ */
 export const SELF_ASSESSMENT_LEVELS = [
-  { id: "new", label: "Completely new — I know nothing", startHint: "Start from the script" },
-  { id: "few-words", label: "I know a few words", startHint: "Start from the script, faster" },
+  { id: "new", label: "Completely new — I know nothing", startHint: "You'll start at Unit 1" },
+  {
+    id: "few-words",
+    label: "I know a few words",
+    startHint: "A short placement test finds your start",
+  },
   {
     id: "knows-script",
     label: "I know the alphabet/script but need practice",
-    startHint: "Start at First Words",
+    startHint: "A short placement test finds your start",
   },
   {
     id: "basic-sentences",
     label: "I can understand basic sentences",
-    startHint: "Placement test recommended",
+    startHint: "A short placement test finds your start",
   },
   {
     id: "simple-conversations",
     label: "I can have simple conversations",
-    startHint: "Placement test recommended",
+    startHint: "A short placement test finds your start",
   },
   {
     id: "advanced",
     label: "I'm comfortable and want advanced practice",
-    startHint: "Placement test recommended",
+    startHint: "A short placement test finds your start",
   },
 ] as const;
 

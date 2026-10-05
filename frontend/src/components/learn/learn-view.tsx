@@ -5,12 +5,14 @@
 //
 // The course, units, lessons and their completed / current / available / locked status
 // come from the backend (GET /api/courses?languageCode=… then GET /api/courses/:id);
-// the review card counts open mistakes (GET /api/review).
-// Streak, XP, level and hearts are still demo values until gamification (Phase 4).
+// XP, level, streak, hearts, daily goal and badges come from GET /api/stats (useStats);
+// recommended practice from GET /api/recommendations.
 import { PartyPopper } from "lucide-react";
+import { AchievementsCard } from "@/components/gamification/achievements-card";
 import { DailyGoalCard } from "@/components/gamification/daily-goal-card";
 import { HeartsCard } from "@/components/gamification/hearts-card";
 import { LevelCard } from "@/components/gamification/level-card";
+import { RecommendationsCard } from "@/components/gamification/recommendations-card";
 import { StreakCard } from "@/components/gamification/streak-card";
 import { LogoMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
@@ -19,10 +21,9 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { getLanguage, withTheme } from "@/data/languages";
 import { useApi } from "@/hooks/use-api";
 import { ApiError } from "@/lib/api/client";
-import { getCourse, getCourses, getReview } from "@/lib/api/endpoints";
+import { getCourse, getCourses } from "@/lib/api/endpoints";
 import { toUnits } from "@/lib/api/mappers";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
-import { ReviewCard } from "./review-card";
 import { UnitSection } from "./unit-section";
 import { UpNextCard } from "./up-next-card";
 
@@ -54,10 +55,6 @@ export function LearnView() {
     unit.lessons.some((lesson) => lesson.id === recommendedId),
   );
   const currentLesson = currentUnit?.lessons.find((lesson) => lesson.id === recommendedId);
-  const { data: review } = useApi(
-    async () => (await getReview(languageCode)).review,
-    `review:${languageCode}`,
-  );
 
   return (
     <div className="flex gap-8">
@@ -121,9 +118,7 @@ export function LearnView() {
             {/* On phones/tablets the daily goal sits above the path; on desktop it is in the right column. */}
             <div className="space-y-4 lg:hidden">
               <DailyGoalCard compact />
-              {review && review.openMistakes > 0 && (
-                <ReviewCard mistakeCount={review.openMistakes} />
-              )}
+              <RecommendationsCard limit={2} />
             </div>
 
             <div className="mx-auto max-w-xl space-y-4 pt-4">
@@ -134,20 +129,25 @@ export function LearnView() {
                 More units (Sentence Building → Advanced) are added as the course content grows.
               </p>
             </div>
+
+            {/* Phones/tablets: the rest of the stats below the path (desktop: right column). */}
+            <div className="space-y-4 lg:hidden">
+              <StreakCard />
+              <LevelCard />
+              <AchievementsCard />
+            </div>
           </>
         )}
       </div>
 
       <aside aria-label="Your progress" className="hidden w-80 shrink-0 space-y-4 lg:block">
-        <div className="sticky top-24 space-y-4">
+        <div className="space-y-4">
           <DailyGoalCard />
           <StreakCard />
           <LevelCard />
           <HeartsCard />
-          <ReviewCard mistakeCount={review ? review.openMistakes : null} />
-          <p className="px-2 text-xs text-slate-500">
-            Streak, XP, level and hearts show demo values until gamification is added in Phase 4.
-          </p>
+          <RecommendationsCard />
+          <AchievementsCard />
         </div>
       </aside>
     </div>

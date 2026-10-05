@@ -40,6 +40,7 @@ export function toUserDto(user: UserWithProfile) {
           showRomanization: profile.showRomanization,
           soundEffects: profile.soundEffects,
           onboardingDone: profile.onboardingDone,
+          timeZone: profile.timeZone,
         }
       : null,
   };
@@ -76,6 +77,7 @@ export async function updateUserProfile(userId: string, input: UpdateMeInput): P
     showRomanization: input.showRomanization,
     soundEffects: input.soundEffects,
     onboardingDone: input.onboardingDone,
+    timeZone: input.timeZone,
   };
 
   await prisma.userProfile.upsert({

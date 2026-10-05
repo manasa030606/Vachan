@@ -1,9 +1,9 @@
 import { BookOpenCheck, Clock, Crown, Flame, Target, Zap } from "lucide-react";
 import type { ReactNode } from "react";
-import { MOCK_PROGRESS } from "@/data/mock-user";
+import { useStats } from "@/components/session/stats-provider";
 import type { ProgressSummaryDto } from "@/lib/api/types";
 
-type Stat = { icon: ReactNode; value: string; label: string; demo?: boolean };
+type Stat = { icon: ReactNode; value: string; label: string };
 
 function lastActive(isoDate: string | null | undefined): string {
   if (!isoDate) return "—";
@@ -13,11 +13,9 @@ function lastActive(isoDate: string | null | undefined): string {
   return `${days} days ago`;
 }
 
-/**
- * Lessons, accuracy and last activity are real (GET /api/progress).
- * Streak, XP and level are demo values until gamification arrives in Phase 4.
- */
+/** Lessons, accuracy, last activity (GET /api/progress) + streak, XP, level (GET /api/stats). */
 export function ProfileStats({ progress }: { progress: ProgressSummaryDto | null }) {
+  const { stats: game } = useStats();
   const stats: Stat[] = [
     {
       icon: <BookOpenCheck aria-hidden="true" className="size-6 text-emerald-600" />,
@@ -38,21 +36,18 @@ export function ProfileStats({ progress }: { progress: ProgressSummaryDto | null
     },
     {
       icon: <Flame aria-hidden="true" className="size-6 fill-orange-400 text-orange-500" />,
-      value: String(MOCK_PROGRESS.streakDays),
-      label: "Day streak",
-      demo: true,
+      value: game ? String(game.streak.current) : "…",
+      label: game ? `Day streak (best ${game.streak.longest})` : "Day streak",
     },
     {
       icon: <Zap aria-hidden="true" className="size-6 fill-marigold-400 text-marigold-500" />,
-      value: MOCK_PROGRESS.totalXp.toLocaleString("en-IN"),
+      value: game ? game.xp.total.toLocaleString("en-IN") : "…",
       label: "Total XP",
-      demo: true,
     },
     {
       icon: <Crown aria-hidden="true" className="size-6 fill-brand-200 text-brand-600" />,
-      value: `Level ${MOCK_PROGRESS.level}`,
+      value: game ? `Level ${game.xp.level}` : "…",
       label: "Current level",
-      demo: true,
     },
   ];
 
@@ -70,17 +65,11 @@ export function ProfileStats({ progress }: { progress: ProgressSummaryDto | null
             {stat.icon}
             <div>
               <p className="text-lg leading-tight font-extrabold text-ink">{stat.value}</p>
-              <p className="text-sm text-slate-500">
-                {stat.label}
-                {stat.demo && <span className="ml-1 text-xs text-slate-400">(demo)</span>}
-              </p>
+              <p className="text-sm text-slate-500">{stat.label}</p>
             </div>
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-xs text-slate-500">
-        Streak, XP, level and achievements are demo values until gamification is added in Phase 4.
-      </p>
     </section>
   );
 }

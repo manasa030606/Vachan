@@ -4,13 +4,14 @@
 
 Vachan is an AI-powered, gamified platform for learning Indian languages: Hindi, Telugu, Tamil, Malayalam, Kannada and Bengali. It's a college capstone project, built in phases.
 
-> **Current status: Phase 3, Real Learning System.** A complete beginner path for all six languages (4 units · 16 small lessons · 7 exercise types: vowels, consonants, sounds/pronunciation, vowel signs, words, greetings, basic sentences), deterministic answer checking with explanations, saved progress you can resume, locked / available / current / completed lessons, and a real mistake-review system. XP, streaks, hearts and badges are still demo values (Phase 4). See the [Roadmap](#roadmap).
+> **Current status: Phase 4, Placement & Gamification.** On top of the Phase 3 learning system (6 languages · 4 units · 16 lessons · 7 exercise types · progress · review): self-assessment, a 12-question placement test with transparent scoring ("You are ready for Unit 3"), XP and levels, daily streaks in your own time zone, hearts with refills, a daily XP goal, 8 badges and rule-based practice recommendations — all configurable in one file. See the [Roadmap](#roadmap).
 
 **Detailed guides:**
 
 - 📘 [docs/DATABASE.md](docs/DATABASE.md): install PostgreSQL, `.env`, migrations, seed, Prisma Studio, reset, schema explanation, database troubleshooting.
 - 📗 [docs/API.md](docs/API.md): every endpoint, authentication flow, a complete Postman guide with expected responses and errors.
 - 📙 [docs/LEARNING_ENGINE.md](docs/LEARNING_ENGINE.md): the course path, exercise types, answer checking, progress, lesson states and review rules.
+- 📕 [docs/GAMIFICATION.md](docs/GAMIFICATION.md): placement algorithm, XP, levels, streak, hearts, daily goal, badges, recommendations, and how to test day changes.
 
 ---
 
@@ -53,8 +54,8 @@ echo "JWT_EXPIRES_IN=7d" >> backend/.env
 # 3. Install, create/update tables, load the courses
 npm install
 npm run db:validate
-npm run db:migrate      # Phase 3 adds one migration (20261005120000_phase3_learning_system)
-npm run db:seed         # loads the 4-unit courses (re-seeding clears lesson progress)
+npm run db:migrate      # applies new migrations (Phase 4: 20261006090000_phase4_placement_gamification)
+npm run db:seed         # courses + placement questions + badges (re-seeding clears lesson progress)
 
 # 4. Run
 npm run dev
@@ -128,7 +129,7 @@ Vachan/
         │   ├── learner-preferences.ts   # profile settings via GET/PATCH /api/me
         │   └── exercises/         # lesson reducer + answer helpers (+ tests)
         ├── hooks/                 # useApi, useLanguages, useNumberShortcuts
-        └── data/                  # static UI data: language themes, onboarding options, demo gamification
+        └── data/                  # static UI data: language themes, onboarding options
 ```
 
 ## Architecture
@@ -167,12 +168,13 @@ The full authentication flow is explained in [docs/API.md → Authentication flo
 | Login           | Real login (`POST /api/auth/login`); wrong passwords show an error; returns to the page you came from                                                                                                                                                                                      |
 | Forgot password | Still a preview: emails are not sent yet                                                                                                                                                                                                                                                   |
 | Onboarding      | Languages come from `GET /api/languages`; answers are saved with `PATCH /api/me`                                                                                                                                                                                                           |
-| Learn           | 4 units · 16 lessons with **completed / current (Continue) / available (Start) / locked** states; "Continue where you left off" card; course + unit progress; review count                                                                                                                 |
+| Learn           | 4 units · 16 lessons with **completed / current (Continue) / available (Start) / locked** states (+ "Placement" label); "Continue where you left off"; XP, level, streak, hearts, daily goal, badges and recommended practice                                                              |
 | Lesson          | Intro with letters/words + pronunciation hints → `POST /lessons/:id/start` → exercises; **Check** = server checks + saves + explains; mistakes repeat at the end; leaving half-way and returning **resumes**; completing unlocks the next lesson; completed lessons can be practised again |
 | Profile         | Real name, email, join date, lessons completed, accuracy and last activity (`GET /api/progress`); settings saved with `PATCH /api/me`; **Log out** calls `POST /api/auth/logout`                                                                                                           |
 | Language switch | Top-bar language menu saves your course language to your profile                                                                                                                                                                                                                           |
 | Practice        | Real: open mistakes (your answer vs correct), **Start review** (`/review` session, no hearts), and everything learned from completed lessons                                                                                                                                               |
-| Gamification    | Streak, XP, level, hearts and achievements are demo values (Phase 4)                                                                                                                                                                                                                       |
+| Placement       | After onboarding (unless "completely new") or from Profile: 12 questions → score per unit → "You are ready for Unit N" → start there or from Unit 1                                                                                                                                        |
+| Gamification    | Real XP + levels, streak with a 7-day strip, hearts (lose on lesson mistakes, refill every 30 min, earn back in the review), daily goal, 8 badges, recommended practice — Home, top bar, lesson complete screen, Profile                                                                   |
 
 **Exercise types (7):** character → sound, character recognition (sound → letter), multiple choice, matching, fill in the blank, translation (typed — also "type the sound") and word order. **Typed answers** ignore capitals, spaces and punctuation ("THankyou" = "thank you") and accept small typos with a "Watch the spelling" note. All of this is checked on the server in `backend/src/services/answer-checker.ts`.
 
@@ -231,12 +233,12 @@ Run from the project root:
 
 ## Testing
 
-| What                | Command / tool                                  | Covers                                                                                                                                              |
-| ------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend unit tests  | `npm test -w backend`                           | 47 tests: answer checking (7 types, typos, Unicode), lesson states, password hashing, seed content for all 6 languages                              |
-| Frontend unit tests | `npm test -w frontend`                          | 9 tests: lesson flow reducer (incl. resume + review mode), answer helpers                                                                           |
-| API end-to-end      | `npm run test:api` (DB migrated + seeded)       | 19 steps: auth → course → start → attempts → resume → complete → unlock → typed answers → review → progress → logout                                |
-| Postman             | Import `postman/Vachan.postman_collection.json` | 56 requests / 121 tests (see [docs/API.md](docs/API.md)); SQL checks in [docs/DATABASE.md §11](docs/DATABASE.md#11-verify-the-records-yourself-sql) |
+| What                | Command / tool                                  | Covers                                                                                                                                                                               |
+| ------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Backend unit tests  | `npm test -w backend`                           | 77 tests: answer checking, lesson states, passwords, seed content, and the Phase 4 rules (dates/time zones, streak, hearts, levels, XP, badges, placement scoring, recommendations)  |
+| Frontend unit tests | `npm test -w frontend`                          | 10 tests: lesson flow reducer (resume, review mode, server hearts), answer helpers                                                                                                   |
+| API end-to-end      | `npm run test:api` (DB migrated + seeded)       | 37 steps: the learning flow + first day / same day / consecutive day / missed day, XP thresholds, badges, heart loss & refill, out of hearts, daily goal, recommendations, placement |
+| Postman             | Import `postman/Vachan.postman_collection.json` | 87 requests / 190 tests (see [docs/API.md](docs/API.md)); SQL checks in [docs/DATABASE.md](docs/DATABASE.md)                                                                         |
 
 ## Troubleshooting
 
@@ -283,6 +285,16 @@ Run from the project root:
 6. **Explanations are sent only after answering**, like the correct answers.
 7. **Mistake review from the attempts table** (`source = LESSON | REVIEW`): a mistake stays open until it is answered correctly in a review.
 
+**Phase 4:**
+
+1. **One config file** (`backend/src/config/gamification.ts`) for XP, levels, hearts, streak, daily goals, recommendation thresholds and placement scoring; badges in `config/achievements.ts`.
+2. **Rules as pure functions** (`services/gamification/*`), unit-tested; `stats.service.ts` only loads/saves.
+3. **Days are the learner's local calendar days** (`UserProfile.timeZone`), stored as `YYYY-MM-DD` and compared as dates — safe across midnight and daylight saving.
+4. **Hearts refill on read** (stored count + timestamp), so no background job is needed.
+5. **Every XP award is logged** (`XpEvent`), so totals are explainable.
+6. **Placement re-uses course exercises** and unlocks earlier lessons as `placedOut` (no XP, no badges) instead of faking completions.
+7. **No ML anywhere:** placement and recommendations are documented rules, and each recommendation says which rule picked it.
+
 ## Roadmap
 
 | Phase | Name                                                                       | Status  |
@@ -291,18 +303,18 @@ Run from the project root:
 | 1     | UI/UX foundation                                                           | ✅ Done |
 | 2     | Database & backend (models, auth, languages/courses/lessons/progress APIs) | ✅ Done |
 | 3     | Real learning system (content path, progression, answer checking, review)  | ✅ Done |
-| 4     | Placement & gamification                                                   | Next    |
-| 5     | RAG knowledge base                                                         | —       |
+| 4     | Placement & gamification                                                   | ✅ Done |
+| 5     | RAG knowledge base                                                         | Next    |
 | 6     | AI tutor                                                                   | —       |
 | 7     | Speaking & AI conversation                                                 | —       |
 | 8     | Admin, analytics & polish (Docker, CI/CD, deployment)                      | —       |
 
-### Known limitations (Phase 3)
+### Known limitations (Phase 4)
 
 - **Content covers the beginner path** (Foundations → Everyday phrases, 16 lessons per language). Sentence building → Advanced units come as content grows; the admin CMS is Phase 8.
 - **No audio yet** — pronunciation is taught with romanization and English sound hints. Audio/speech is planned for Phase 7.
-- **XP, streaks, hearts, levels and achievements are demo values and are not stored** (Phase 4). Hearts in a lesson are counted only on the page; the review costs no hearts.
-- **Placement test** is Phase 4 — everyone starts at Unit 1.
+- **No listening questions in the placement test** yet (they need audio, Phase 7).
+- **No streak freeze / leaderboard** (the spec marks the leaderboard as optional for a later phase).
 - **Re-seeding resets lesson progress** (content rows are re-created).
 - **Forgot password** doesn't send emails yet.
 - **No rate limiting on login yet** (Phase 8: security hardening).

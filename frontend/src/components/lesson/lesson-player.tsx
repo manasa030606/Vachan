@@ -11,10 +11,9 @@
 import { useCallback, useEffect, useReducer, useState } from "react";
 import type { ExerciseAnswer, Lesson } from "@/types/exercise";
 import { ExerciseRenderer } from "@/components/exercises/exercise-renderer";
-import { MOCK_PROGRESS } from "@/data/mock-user";
 import { ApiError } from "@/lib/api/client";
 import { startLesson, submitAttempt } from "@/lib/api/endpoints";
-import type { AttemptResultDto } from "@/lib/api/types";
+import type { AttemptResultDto, BadgeDto, RewardsDto } from "@/lib/api/types";
 import { isAnswerReady, toAttemptAnswer } from "@/lib/exercises/check-answer";
 import {
   createInitialLessonState,
@@ -32,8 +31,25 @@ type LessonPlayerProps = {
   showRomanization: boolean;
 };
 
-/** Hearts are demo values until gamification (Phase 4). */
-const START_HEARTS = MOCK_PROGRESS.hearts;
+/** Placeholder until POST /lessons/:id/start returns the real number of hearts. */
+const START_HEARTS = 5;
+
+/** What the learner earned in this run, for the complete screen. */
+export type RunRewards = {
+  xpEarned: number;
+  badges: BadgeDto[];
+  last: RewardsDto | null;
+  leveledUp: boolean;
+  goalJustCompleted: boolean;
+};
+
+const NO_REWARDS: RunRewards = {
+  xpEarned: 0,
+  badges: [],
+  last: null,
+  leveledUp: false,
+  goalJustCompleted: false,
+};
 
 export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   const isReview = lesson.mode === "review";
@@ -55,6 +71,8 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   );
   const [firstCompletion, setFirstCompletion] = useState(false);
   const [resumed, setResumed] = useState(false);
+  const [runRewards, setRunRewards] = useState<RunRewards>(NO_REWARDS);
+  const [nextHeartAt, setNextHeartAt] = useState<string | null>(null);
 
   const exercise = state.queue[state.position];
   const canCheck = exercise ? isAnswerReady(exercise, state.answer) && !isChecking : false;
@@ -69,12 +87,14 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
       setIsStarting(true);
       setStartError(null);
       try {
-        const { progress, resumed: wasResumed } = await startLesson(lesson.id, restart);
+        const { progress, resumed: wasResumed, hearts } = await startLesson(lesson.id, restart);
         setResumed(wasResumed && progress.completedExerciseIds.length > 0);
+        setRunRewards(NO_REWARDS);
+        setNextHeartAt(hearts.nextHeartAt);
         dispatch({
           type: "BEGIN",
           exercises: lesson.exercises,
-          hearts: START_HEARTS,
+          hearts: hearts.current,
           alreadyCompletedIds: progress.completedExerciseIds,
         });
       } catch (error) {
@@ -100,7 +120,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
     setIsChecking(true);
     setCheckError(null);
     try {
-      const { attempt, lessonProgress } = await submitAttempt(
+      const { attempt, lessonProgress, rewards } = await submitAttempt(
         exercise.id,
         toAttemptAnswer(state.answer),
         isReview ? "review" : "lesson",
@@ -109,14 +129,29 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
       if (lessonProgress.justCompleted && lessonProgress.timesCompleted === 1) {
         setFirstCompletion(true);
       }
+      setNextHeartAt(rewards.hearts.nextHeartAt);
+      setRunRewards((previous) => ({
+        xpEarned: previous.xpEarned + rewards.xpEarned,
+        badges: [...previous.badges, ...rewards.newAchievements],
+        last: rewards,
+        leveledUp: previous.leveledUp || rewards.leveledUp,
+        goalJustCompleted: previous.goalJustCompleted || rewards.dailyGoal.justCompleted,
+      }));
       dispatch({
         type: "CHECK",
         isCorrect: attempt.isCorrect,
         typoCorrection: attempt.typoCorrection,
         correctAnswer: attempt.correctAnswer,
         explanation: attempt.explanation,
+        hearts: rewards.hearts.current,
       });
     } catch (error) {
+      if (error instanceof ApiError && error.code === "OUT_OF_HEARTS") {
+        const details = error.details as unknown as { nextHeartAt?: string | null } | undefined;
+        setNextHeartAt(details?.nextHeartAt ?? null);
+        dispatch({ type: "OUT_OF_HEARTS" });
+        return;
+      }
       setCheckError(
         error instanceof ApiError ? error.message : "Couldn't check your answer. Please try again.",
       );
@@ -161,7 +196,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   }
 
   if (state.phase === "out-of-hearts") {
-    return <OutOfHearts />;
+    return <OutOfHearts nextHeartAt={nextHeartAt} />;
   }
 
   if (state.phase === "complete") {
@@ -176,6 +211,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
         // Lessons show the saved accuracy (includes answers given before leaving and resuming).
         accuracy={isReview ? getAccuracy(state) : (serverProgress?.accuracy ?? getAccuracy(state))}
         resumed={resumed}
+        rewards={runRewards}
         heartsLeft={isReview ? null : state.hearts}
         mistakesReviewed={state.mistakeIds.length}
         savedAsCompleted={serverProgress?.status === "COMPLETED"}

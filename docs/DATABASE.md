@@ -230,7 +230,58 @@ The migration also back-fills these counters for any Phase 2 progress rows, so n
 
 ---
 
-## 10. The schema (11 tables, one set for all languages)
+## 9b. Phase 4 migration — what changed
+
+One more migration: `backend/prisma/migrations/20261006090000_phase4_placement_gamification/migration.sql`.
+
+```bash
+npm run db:migrate     # applies the Phase 4 migration (existing users and progress are kept)
+npm run db:seed        # adds the 8 badges + 12 placement questions per language
+```
+
+| Change                                    | Table / column                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| Learner's time zone (for streak days)     | `UserProfile.timeZone` (default `Asia/Kolkata`)                                      |
+| Placement-unlocked lessons                | `UserLessonProgress.placedOut`                                                       |
+| XP, hearts, streak, counters (1 per user) | **new** `UserStats`                                                                  |
+| One row per active local day              | **new** `UserDailyActivity` (xpEarned, exercisesAnswered, lessonsCompleted, goalMet) |
+| Every XP award                            | **new** `XpEvent` (amount, reason, localDate)                                        |
+| Badge definitions / unlocked badges       | **new** `Achievement`, `UserAchievement`                                             |
+| Placement questions / tests / answers     | **new** `PlacementQuestion`, `PlacementTest`, `PlacementAnswer`                      |
+| New enums                                 | `XpReason`, `AchievementMetric`, `PlacementSkill`, `PlacementStatus`                 |
+
+`UserStats` rows are created automatically the first time a learner is seen, so old accounts work without a backfill. Re-seeding re-creates content and placement questions (and, as before, clears lesson progress); XP, streaks and badges in `UserStats`/`UserAchievement` are kept.
+
+The spec lists `Streak` and `DailyGoal` as separate models; here they are fields of `UserStats` / rows of `UserDailyActivity` (same data, fewer tables). Rules: [GAMIFICATION.md](GAMIFICATION.md).
+
+**Inspect the Phase 4 records:**
+
+```sql
+SELECT s."totalXp", s.hearts, s."heartsUpdatedAt", s."currentStreak", s."longestStreak", s."lastActiveDate",
+       s."perfectLessons", s."mistakesCleared", s."dailyGoalsMet"
+FROM "UserStats" s JOIN "User" u ON u.id = s."userId" WHERE u.email = 'you@example.com';
+
+SELECT d.date, d."xpEarned", d."exercisesAnswered", d."lessonsCompleted", d."goalMet"
+FROM "UserDailyActivity" d JOIN "User" u ON u.id = d."userId" WHERE u.email = 'you@example.com' ORDER BY d.date;
+
+SELECT x.reason, x.amount, x."lessonId", x."localDate" FROM "XpEvent" x JOIN "User" u ON u.id = x."userId"
+WHERE u.email = 'you@example.com' ORDER BY x."createdAt";
+
+SELECT a.code, ua."unlockedAt" FROM "UserAchievement" ua JOIN "Achievement" a ON a.id = ua."achievementId"
+JOIN "User" u ON u.id = ua."userId" WHERE u.email = 'you@example.com';
+
+SELECT t.status, t."selfAssessment", t."correctCount", t."recommendedUnit", t."chosenUnit"
+FROM "PlacementTest" t JOIN "User" u ON u.id = t."userId" WHERE u.email = 'you@example.com';
+
+SELECT "lessonId", status, "placedOut" FROM "UserLessonProgress" p JOIN "User" u ON u.id = p."userId"
+WHERE u.email = 'you@example.com' AND p."placedOut";
+```
+
+After the full Postman run: `totalXp` 70, `currentStreak` 1, 4 badges (first-lesson, perfect-lesson, mistake-mender, goal-getter), one `ACCEPTED` placement test with `recommendedUnit` 3 and 8 Hindi lessons `placedOut`.
+
+---
+
+## 10. The schema (19 tables, one set for all languages)
 
 ```
 Language ─┬─ Course ── Unit ── Lesson ─┬─ Exercise ── ExerciseOption
@@ -284,7 +335,7 @@ Open a SQL prompt: `psql "postgresql://vachan:vachan_dev_password@localhost:5432
 SELECT (SELECT count(*) FROM "Language") AS languages, (SELECT count(*) FROM "Course") AS courses,
        (SELECT count(*) FROM "Unit") AS units, (SELECT count(*) FROM "Lesson") AS lessons,
        (SELECT count(*) FROM "Exercise") AS exercises, (SELECT count(*) FROM "VocabularyItem") AS vocabulary;
--- expected: 6 | 6 | 24 | 96 | 402 | 204
+-- expected: 6 | 6 | 24 | 96 | 402 | 204   (Phase 4 also: 72 PlacementQuestion rows, 8 Achievement rows)
 ```
 
 **Lesson started / completed, counters, accuracy, last activity** (table `UserLessonProgress`):

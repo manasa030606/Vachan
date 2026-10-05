@@ -9,10 +9,15 @@ import type {
   LanguageDto,
   LessonDto,
   ProfileUpdate,
+  PlacementResultDto,
+  PlacementStartDto,
   ProgressSummaryDto,
+  RecommendationDto,
   ReviewDto,
   ReviewSessionDto,
+  AchievementDto,
   StartLessonDto,
+  StatsDto,
   UserDto,
 } from "./types";
 
@@ -75,3 +80,40 @@ export const getReviewSession = (languageCode: string) =>
   apiFetch<{ session: ReviewSessionDto }>(
     `/review/session?languageCode=${encodeURIComponent(languageCode)}`,
   );
+
+// ── Gamification ──
+export const getStats = () => apiFetch<{ stats: StatsDto }>("/stats");
+
+export const getAchievements = () =>
+  apiFetch<{ unlockedCount: number; total: number; achievements: AchievementDto[] }>(
+    "/achievements",
+  );
+
+export const getRecommendations = (languageCode: string) =>
+  apiFetch<{ languageCode: string; recommendations: RecommendationDto[]; rules: string[] }>(
+    `/recommendations?languageCode=${encodeURIComponent(languageCode)}`,
+  );
+
+// ── Placement test ──
+export const startPlacement = (languageCode: string) =>
+  apiFetch<PlacementStartDto>("/placement/start", { method: "POST", body: { languageCode } });
+
+export const answerPlacement = (testId: string, questionId: string, answer: AttemptAnswerDto) =>
+  apiFetch<{ testId: string; answered: number; total: number; completed: boolean }>(
+    "/placement/answer",
+    { method: "POST", body: { testId, questionId, answer } },
+  );
+
+export const getPlacementResult = (testId: string) =>
+  apiFetch<{ result: PlacementResultDto }>(
+    `/placement/result?testId=${encodeURIComponent(testId)}`,
+  );
+
+export const decidePlacement = (testId: string, choice: "recommended" | "beginning") =>
+  apiFetch<{
+    testId: string;
+    status: string;
+    chosenUnit: number;
+    startLessonId: string | null;
+    lessonsUnlocked: number;
+  }>("/placement/decide", { method: "POST", body: { testId, choice } });

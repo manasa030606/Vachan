@@ -108,6 +108,7 @@ export function toUnits(course: CourseDetailDto): Unit[] {
       status: lesson.status,
       icon: ICON_BY_KIND[lesson.kind],
       exerciseCount: lesson.exerciseCount,
+      placedOut: lesson.placedOut,
     })),
   }));
 }

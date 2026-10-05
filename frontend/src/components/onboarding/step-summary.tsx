@@ -8,6 +8,8 @@ type StepSummaryProps = {
   dailyGoalLabel: string;
   levelLabel: string;
   startHint: string;
+  /** True when the placement test comes next. */
+  offersPlacement: boolean;
 };
 
 /** Final onboarding step: confirms the choices and explains where the learner starts. */
@@ -17,6 +19,7 @@ export function StepSummary({
   dailyGoalLabel,
   levelLabel,
   startHint,
+  offersPlacement,
 }: StepSummaryProps) {
   const rows = [
     { icon: Flag, label: "Your reason", value: goalLabel },
@@ -46,7 +49,9 @@ export function StepSummary({
         ))}
       </ul>
       <p className="mx-auto mt-6 max-w-md text-sm text-slate-500">
-        A short placement test will fine-tune your starting point once it&apos;s added (Phase 4).
+        {offersPlacement
+          ? "Next: a 12-question placement test recommends your starting unit. You can skip it and start from Unit 1."
+          : "You can take the placement test any time from your profile."}
       </p>
     </div>
   );

@@ -52,7 +52,11 @@ export type LessonAction =
       typoCorrection: string | null;
       correctAnswer: string;
       explanation?: string | null;
+      /** Hearts left according to the server (overrides the local count). */
+      hearts?: number;
     }
+  /** The server refused the answer because the learner has no hearts. */
+  | { type: "OUT_OF_HEARTS" }
   | { type: "CONTINUE" }
   | { type: "RESTART"; exercises: Exercise[]; hearts: number }
   /** Leave the intro with the server's view of this run (resume or fresh start). */
@@ -110,6 +114,7 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
           typoCorrection: action.typoCorrection,
           correctAnswer: action.correctAnswer,
           explanation: action.explanation ?? null,
+          hearts: state.heartsEnabled && action.hearts !== undefined ? action.hearts : state.hearts,
           correctAnswers: state.correctAnswers + 1,
           totalAnswers: state.totalAnswers + 1,
           completedIds: state.completedIds.includes(exercise.id)
@@ -122,7 +127,9 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
         result: "incorrect",
         correctAnswer: action.correctAnswer,
         explanation: action.explanation ?? null,
-        hearts: state.heartsEnabled ? Math.max(0, state.hearts - 1) : state.hearts,
+        hearts: state.heartsEnabled
+          ? (action.hearts ?? Math.max(0, state.hearts - 1))
+          : state.hearts,
         totalAnswers: state.totalAnswers + 1,
         mistakeIds: state.mistakeIds.includes(exercise.id)
           ? state.mistakeIds
@@ -155,8 +162,12 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
         alreadyCompletedIds: action.alreadyCompletedIds,
         heartsEnabled: state.heartsEnabled,
       });
+      if (fresh.heartsEnabled && fresh.hearts <= 0) return { ...fresh, phase: "out-of-hearts" };
       return { ...fresh, phase: fresh.queue.length > 0 ? "exercise" : "complete" };
     }
+
+    case "OUT_OF_HEARTS":
+      return { ...state, hearts: 0, phase: "out-of-hearts" };
 
     case "RESTART":
       return {

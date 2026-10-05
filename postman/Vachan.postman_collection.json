@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Vachan API",
-    "description": "Phase 3 API (real learning system). Run the requests from top to bottom (folders 0 → 9) — each folder builds on the one before.\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
+    "description": "Phase 4 API (placement & gamification). Run the requests from top to bottom (folders 0 → 12) — each folder builds on the one before.\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -38,6 +38,18 @@
     {
       "key": "lessonId",
       "value": "te-u1-l1"
+    },
+    {
+      "key": "u1l4e1Correct",
+      "value": "te-u1-l4-e1-o1"
+    },
+    {
+      "key": "u1l4e2Wrong",
+      "value": "te-u1-l4-e2-o1"
+    },
+    {
+      "key": "placementTestId",
+      "value": ""
     }
   ],
   "item": [
@@ -411,7 +423,7 @@
             "description": "",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"languageCode\": \"te\",\n  \"learningGoal\": \"travel\",\n  \"dailyGoal\": \"regular\",\n  \"selfAssessment\": \"new\",\n  \"onboardingDone\": true\n}",
+              "raw": "{\n  \"languageCode\": \"te\",\n  \"learningGoal\": \"travel\",\n  \"dailyGoal\": \"regular\",\n  \"selfAssessment\": \"knows-script\",\n  \"timeZone\": \"Asia/Kolkata\",\n  \"onboardingDone\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2138,7 +2150,1270 @@
       ]
     },
     {
-      "name": "9. Logout",
+      "name": "9. XP, level, streak, hearts & daily goal",
+      "description": "After folders 5–8 this learner has 68 XP (level 2), a 1-day streak, 4 hearts (2 wrong lesson answers, 1 fixed in review) and today's goal met. Day changes (consecutive / missed day) are tested with SQL — see docs/GAMIFICATION.md.",
+      "item": [
+        {
+          "name": "Get stats (Home screen)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["stats"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"XP and level\", () => { pm.expect(json.stats.xp.total).to.eql(68); pm.expect(json.stats.xp.level).to.eql(2); pm.expect(json.stats.xp.xpToNextLevel).to.eql(52); });",
+                  "pm.test(\"Streak 1 day, active today\", () => { pm.expect(json.stats.streak.current).to.eql(1); pm.expect(json.stats.streak.activeToday).to.eql(true); pm.expect(json.stats.streak.week.length).to.eql(7); });",
+                  "pm.test(\"Hearts 4 of 5 (refill timer running)\", () => { pm.expect(json.stats.hearts.current).to.be.within(4, 5); pm.expect(json.stats.hearts.max).to.eql(5); });",
+                  "pm.test(\"Daily goal met (20 XP)\", () => { pm.expect(json.stats.dailyGoal.targetXp).to.eql(20); pm.expect(json.stats.dailyGoal.completed).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get streak",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/streak",
+              "host": ["{{baseUrl}}"],
+              "path": ["streak"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Streak\", () => { pm.expect(json.streak.current).to.eql(1); pm.expect(json.streak.longest).to.eql(1); pm.expect(json.streak.timeZone).to.eql(\"Asia/Kolkata\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer correctly → rewards in the response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l4-e1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l4-e1", "attempt"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"{{u1l4e1Correct}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"2 XP for a new correct answer\", () => { pm.expect(json.rewards.xpEarned).to.eql(2); pm.expect(json.rewards.totalXp).to.eql(70); });",
+                  "pm.test(\"Rewards shape\", () => { [\"level\",\"hearts\",\"streak\",\"dailyGoal\",\"newAchievements\"].forEach(k => pm.expect(json.rewards).to.have.property(k)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wrong answer → loses a heart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l4-e2/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l4-e2", "attempt"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"{{u1l4e2Wrong}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Heart lost, no XP\", () => { pm.expect(json.rewards.hearts.current).to.be.within(3, 4); pm.expect(json.rewards.xpEarned).to.eql(0); pm.expect(json.rewards.hearts.nextHeartAt).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change daily goal to intense (50 XP)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dailyGoal\": \"intense\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Daily goal now 70 / 50 XP",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["stats"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Target 50\", () => { pm.expect(json.stats.dailyGoal.targetXp).to.eql(50); pm.expect(json.stats.dailyGoal.completed).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid time zone (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timeZone\": \"Mars/Olympus\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"VALIDATION_ERROR\", () => pm.expect(json.error.code).to.eql(\"VALIDATION_ERROR\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid self-assessment (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"selfAssessment\": \"expert\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10. Achievements & recommendations",
+      "description": "Badges unlock when a rule is met; recommendations explain which rule picked them.",
+      "item": [
+        {
+          "name": "Get achievements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements",
+              "host": ["{{baseUrl}}"],
+              "path": ["achievements"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "const by = Object.fromEntries(json.achievements.map(a => [a.code, a]));",
+                  "pm.test(\"8 badges\", () => pm.expect(json.total).to.eql(8));",
+                  "pm.test(\"Unlocked: first lesson, flawless, mistake mender, goal getter\", () => [\"first-lesson\",\"perfect-lesson\",\"mistake-mender\",\"goal-getter\"].forEach(c => pm.expect(by[c].unlocked).to.eql(true)));",
+                  "pm.test(\"Locked with progress: 100 XP, 3-day streak\", () => { pm.expect(by[\"xp-100\"].unlocked).to.eql(false); pm.expect(by[\"xp-100\"].progress).to.eql(0.7); pm.expect(by[\"streak-3\"].value).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get recommendations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations?languageCode=te",
+              "host": ["{{baseUrl}}"],
+              "path": ["recommendations"],
+              "query": [
+                {
+                  "key": "languageCode",
+                  "value": "te"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Unfinished lesson te-u1-l4 is recommended\", () => pm.expect(json.recommendations.some(r => r.type === \"unfinished-lesson\" && r.action.lessonId === \"te-u1-l4\")).to.eql(true));",
+                  "pm.test(\"Every item explains its rule\", () => json.recommendations.forEach(r => pm.expect(r.reason).to.be.a(\"string\")));",
+                  "pm.test(\"Rules listed\", () => pm.expect(json.rules.length).to.eql(6));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "11. Placement test (Hindi)",
+      "description": "Transparent scoring: 3 questions per unit, pass = 2+ correct, start at the first unit not passed.",
+      "item": [
+        {
+          "name": "Start placement test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "start"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"languageCode\": \"hi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"placementTestId\", json.test.id);",
+                  "pm.test(\"12 questions, 4 skills, no answers\", () => { pm.expect(json.questions.length).to.eql(12); pm.expect(new Set(json.questions.map(q => q.skill)).size).to.eql(4); pm.expect(JSON.stringify(json)).to.not.include(\"isCorrect\"); });",
+                  "pm.test(\"Self-assessment stored\", () => pm.expect(json.test.selfAssessment).to.eql(\"knows-script\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 1 (unit 1, script, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq1\",\n  \"answer\": {\n    \"optionId\": \"hi-u1-l1-e3-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 1/12\", () => { pm.expect(json.answered).to.eql(1); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Result before finishing (409)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/result?testId={{placementTestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "result"],
+              "query": [
+                {
+                  "key": "testId",
+                  "value": "{{placementTestId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"PLACEMENT_INCOMPLETE\", () => pm.expect(json.error.code).to.eql(\"PLACEMENT_INCOMPLETE\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer the same question again (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq1\",\n  \"answer\": {\n    \"optionId\": \"x\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"ALREADY_ANSWERED\", () => pm.expect(json.error.code).to.eql(\"ALREADY_ANSWERED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Question from another language (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"te-pq2\",\n  \"answer\": {\n    \"optionId\": \"x\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 2 (unit 1, script, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq2\",\n  \"answer\": {\n    \"optionId\": \"hi-u1-l2-e2-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 2/12\", () => { pm.expect(json.answered).to.eql(2); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 3 (unit 1, script, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq3\",\n  \"answer\": {\n    \"optionId\": \"hi-u1-l3-e2-o3\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 3/12\", () => { pm.expect(json.answered).to.eql(3); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 4 (unit 2, script, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq4\",\n  \"answer\": {\n    \"optionId\": \"hi-u2-l1-e1-o2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 4/12\", () => { pm.expect(json.answered).to.eql(4); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 5 (unit 2, script, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq5\",\n  \"answer\": {\n    \"optionId\": \"hi-u2-l3-e3-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 5/12\", () => { pm.expect(json.answered).to.eql(5); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 6 (unit 2, script, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq6\",\n  \"answer\": {\n    \"optionId\": \"hi-u2-l4-e2-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 6/12\", () => { pm.expect(json.answered).to.eql(6); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 7 (unit 3, vocabulary, wrong)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq7\",\n  \"answer\": {\n    \"optionId\": \"hi-u3-l1-e1-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 7/12\", () => { pm.expect(json.answered).to.eql(7); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 8 (unit 3, vocabulary, wrong)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq8\",\n  \"answer\": {\n    \"optionId\": \"hi-u3-l3-e2-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 8/12\", () => { pm.expect(json.answered).to.eql(8); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 9 (unit 3, translation, wrong)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq9\",\n  \"answer\": {\n    \"text\": \"no idea\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 9/12\", () => { pm.expect(json.answered).to.eql(9); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 10 (unit 4, sentence, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq10\",\n  \"answer\": {\n    \"optionId\": \"hi-u4-l2-e1-o2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 10/12\", () => { pm.expect(json.answered).to.eql(10); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 11 (unit 4, sentence, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq11\",\n  \"answer\": {\n    \"optionId\": \"hi-u4-l3-e1-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 11/12\", () => { pm.expect(json.answered).to.eql(11); pm.expect(json.completed).to.eql(false); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer question 12 (unit 4, translation, right)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "answer"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"questionId\": \"hi-pq12\",\n  \"answer\": {\n    \"text\": \"what is your name\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Progress 12/12\", () => { pm.expect(json.answered).to.eql(12); pm.expect(json.completed).to.eql(true); pm.expect(json).to.not.have.property(\"isCorrect\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get result → 'You are ready for Unit 3'",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/result?testId={{placementTestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "result"],
+              "query": [
+                {
+                  "key": "testId",
+                  "value": "{{placementTestId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Recommended unit 3\", () => { pm.expect(json.result.recommendedUnit).to.eql(3); pm.expect(json.result.message).to.eql(\"You are ready for Unit 3 — First words.\"); });",
+                  "pm.test(\"Per-unit scores\", () => pm.expect(json.result.units.map(u => u.correct)).to.eql([3,3,0,3]));",
+                  "pm.test(\"Rules explained\", () => pm.expect(json.result.rules.length).to.eql(5));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Decide with an invalid choice (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/decide",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "decide"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"choice\": \"unit7\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Accept the recommendation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/decide",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "decide"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"choice\": \"recommended\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Start at Unit 3, 8 lessons unlocked\", () => { pm.expect(json.chosenUnit).to.eql(3); pm.expect(json.lessonsUnlocked).to.eql(8); pm.expect(json.startLessonId).to.eql(\"hi-u3-l1\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Decide again (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/placement/decide",
+              "host": ["{{baseUrl}}"],
+              "path": ["placement", "decide"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"testId\": \"{{placementTestId}}\",\n  \"choice\": \"beginning\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"PLACEMENT_ALREADY_DECIDED\", () => pm.expect(json.error.code).to.eql(\"PLACEMENT_ALREADY_DECIDED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hindi course: units 1–2 placed out, Unit 3 lesson 1 available",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/hi-course",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", "hi-course"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "const l = json.course.units.flatMap(u => u.lessons);",
+                  "pm.test(\"Placed out\", () => { pm.expect(l.slice(0, 8).every(x => x.status === \"completed\" && x.placedOut)).to.eql(true); pm.expect(l[8].status).to.eql(\"available\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "12. Logout",
       "item": [
         {
           "name": "Logout",

@@ -70,6 +70,8 @@ export type LessonSummary = {
   status: LessonStatus;
   icon: LessonIcon;
   exerciseCount: number;
+  /** Unlocked by the placement test (not studied yet). */
+  placedOut: boolean;
 };
 
 export type UnitColor = "brand" | "teal" | "rose";

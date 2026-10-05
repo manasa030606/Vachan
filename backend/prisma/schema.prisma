@@ -1,4 +1,4 @@
-// Prisma schema for Vachan (Phase 3 — real learning system).
+// Prisma schema for Vachan (Phase 4 — placement & gamification).
 //
 // One set of tables serves ALL languages. Every piece of content belongs to a
 // Language row (Hindi, Telugu, …), so adding a seventh language later means
@@ -11,6 +11,9 @@
 //   User ── UserProfile
 //   User ── UserLessonProgress  (one row per user per lesson)
 //   User ── UserExerciseAttempt (one row per submitted answer, from a lesson or a review)
+//   User ── UserStats (XP, hearts, streak) · UserDailyActivity (one row per day) · XpEvent (XP log)
+//   User ── UserAchievement ── Achievement
+//   User ── PlacementTest ── PlacementAnswer ── PlacementQuestion ── Exercise
 //
 // The connection URL is NOT written here. It is read from DATABASE_URL
 // in backend/prisma.config.ts (Prisma CLI) and backend/src/lib/prisma.ts (the app).
@@ -83,6 +86,44 @@ enum LessonProgressStatus {
   COMPLETED
 }
 
+/// Why XP was given (see backend/src/config/gamification.ts for the amounts).
+enum XpReason {
+  EXERCISE_CORRECT
+  LESSON_COMPLETED
+  LESSON_PRACTICED
+  PERFECT_LESSON
+  REVIEW_CORRECT
+}
+
+/// What a badge counts.
+enum AchievementMetric {
+  LESSONS_COMPLETED
+  TOTAL_XP
+  LONGEST_STREAK
+  UNITS_COMPLETED
+  PERFECT_LESSONS
+  MISTAKES_CLEARED
+  DAILY_GOALS_MET
+}
+
+/// Skill a placement question checks (spec section 3).
+enum PlacementSkill {
+  SCRIPT
+  VOCABULARY
+  TRANSLATION
+  SENTENCE
+}
+
+enum PlacementStatus {
+  IN_PROGRESS
+  /// All questions answered; a starting unit is recommended.
+  COMPLETED
+  /// The learner accepted the recommended unit.
+  ACCEPTED
+  /// The learner chose to start from Unit 1.
+  DECLINED
+}
+
 /// Where an answer was given: inside a lesson, or in the mistake review.
 enum AttemptSource {
   LESSON
@@ -107,6 +148,11 @@ model User {
   profile          UserProfile?
   lessonProgress   UserLessonProgress[]
   exerciseAttempts UserExerciseAttempt[]
+  stats            UserStats?
+  dailyActivity    UserDailyActivity[]
+  xpEvents         XpEvent[]
+  achievements     UserAchievement[]
+  placementTests   PlacementTest[]
 }
 
 model UserProfile {
@@ -124,6 +170,8 @@ model UserProfile {
   showRomanization  Boolean   @default(true)
   soundEffects      Boolean   @default(true)
   onboardingDone    Boolean   @default(false)
+  /// IANA time zone from the browser (e.g. "Asia/Kolkata"); decides where a "day" starts for streaks.
+  timeZone          String    @default("Asia/Kolkata")
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -146,9 +194,11 @@ model Language {
   sortOrder   Int     @default(0)
   isActive    Boolean @default(true)
 
-  courses    Course[]
-  vocabulary VocabularyItem[]
-  learners   UserProfile[]
+  courses            Course[]
+  vocabulary         VocabularyItem[]
+  learners           UserProfile[]
+  placementQuestions PlacementQuestion[]
+  placementTests     PlacementTest[]
 }
 
 model Course {
@@ -215,9 +265,10 @@ model Exercise {
   /// Short teaching note shown AFTER the learner answers (never sent before).
   explanation    String?
 
-  lesson   Lesson                @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  options  ExerciseOption[]
-  attempts UserExerciseAttempt[]
+  lesson             Lesson                @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  options            ExerciseOption[]
+  attempts           UserExerciseAttempt[]
+  placementQuestions PlacementQuestion[]
 
   @@unique([lessonId, sortOrder])
 }
@@ -283,6 +334,8 @@ model UserLessonProgress {
   incorrectAttempts Int                  @default(0)
   /// correctAttempts / all attempts, 0–100 (null until the first answer).
   accuracy          Int?
+  /// Unlocked by the placement test, not actually studied (doesn't count for stats or badges).
+  placedOut         Boolean              @default(false)
   updatedAt         DateTime             @updatedAt
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -293,7 +346,7 @@ model UserLessonProgress {
 }
 
 model UserExerciseAttempt {
-  id         String   @id @default(cuid())
+  id         String        @id @default(cuid())
   userId     String
   exerciseId String
   /// Copied from the exercise so lesson progress can be calculated with one query.
@@ -309,4 +362,143 @@ model UserExerciseAttempt {
 
   @@index([userId, lessonId])
   @@index([userId, exerciseId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Gamification (Phase 4) — amounts and limits live in backend/src/config/gamification.ts
+// ─────────────────────────────────────────────────────────────
+
+/// One row per learner: XP, hearts and streak.
+model UserStats {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  totalXp         Int      @default(0)
+  /// Hearts as last saved; refills are added on read (see hearts.ts).
+  hearts          Int      @default(5)
+  heartsUpdatedAt DateTime @default(now())
+  currentStreak   Int      @default(0)
+  longestStreak   Int      @default(0)
+  /// Learner's local date (YYYY-MM-DD) of the last day that counted for the streak.
+  lastActiveDate  String?
+  perfectLessons  Int      @default(0)
+  mistakesCleared Int      @default(0)
+  dailyGoalsMet   Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// One row per learner per LOCAL day with activity (daily goal + streak calendar).
+model UserDailyActivity {
+  id                String  @id @default(cuid())
+  userId            String
+  /// Learner's local date, YYYY-MM-DD.
+  date              String
+  xpEarned          Int     @default(0)
+  exercisesAnswered Int     @default(0)
+  lessonsCompleted  Int     @default(0)
+  goalMet           Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+/// Every XP award, so totals can always be explained.
+model XpEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  amount     Int
+  reason     XpReason
+  lessonId   String?
+  exerciseId String?
+  /// Learner's local date (YYYY-MM-DD) when it was earned.
+  localDate  String
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// A badge (seeded from backend/src/config/achievements.ts).
+model Achievement {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  title       String
+  description String
+  icon        String
+  metric      AchievementMetric
+  threshold   Int
+  sortOrder   Int               @default(0)
+
+  unlockedBy UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Placement test (Phase 4)
+// ─────────────────────────────────────────────────────────────
+
+/// A placement question re-uses a course exercise; `unitNumber` is the unit it checks.
+model PlacementQuestion {
+  id         String         @id @default(cuid())
+  languageId String
+  exerciseId String
+  unitNumber Int
+  skill      PlacementSkill
+  sortOrder  Int
+
+  language Language          @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  exercise Exercise          @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  answers  PlacementAnswer[]
+
+  @@unique([languageId, sortOrder])
+}
+
+model PlacementTest {
+  id              String          @id @default(cuid())
+  userId          String
+  languageId      String
+  status          PlacementStatus @default(IN_PROGRESS)
+  /// Self-assessment answer at the time of the test.
+  selfAssessment  String?
+  correctCount    Int?
+  recommendedUnit Int?
+  chosenUnit      Int?
+  startedAt       DateTime        @default(now())
+  completedAt     DateTime?
+  decidedAt       DateTime?
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language          @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  answers  PlacementAnswer[]
+
+  @@index([userId, languageId])
+}
+
+model PlacementAnswer {
+  id         String   @id @default(cuid())
+  testId     String
+  questionId String
+  answer     Json
+  isCorrect  Boolean
+  createdAt  DateTime @default(now())
+
+  test     PlacementTest     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  question PlacementQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, questionId])
 }

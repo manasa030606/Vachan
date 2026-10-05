@@ -108,4 +108,34 @@ describe("lessonReducer", () => {
     assert.equal(state.phase, "exercise");
     assert.equal(state.explanation, null);
   });
+
+  it("uses the server's heart count and stops when the server says there are none", () => {
+    let state = lessonReducer(createInitialLessonState(exercises, 5), {
+      type: "BEGIN",
+      exercises,
+      hearts: 2,
+      alreadyCompletedIds: [],
+    });
+    assert.equal(state.hearts, 2);
+    state = lessonReducer(state, {
+      type: "ANSWER_CHANGED",
+      answer: { type: "choice", optionId: "wrong" },
+    });
+    state = lessonReducer(state, {
+      type: "CHECK",
+      isCorrect: false,
+      typoCorrection: null,
+      correctAnswer: "Right",
+      hearts: 1,
+    });
+    assert.equal(state.hearts, 1);
+    assert.equal(lessonReducer(state, { type: "OUT_OF_HEARTS" }).phase, "out-of-hearts");
+    const empty = lessonReducer(createInitialLessonState(exercises, 5), {
+      type: "BEGIN",
+      exercises,
+      hearts: 0,
+      alreadyCompletedIds: [],
+    });
+    assert.equal(empty.phase, "out-of-hearts");
+  });
 });

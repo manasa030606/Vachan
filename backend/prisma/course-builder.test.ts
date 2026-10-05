@@ -74,6 +74,18 @@ for (const language of SEED_LANGUAGES) {
       assert.equal(new Set(exercises.map((exercise) => exercise.type)).size, 7);
     });
 
+    it("has 3 placement questions per unit, all pointing at real exercises", () => {
+      const ids = new Set(exercises.map((exercise) => exercise.id));
+      assert.equal(course.placementQuestions.length, 12);
+      for (const unit of [1, 2, 3, 4]) {
+        assert.equal(course.placementQuestions.filter((q) => q.unitNumber === unit).length, 3);
+      }
+      for (const question of course.placementQuestions) {
+        assert.ok(ids.has(question.exerciseId), question.exerciseId);
+        assert.ok(question.exerciseId.includes(`-u${question.unitNumber}-`), question.exerciseId);
+      }
+    });
+
     it("teaches at most two new letters per script lesson", () => {
       for (const lesson of lessons.filter((item) => item.kind === "SCRIPT")) {
         assert.ok(lesson.vocabularyIds.length <= 3, lesson.id);

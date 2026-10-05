@@ -17,6 +17,7 @@ export type UserDto = {
     showRomanization: boolean;
     soundEffects: boolean;
     onboardingDone: boolean;
+    timeZone: string;
   } | null;
 };
 
@@ -29,6 +30,7 @@ export type ProfileUpdate = Partial<{
   showRomanization: boolean;
   soundEffects: boolean;
   onboardingDone: boolean;
+  timeZone: string;
 }>;
 
 export type LanguageDto = {
@@ -79,6 +81,8 @@ export type CourseDetailDto = {
       kind: LessonKind;
       exerciseCount: number;
       status: LessonStatusDto;
+      /** Unlocked by the placement test (not studied yet). */
+      placedOut: boolean;
     }>;
   }>;
 };
@@ -169,7 +173,38 @@ export type LessonProgressDto = {
   totalExercises: number;
 };
 
-export type StartLessonDto = { resumed: boolean; progress: LessonProgressDto };
+export type HeartsDto = {
+  current: number;
+  max: number;
+  nextHeartAt: string | null;
+  refillMinutes: number;
+};
+
+export type StartLessonDto = { resumed: boolean; progress: LessonProgressDto; hearts: HeartsDto };
+
+export type LevelDto = {
+  level: number;
+  levelStartXp: number;
+  nextLevelXp: number | null;
+  xpIntoLevel: number;
+  xpToNextLevel: number;
+  isMaxLevel: boolean;
+};
+
+export type BadgeDto = { code: string; title: string; description: string; icon: string };
+
+/** XP, hearts, streak, goal and badges after one answer (POST /exercises/:id/attempt). */
+export type RewardsDto = {
+  xpEarned: number;
+  awards: Array<{ reason: string; amount: number }>;
+  totalXp: number;
+  level: LevelDto;
+  leveledUp: boolean;
+  hearts: HeartsDto;
+  streak: { current: number; longest: number; change: string };
+  dailyGoal: { targetXp: number; earnedToday: number; completed: boolean; justCompleted: boolean };
+  newAchievements: BadgeDto[];
+};
 
 export type AttemptMode = "lesson" | "review";
 
@@ -185,6 +220,7 @@ export type AttemptResultDto = {
     createdAt: string;
   };
   lessonProgress: LessonProgressDto & { justCompleted: boolean };
+  rewards: RewardsDto;
 };
 
 export type ProgressSummaryDto = {
@@ -271,4 +307,97 @@ export type ReviewSessionDto = {
   introText: string;
   totalOpen: number;
   exercises: Array<PublicExerciseDto & { lessonTitle: string }>;
+};
+
+export type StreakDto = {
+  current: number;
+  longest: number;
+  lastActiveDate: string | null;
+  today: string;
+  timeZone: string;
+  activeToday: boolean;
+  week: Array<{ date: string; xpEarned: number; active: boolean; goalMet: boolean }>;
+};
+
+export type AchievementDto = BadgeDto & {
+  metric: string;
+  threshold: number;
+  value: number;
+  progress: number;
+  unlocked: boolean;
+  unlockedAt: string | null;
+};
+
+export type StatsDto = {
+  xp: LevelDto & { total: number; today: number };
+  streak: StreakDto;
+  hearts: HeartsDto;
+  dailyGoal: { date: string; targetXp: number; earnedToday: number; completed: boolean };
+  achievements: { unlockedCount: number; total: number; recent: AchievementDto[] };
+  rules: {
+    xp: Record<string, number>;
+    hearts: {
+      max: number;
+      initial: number;
+      lossPerMistake: number;
+      refillMinutes: number;
+      reviewRestore: number;
+    };
+    levelThresholds: number[];
+    dailyGoalXp: Record<string, number>;
+  };
+};
+
+export type RecommendationDto = {
+  type:
+    | "earn-hearts"
+    | "repeated-mistakes"
+    | "unfinished-lesson"
+    | "weak-topic"
+    | "review"
+    | "next-lesson";
+  title: string;
+  reason: string;
+  action: { kind: "review" } | { kind: "lesson"; lessonId: string };
+};
+
+export type PlacementSkill = "SCRIPT" | "VOCABULARY" | "TRANSLATION" | "SENTENCE";
+
+export type PlacementStartDto = {
+  test: {
+    id: string;
+    status: string;
+    language: { code: string; name: string };
+    selfAssessment: string | null;
+    totalQuestions: number;
+  };
+  questions: Array<{
+    id: string;
+    unit: number;
+    skill: PlacementSkill;
+    exercise: PublicExerciseDto;
+  }>;
+  rules: string[];
+};
+
+export type PlacementResultDto = {
+  testId: string;
+  status: "IN_PROGRESS" | "COMPLETED" | "ACCEPTED" | "DECLINED";
+  language: { code: string; name: string };
+  selfAssessment: { id: string; label: string } | null;
+  correctCount: number;
+  totalQuestions: number;
+  units: Array<{
+    unit: number;
+    title: string;
+    correct: number;
+    total: number;
+    passed: boolean;
+    skills: PlacementSkill[];
+  }>;
+  recommendedUnit: number;
+  recommendedUnitTitle: string;
+  message: string;
+  chosenUnit: number | null;
+  rules: string[];
 };

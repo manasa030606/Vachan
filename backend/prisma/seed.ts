@@ -2,7 +2,8 @@
 //
 // Creates for each of the six languages (see course-builder.ts for the lesson plan):
 //   1 language · 1 course · 4 units · 16 lessons · 67 exercises · 34 vocabulary items
-// plus one demo account (see DEMO_USER in seed-data.ts).
+//   · 12 placement questions
+// plus the badge definitions (src/config/achievements.ts) and one demo account.
 //
 // Safe to run again: languages are updated in place; courses and vocabulary are
 // deleted and re-created. ⚠️ That also clears learners' lesson progress and answers
@@ -10,6 +11,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
+import { ACHIEVEMENTS } from "../src/config/achievements.ts";
 import { hashPassword } from "../src/lib/password.ts";
 import { buildCourse } from "./course-builder.ts";
 import { DEMO_USER, SEED_LANGUAGES } from "./seed-data.ts";
@@ -110,11 +112,33 @@ async function seedLanguage(index: number) {
     },
   });
 
+  await prisma.placementQuestion.createMany({
+    data: course.placementQuestions.map((question, index) => ({
+      id: `${data.code}-pq${index + 1}`,
+      languageId: language.id,
+      exerciseId: question.exerciseId,
+      unitNumber: question.unitNumber,
+      skill: question.skill,
+      sortOrder: index + 1,
+    })),
+  });
+
   const lessons = course.units.flatMap((unit) => unit.lessons);
   const exercises = lessons.flatMap((lesson) => lesson.exercises);
   console.log(
-    `  ✓ ${data.name.padEnd(10)} ${course.units.length} units · ${lessons.length} lessons · ${exercises.length} exercises · ${course.vocabulary.length} vocabulary items`,
+    `  ✓ ${data.name.padEnd(10)} ${course.units.length} units · ${lessons.length} lessons · ${exercises.length} exercises · ${course.vocabulary.length} vocabulary items · ${course.placementQuestions.length} placement questions`,
   );
+}
+
+async function seedAchievements() {
+  for (const [index, definition] of ACHIEVEMENTS.entries()) {
+    await prisma.achievement.upsert({
+      where: { code: definition.code },
+      update: { ...definition, sortOrder: index + 1 },
+      create: { ...definition, sortOrder: index + 1 },
+    });
+  }
+  console.log(`  ✓ Badges       ${ACHIEVEMENTS.length} achievements`);
 }
 
 async function seedDemoUser() {
@@ -146,6 +170,7 @@ async function main() {
   for (let index = 0; index < SEED_LANGUAGES.length; index++) {
     await seedLanguage(index);
   }
+  await seedAchievements();
   await seedDemoUser();
   console.log("✅ Seed finished.");
 }

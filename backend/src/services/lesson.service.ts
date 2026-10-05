@@ -5,6 +5,7 @@ import { forbidden, notFound } from "../lib/http-error.ts";
 import { prisma } from "../lib/prisma.ts";
 import { getStatusesForCourse } from "./course.service.ts";
 import { isUnlocked, type LessonStatus } from "./lesson-status.ts";
+import { getHearts } from "./stats.service.ts";
 
 /** API names for exercise types (match the frontend components). */
 export const EXERCISE_TYPE_NAMES: Record<ExerciseType, string> = {
@@ -240,5 +241,7 @@ export async function startLesson(lessonId: string, userId: string, restart: boo
   return {
     resumed: !newRun,
     progress: toLessonProgressDto(lessonId, row, solved, lesson._count.exercises),
+    /** Hearts right now (with refills) — 0 means lesson answers are refused until a refill. */
+    hearts: await getHearts(userId),
   };
 }

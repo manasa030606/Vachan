@@ -1,4 +1,4 @@
-# Vachan — Learning engine (Phase 3)
+# Vachan — Learning engine (Phases 3–4)
 
 How a learner moves through a course, how answers are checked, how progress is stored and how mistakes come back for review. Everything here is deterministic — no AI is involved in teaching or checking.
 
@@ -75,6 +75,6 @@ Adding a type = one enum value in `schema.prisma`, one `case` in `toPublicExerci
 - `GET /review` → open mistakes (your answer, correct answer, explanation, lesson) + words learned. `GET /review/attempts` → every wrong answer. `GET /review/session` → up to 10 open mistakes as exercises.
 - Review answers use the same attempt endpoint with `"mode": "review"`; they're stored with `source = REVIEW`, clear the mistake when correct, cost no hearts and don't change lesson counters.
 
-## 7. What is still demo / later
+## 7. Gamification and later phases
 
-Hearts, XP, streak, levels, badges and placement are **Phase 4**. Audio/speech is **Phase 7**. RAG and the AI tutor are **Phases 5–6**.
+Since Phase 4 every answer also updates XP, hearts, streak, daily goal and badges, and a placement test can unlock later units — see [GAMIFICATION.md](GAMIFICATION.md). With 0 hearts, lesson answers are refused until a refill (the review still works). Audio/speech is **Phase 7**. RAG and the AI tutor are **Phases 5–6**.
