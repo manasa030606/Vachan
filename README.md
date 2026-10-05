@@ -4,7 +4,16 @@
 
 Vachan is an AI-powered, gamified platform for learning Indian languages: Hindi, Telugu, Tamil, Malayalam, Kannada and Bengali. It's a college capstone project, built in phases.
 
-> **Current status: Phase 4, Placement & Gamification.** On top of the Phase 3 learning system (6 languages · 4 units · 16 lessons · 7 exercise types · progress · review): self-assessment, a 12-question placement test with transparent scoring ("You are ready for Unit 3"), XP and levels, daily streaks in your own time zone, hearts with refills, a daily XP goal, 8 badges and rule-based practice recommendations — all configurable in one file. See the [Roadmap](#roadmap).
+## Live Demo
+
+- **App:** _added after the first deployment (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md))_
+- **API health check:** _added after the first deployment_
+
+> Free hosting: the API sleeps after ~15 minutes without visitors, so the first request can take up to a minute.
+
+> **Current status:** ✅ Phase 4 (placement & gamification) completed · 🚀 Phase 4.5 (initial deployment) in progress · ⏳ Phase 5 (RAG knowledge base) **not started**. RAG and the AI Tutor are **not** implemented yet.
+>
+> What exists today: 6 languages · 4 units · 16 lessons · 7 exercise types · progress & review (Phase 3) · self-assessment, placement test, XP, levels, streaks, hearts, daily goal, badges and rule-based recommendations (Phase 4).
 
 **Detailed guides:**
 
@@ -12,6 +21,7 @@ Vachan is an AI-powered, gamified platform for learning Indian languages: Hindi,
 - 📗 [docs/API.md](docs/API.md): every endpoint, authentication flow, a complete Postman guide with expected responses and errors.
 - 📙 [docs/LEARNING_ENGINE.md](docs/LEARNING_ENGINE.md): the course path, exercise types, answer checking, progress, lesson states and review rules.
 - 📕 [docs/GAMIFICATION.md](docs/GAMIFICATION.md): placement algorithm, XP, levels, streak, hearts, daily goal, badges, recommendations, and how to test day changes.
+- 🚀 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): Vercel + Render + Neon deployment, step by step, environment variables, redeploying, troubleshooting.
 
 ---
 
@@ -160,6 +170,20 @@ Vachan/
 
 The full authentication flow is explained in [docs/API.md → Authentication flow](docs/API.md#2-authentication-flow).
 
+### Deployed architecture (Phase 4.5)
+
+```
+Next.js frontend  (Vercel)      https://<app>.vercel.app — pages + /api/* proxy (BACKEND_URL)
+        ↓
+Express API       (Render)      https://<api>.onrender.com/api/...
+        ↓
+Prisma Client     (pg driver adapter)
+        ↓
+PostgreSQL        (Neon)        migrations: prisma migrate deploy · seed: npm run db:seed
+```
+
+The browser only talks to the Vercel domain; Next.js forwards `/api/*` to the Express API, so the login cookie stays first-party (works in Safari too). Same code, same architecture as local — only environment variables differ. Details: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## What works in the app
 
 | Screen          | Behaviour (Phase 3)                                                                                                                                                                                                                                                                        |
@@ -229,7 +253,21 @@ Run from the project root:
 
 `frontend/.env.local`: `NEXT_PUBLIC_API_URL=http://localhost:4000` (unchanged). Anything `NEXT_PUBLIC_` is visible in the browser, so no secrets ever go there.
 
-**Local vs production:** locally the values above are enough. In production (Phase 8) you need `NODE_ENV=production`, a strong unique `JWT_SECRET`, the production `DATABASE_URL`, and the real site address in `CORS_ORIGIN` / `NEXT_PUBLIC_API_URL`.
+**Deployed:** Render gets `NODE_ENV=production`, `DATABASE_URL` (Neon), `JWT_SECRET` (generated, different from local), `JWT_EXPIRES_IN`, `CORS_ORIGIN` (the Vercel URL), `NODE_VERSION=22`; Vercel gets only `BACKEND_URL` (server-only). Full table: [docs/DEPLOYMENT.md §2](docs/DEPLOYMENT.md#2-environment-variables).
+
+## Deployment
+
+| What         | How                                                                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Frontend     | Vercel, Root Directory `frontend` (`frontend/vercel.json` sets the install/build commands)                                                                               |
+| Backend      | Render Blueprint `render.yaml` (build: `npm ci --include=dev -w backend && npm run build -w backend && npm run db:deploy -w backend`, start: `npm run start -w backend`) |
+| Database     | Neon PostgreSQL (direct connection string with `?sslmode=require`)                                                                                                       |
+| Migrations   | Automatically on every Render build (`prisma migrate deploy`), or `npm run db:deploy` with `DATABASE_URL` set                                                            |
+| Seed         | Once, from your Mac: `DATABASE_URL='<neon>' NODE_ENV=production npm run db:seed`                                                                                         |
+| Health check | `https://<api>.onrender.com/api/health` and through the proxy `https://<app>.vercel.app/api/health`                                                                      |
+| Redeploy     | `git push` — Vercel and Render rebuild automatically                                                                                                                     |
+
+Step-by-step guide with screenshots-level detail: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Testing
 
@@ -297,19 +335,23 @@ Run from the project root:
 
 ## Roadmap
 
-| Phase | Name                                                                       | Status  |
-| ----- | -------------------------------------------------------------------------- | ------- |
-| 0     | Project setup                                                              | ✅ Done |
-| 1     | UI/UX foundation                                                           | ✅ Done |
-| 2     | Database & backend (models, auth, languages/courses/lessons/progress APIs) | ✅ Done |
-| 3     | Real learning system (content path, progression, answer checking, review)  | ✅ Done |
-| 4     | Placement & gamification                                                   | ✅ Done |
-| 5     | RAG knowledge base                                                         | Next    |
-| 6     | AI tutor                                                                   | —       |
-| 7     | Speaking & AI conversation                                                 | —       |
-| 8     | Admin, analytics & polish (Docker, CI/CD, deployment)                      | —       |
+| Phase | Name                                                                       | Status      |
+| ----- | -------------------------------------------------------------------------- | ----------- |
+| 0     | Project setup                                                              | ✅ Done     |
+| 1     | UI/UX foundation                                                           | ✅ Done     |
+| 2     | Database & backend (models, auth, languages/courses/lessons/progress APIs) | ✅ Done     |
+| 3     | Real learning system (content path, progression, answer checking, review)  | ✅ Done     |
+| 4     | Placement & gamification                                                   | ✅ Done     |
+| 5     | RAG knowledge base                                                         | Next        |
+| 6     | AI tutor                                                                   | —           |
+| 7     | Speaking & AI conversation                                                 | —           |
+| 4.5   | Initial deployment (Vercel + Render + Neon)                                | In progress |
+| 8     | Admin, analytics & polish (Docker, CI/CD, final production deployment)     | —           |
 
-### Known limitations (Phase 4)
+### Known limitations (Phase 4 / 4.5)
+
+- **Free hosting:** the API (Render free) sleeps after ~15 minutes idle; the first request then takes 30–60 s. Neon free has a small storage limit. Fine for a demo/staging, not for real production.
+- **Re-seeding the deployed database clears learners' lesson progress** (content rows are re-created) — only re-seed when content changes.
 
 - **Content covers the beginner path** (Foundations → Everyday phrases, 16 lessons per language). Sentence building → Advanced units come as content grows; the admin CMS is Phase 8.
 - **No audio yet** — pronunciation is taught with romanization and English sound hints. Audio/speech is planned for Phase 7.

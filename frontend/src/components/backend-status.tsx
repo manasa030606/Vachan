@@ -27,7 +27,7 @@ export function BackendStatus() {
         if (!cancelled) {
           setState({
             kind: "error",
-            message: `Could not reach the backend at ${API_URL}. Is it running?`,
+            message: `Could not reach the backend at ${API_URL || "/api (proxied)"}. Is it running?`,
           });
         }
       });

@@ -1,0 +1,35 @@
+# Render Blueprint for the Vachan backend (Express API).
+# Render → New → Blueprint → pick this repository → it reads this file.
+# Secrets marked `sync: false` are asked for in the dashboard (never stored in Git).
+services:
+  - type: web
+    name: vachan-api
+    runtime: node
+    plan: free
+    region: singapore
+    # The repository root (npm workspaces: the lockfile lives here).
+    rootDir: .
+    buildCommand: npm ci --include=dev -w backend && npm run build -w backend && npm run db:deploy -w backend
+    startCommand: npm run start -w backend
+    healthCheckPath: /api/health
+    autoDeploy: true
+    # Only redeploy the API when backend files change.
+    buildFilter:
+      paths:
+        - backend/**
+        - package.json
+        - package-lock.json
+        - render.yaml
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

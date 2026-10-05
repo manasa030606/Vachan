@@ -171,7 +171,14 @@ async function main() {
     await seedLanguage(index);
   }
   await seedAchievements();
-  await seedDemoUser();
+  // The demo account has a publicly documented password, so it is only created in
+  // development — unless SEED_DEMO_USER=true is set on purpose.
+  const seedDemo =
+    process.env.SEED_DEMO_USER !== undefined
+      ? process.env.SEED_DEMO_USER === "true"
+      : process.env.NODE_ENV !== "production";
+  if (seedDemo) await seedDemoUser();
+  else console.log("  – Demo account skipped (production). Set SEED_DEMO_USER=true to create it.");
   console.log("✅ Seed finished.");
 }
 

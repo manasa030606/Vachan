@@ -1,6 +1,6 @@
 # Vachan — API reference & Postman testing guide (Phase 4)
 
-Base URL: **`http://localhost:4000/api`** · All bodies are JSON · All errors look like:
+Base URL: **`http://localhost:4000/api`** locally · **`https://<your-api>.onrender.com/api`** deployed (see [DEPLOYMENT.md](DEPLOYMENT.md)) · All bodies are JSON · All errors look like:
 
 ```json
 { "error": { "code": "SOME_CODE", "message": "Human-readable explanation", "details": [ … optional … ] } }
@@ -69,6 +69,15 @@ Logout ──► tokenVersion + 1  ──► every token issued before is now in
 ---
 
 ## 3. Postman setup (once)
+
+**Local vs deployed.** The same collection runs against both; only `baseUrl` changes. Import one of the environments in `postman/` and pick it in the top-right environment menu:
+
+| Environment file                           | `baseUrl`                                                    |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| `Vachan.local.postman_environment.json`    | `http://localhost:4000/api`                                  |
+| `Vachan.deployed.postman_environment.json` | `https://<your-api>.onrender.com/api` (edit after deploying) |
+
+(`https://<your-app>.vercel.app/api` also works — that's the same backend through the website's proxy.) On the deployed backend the demo account doesn't exist, and the API may need ~1 minute to wake up — send **Health** first.
 
 1. Start everything: `npm run dev` (backend on 4000, frontend on 3000). Database migrated and seeded (see `docs/DATABASE.md`).
 2. Postman → **Import** → choose `postman/Vachan.postman_collection.json`.

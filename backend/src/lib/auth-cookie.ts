@@ -8,7 +8,11 @@ export const AUTH_COOKIE_NAME = "vachan_token";
 function cookieOptions(): CookieOptions {
   return {
     httpOnly: true,
-    sameSite: "lax", // sent on same-site requests (localhost:3000 → localhost:4000 is same-site)
+    // "lax" works because the browser always talks to ONE site:
+    //   local:    localhost:3000 → localhost:4000 (same site)
+    //   deployed: https://<vercel-app>/api/* is proxied to the backend by next.config.ts,
+    //             so the cookie belongs to the frontend's own domain (first-party).
+    sameSite: "lax",
     secure: env.NODE_ENV === "production", // HTTPS-only in production
     path: "/",
   };

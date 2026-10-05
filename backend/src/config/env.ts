@@ -46,6 +46,11 @@ function loadEnv(): Env {
 export const env = loadEnv();
 
 if (env.JWT_SECRET.startsWith("replace-this")) {
+  if (env.NODE_ENV === "production") {
+    // Never run a public server with the documented example secret.
+    console.error("❌ JWT_SECRET is still the example value. Set a real random secret.");
+    process.exit(1);
+  }
   console.warn(
     "⚠️  JWT_SECRET is still the example value. Generate your own: openssl rand -hex 32",
   );

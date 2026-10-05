@@ -6,8 +6,14 @@ import { isDatabaseReachable, prisma } from "./lib/prisma.ts";
 const app = createApp();
 
 const server = app.listen(env.PORT, () => {
-  console.log(`🚀 Vachan API running at http://localhost:${env.PORT} (${env.NODE_ENV})`);
-  console.log(`   Health check: http://localhost:${env.PORT}/api/health`);
+  if (env.NODE_ENV === "production") {
+    console.log(
+      `🚀 Vachan API listening on port ${env.PORT} (production) — health check: /api/health`,
+    );
+  } else {
+    console.log(`🚀 Vachan API running at http://localhost:${env.PORT} (${env.NODE_ENV})`);
+    console.log(`   Health check: http://localhost:${env.PORT}/api/health`);
+  }
 
   // Warn early (but keep running) if PostgreSQL is not reachable.
   void isDatabaseReachable().then((connected) => {
@@ -20,6 +26,12 @@ const server = app.listen(env.PORT, () => {
     }
   });
 });
+
+// Behind a proxy / load balancer (Render, the Vercel /api proxy) connections are re-used.
+// Keep them open longer than the proxy does, so it never re-uses a socket we just closed
+// (that shows up as random "ECONNRESET" / 502 errors).
+server.keepAliveTimeout = 65_000;
+server.headersTimeout = 66_000;
 
 server.on("error", (error: NodeJS.ErrnoException) => {
   if (error.code === "EADDRINUSE") {

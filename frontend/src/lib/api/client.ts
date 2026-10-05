@@ -47,7 +47,9 @@ export async function apiFetch<T>(
     throw new ApiError(
       0,
       "NETWORK_ERROR",
-      `Can't reach the Vachan server at ${API_URL}. Is the backend running (npm run dev)?`,
+      API_URL
+        ? `Can't reach the Vachan server at ${API_URL}. Is the backend running (npm run dev)?`
+        : "Can't reach the Vachan server right now. Please try again in a minute.",
     );
   }
 
