@@ -6,8 +6,8 @@ Vachan is an AI-powered, gamified platform for learning Indian languages: Hindi,
 
 ## Live Demo
 
-- **App:** _added after the first deployment (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md))_
-- **API health check:** _added after the first deployment_
+- **App:** https://vachan-eta.vercel.app
+- **API health check:** https://vachan-api.onrender.com/api/health
 
 > Free hosting: the API sleeps after ~15 minutes without visitors, so the first request can take up to a minute.
 
@@ -173,9 +173,9 @@ The full authentication flow is explained in [docs/API.md → Authentication flo
 ### Deployed architecture (Phase 4.5)
 
 ```
-Next.js frontend  (Vercel)      https://<app>.vercel.app — pages + /api/* proxy (BACKEND_URL)
+Next.js frontend  (Vercel)      https://vachan-eta.vercel.app — pages + /api/* proxy (BACKEND_URL)
         ↓
-Express API       (Render)      https://<api>.onrender.com/api/...
+Express API       (Render)      https://vachan-api.onrender.com/api/...
         ↓
 Prisma Client     (pg driver adapter)
         ↓
@@ -264,7 +264,7 @@ Run from the project root:
 | Database     | Neon PostgreSQL (direct connection string with `?sslmode=require`)                                                                                                       |
 | Migrations   | Automatically on every Render build (`prisma migrate deploy`), or `npm run db:deploy` with `DATABASE_URL` set                                                            |
 | Seed         | Once, from your Mac: `DATABASE_URL='<neon>' NODE_ENV=production npm run db:seed`                                                                                         |
-| Health check | `https://<api>.onrender.com/api/health` and through the proxy `https://<app>.vercel.app/api/health`                                                                      |
+| Health check | `https://vachan-api.onrender.com/api/health` and through the proxy `https://vachan-eta.vercel.app/api/health`                                                            |
 | Redeploy     | `git push` — Vercel and Render rebuild automatically                                                                                                                     |
 
 Step-by-step guide with screenshots-level detail: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
