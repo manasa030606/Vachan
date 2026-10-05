@@ -2,41 +2,36 @@
 
 import { useState } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
-import { WEAK_WORD_THRESHOLD, type VocabularyEntry } from "@/data/mock-practice";
+import type { VocabularyDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { StrengthMeter } from "./strength-meter";
 
 const FILTERS = [
   { id: "all", label: "All" },
-  { id: "weak", label: "Needs practice" },
-  { id: "strong", label: "Strong" },
+  { id: "LETTER", label: "Letters" },
+  { id: "WORD", label: "Words" },
+  { id: "PHRASE", label: "Phrases" },
 ] as const;
 
 type FilterId = (typeof FILTERS)[number]["id"];
 
 type VocabularyListProps = {
-  words: VocabularyEntry[];
+  words: VocabularyDto[];
   showRomanization: boolean;
 };
 
-/** All words the learner has met, filterable by strength. */
+/** Letters, words and phrases from the lessons the learner has completed. */
 export function VocabularyList({ words, showRomanization }: VocabularyListProps) {
   const [filter, setFilter] = useState<FilterId>("all");
-
-  const visibleWords = words.filter((word) => {
-    if (filter === "weak") return word.strength < WEAK_WORD_THRESHOLD;
-    if (filter === "strong") return word.strength >= WEAK_WORD_THRESHOLD;
-    return true;
-  });
+  const visibleWords = words.filter((word) => filter === "all" || word.kind === filter);
 
   return (
     <Card>
       <CardHeader
-        title="Vocabulary"
-        description={`${words.length} words learned in this demo course`}
+        title="What you've learned"
+        description={`${words.length} letters, words and phrases from completed lessons`}
       />
 
-      <div role="group" aria-label="Filter words" className="mb-4 flex flex-wrap gap-2">
+      <div role="group" aria-label="Filter" className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((item) => (
           <button
             key={item.id}
@@ -57,26 +52,25 @@ export function VocabularyList({ words, showRomanization }: VocabularyListProps)
 
       <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {visibleWords.map((word) => (
-          <li
-            key={word.id}
-            className="flex items-center gap-3 rounded-2xl border-2 border-slate-100 p-3"
-          >
-            <div className="min-w-0 flex-1">
-              <p className="font-display text-2xl leading-tight font-bold text-brand-800">
-                {word.script}
-              </p>
-              {showRomanization && <p className="text-sm text-slate-500">{word.romanization}</p>}
-              <p className="font-bold text-ink">{word.meaning}</p>
-              <p className="text-xs text-slate-500">
-                {word.topic} · {word.lastPracticed}
-              </p>
-            </div>
-            <StrengthMeter strength={word.strength} />
+          <li key={word.id} className="rounded-2xl border-2 border-slate-100 p-3">
+            <p
+              className={cn(
+                "font-display leading-tight font-bold [overflow-wrap:anywhere] text-brand-800",
+                word.kind === "LETTER" ? "text-4xl" : "text-2xl",
+              )}
+            >
+              {word.script}
+            </p>
+            {showRomanization && <p className="text-sm text-slate-500">{word.romanization}</p>}
+            <p className="font-bold text-ink">{word.meaning}</p>
+            <p className="text-xs text-slate-500">{word.topic}</p>
           </li>
         ))}
       </ul>
       {visibleWords.length === 0 && (
-        <p className="py-6 text-center text-slate-500">No words here yet.</p>
+        <p className="py-6 text-center text-slate-500">
+          Nothing here yet — complete a lesson to collect its words.
+        </p>
       )}
     </Card>
   );

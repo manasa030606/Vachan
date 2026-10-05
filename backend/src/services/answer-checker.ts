@@ -27,11 +27,19 @@ export type CheckResult = {
 
 // ── Text helpers ─────────────────────────────────────────────
 
-/** Lower-case, remove punctuation and extra spaces: " Thank-you! " → "thank you". */
+/**
+ * Makes two answers comparable:
+ *  - Unicode NFC, so the same Indian-script letter typed two ways is equal
+ *  - removes zero-width joiners (invisible characters some keyboards add)
+ *  - lower case, punctuation → space (also the Devanagari full stop "।"), collapse spaces
+ * " Thank-you! " → "thank you"
+ */
 export function normalizeText(text: string): string {
   return text
+    .normalize("NFC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
     .toLowerCase()
-    .replace(/[.,!?;:'"“”‘’-]/g, " ")
+    .replace(/[.,!?;:'"“”‘’`´\-–—()[\]{}।॥]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -70,6 +78,50 @@ export function editDistance(a: string, b: string): number {
 
 // ── Checking ─────────────────────────────────────────────────
 
+/** The right answer as text (feedback banner, review list). */
+export function correctAnswerText(exercise: CheckableExercise): string {
+  const options = exercise.options;
+  switch (exercise.type) {
+    case "TRANSLATION":
+      return options.find((option) => option.isCorrect)?.text ?? "";
+    case "WORD_ORDER":
+      return options
+        .filter((option) => option.correctPosition !== null)
+        .sort((a, b) => (a.correctPosition ?? 0) - (b.correctPosition ?? 0))
+        .map((option) => option.text)
+        .join(" ");
+    case "MATCHING":
+      return options.map((option) => `${option.text} = ${option.matchText}`).join(", ");
+    default:
+      return options.find((option) => option.isCorrect)?.text ?? "";
+  }
+}
+
+/** Turns a stored answer back into readable text, e.g. for "You answered: …". */
+export function describeAnswer(exercise: CheckableExercise, answer: unknown): string {
+  const byId = new Map(exercise.options.map((option) => [option.id, option]));
+  if (typeof answer !== "object" || answer === null) return "";
+  if ("optionId" in answer && typeof answer.optionId === "string") {
+    return byId.get(answer.optionId)?.text ?? "";
+  }
+  if ("text" in answer && typeof answer.text === "string") return answer.text;
+  if ("optionIds" in answer && Array.isArray(answer.optionIds)) {
+    return answer.optionIds.map((id) => byId.get(String(id))?.text ?? "?").join(" ");
+  }
+  if ("pairs" in answer && Array.isArray(answer.pairs)) {
+    const pairs = answer.pairs as Array<{ leftId: string; rightId: string }>;
+    const wrong = pairs.filter((pair) => pair.leftId !== pair.rightId);
+    const shown = wrong.length > 0 ? wrong : pairs;
+    return shown
+      .map(
+        (pair) =>
+          `${byId.get(pair.leftId)?.text ?? "?"} = ${byId.get(pair.rightId)?.matchText ?? "?"}`,
+      )
+      .join(", ");
+  }
+  return "";
+}
+
 function wrongShape(expected: string): HttpError {
   return new HttpError(
     400,
@@ -84,6 +136,7 @@ export function checkAnswer(exercise: CheckableExercise, answer: AttemptAnswer):
   switch (exercise.type) {
     case "MULTIPLE_CHOICE":
     case "CHARACTER_RECOGNITION":
+    case "CHARACTER_SOUND":
     case "FILL_IN_BLANK": {
       if (!("optionId" in answer)) throw wrongShape('{ "optionId": "..." }');
       const correct = options.find((option) => option.isCorrect);

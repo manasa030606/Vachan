@@ -1,7 +1,7 @@
 "use client";
 
 // A list of OptionButtons with single selection + number-key shortcuts.
-// Shared by multiple-choice, character-recognition and fill-in-the-blank.
+// Shared by multiple-choice, character-sound, character-recognition and fill-in-the-blank.
 import { useCallback } from "react";
 import type { ChoiceOption } from "@/types/exercise";
 import { cn } from "@/lib/cn";
@@ -15,6 +15,8 @@ type ChoiceListProps = {
   isLocked: boolean;
   onSelect: (optionId: string) => void;
   large?: boolean;
+  /** Options are single letters: show them very large and centred. */
+  glyph?: boolean;
   showSubtext: boolean;
   layout?: "grid" | "row";
   label: string;
@@ -27,6 +29,7 @@ export function ChoiceList({
   isLocked,
   onSelect,
   large,
+  glyph,
   showSubtext,
   layout = "grid",
   label,
@@ -55,6 +58,7 @@ export function ChoiceList({
           option={option}
           shortcut={index + 1}
           large={large}
+          glyph={glyph}
           showSubtext={showSubtext}
           disabled={isLocked}
           onSelect={() => onSelect(option.id)}

@@ -1,5 +1,6 @@
 // One lesson on the learning path, drawn as a kolam-style diamond tile.
-// States: completed (filled + check), current (bigger, glowing, "Start" label), locked (grey + lock).
+// States: completed (filled + check) · current (started: bigger, glowing, "Continue")
+//         available (unlocked, not started: bigger, glowing, "Start") · locked (grey + lock).
 import Link from "next/link";
 import {
   BookOpenText,
@@ -57,20 +58,23 @@ type LessonNodeProps = {
 
 export function LessonNode({ lesson, lessonNumber, color, offsetX }: LessonNodeProps) {
   const colors = UNIT_COLORS[color];
-  const isCurrent = lesson.status === "current";
+  // "Open" lessons (started or ready to start) are highlighted on the path.
+  const isCurrent = lesson.status === "current" || lesson.status === "available";
   const isLocked = lesson.status === "locked";
   const Icon = lesson.status === "completed" ? Check : isLocked ? Lock : ICONS[lesson.icon];
   const statusText = {
-    completed: "completed",
-    current: "current lesson, start now",
+    completed: "completed, practise again",
+    current: "in progress, continue",
+    available: "unlocked, start now",
     locked: "locked",
   }[lesson.status];
+  const bubble = lesson.status === "current" ? "Continue" : "Start";
 
   const tile = (
     <span className="relative flex flex-col items-center">
       {isCurrent && (
         <span className="absolute -top-12 z-10 animate-float rounded-xl border-2 border-slate-200 bg-white px-3 py-1 text-sm font-extrabold tracking-wide text-brand-700 uppercase shadow-md motion-reduce:animate-none">
-          Start
+          {bubble}
           <span className="absolute -bottom-2 left-1/2 size-3 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-slate-200 bg-white" />
         </span>
       )}

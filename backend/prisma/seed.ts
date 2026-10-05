@@ -1,12 +1,12 @@
 // Development seed: run with `npm run db:seed` (from the project root).
 //
-// Creates for each of the six languages:
-//   1 language · 1 course · 3 units · 5 lessons · 18 exercises · 10 vocabulary items
+// Creates for each of the six languages (see course-builder.ts for the lesson plan):
+//   1 language · 1 course · 4 units · 16 lessons · 67 exercises · 34 vocabulary items
 // plus one demo account (see DEMO_USER in seed-data.ts).
 //
 // Safe to run again: languages are updated in place; courses and vocabulary are
-// deleted and re-created (this also clears lesson progress — fine for development).
-// User accounts are kept.
+// deleted and re-created. ⚠️ That also clears learners' lesson progress and answers
+// (fine for development). User accounts are kept.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
@@ -89,6 +89,7 @@ async function seedLanguage(index: number) {
                   sentenceBefore: exercise.sentenceBefore,
                   sentenceAfter: exercise.sentenceAfter,
                   translation: exercise.translation,
+                  explanation: exercise.explanation,
                   options: {
                     create: exercise.options.map((option, optionIndex) => ({
                       id: `${exercise.id}-o${optionIndex + 1}`,

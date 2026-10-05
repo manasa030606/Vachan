@@ -77,4 +77,35 @@ describe("lessonReducer", () => {
     });
     assert.equal(after, state);
   });
+
+  it("resumes: exercises already done in this run are skipped but counted", () => {
+    let state = createInitialLessonState(exercises, 3, { alreadyCompletedIds: ["e1"] });
+    assert.equal(state.queue.length, 1);
+    assert.deepEqual(state.completedIds, ["e1"]);
+    state = lessonReducer(state, { type: "START" });
+    state = answer(state, "right");
+    assert.equal(state.phase, "complete");
+    assert.equal(state.completedIds.length, 2);
+  });
+
+  it("review mode: mistakes cost no hearts and the explanation is kept until Continue", () => {
+    let state = createInitialLessonState(exercises, 1, { heartsEnabled: false });
+    state = lessonReducer(state, { type: "START" });
+    state = lessonReducer(state, {
+      type: "ANSWER_CHANGED",
+      answer: { type: "choice", optionId: "wrong" },
+    });
+    state = lessonReducer(state, {
+      type: "CHECK",
+      isCorrect: false,
+      typoCorrection: null,
+      correctAnswer: "Right",
+      explanation: "Because.",
+    });
+    assert.equal(state.hearts, 1);
+    assert.equal(state.explanation, "Because.");
+    state = lessonReducer(state, { type: "CONTINUE" });
+    assert.equal(state.phase, "exercise");
+    assert.equal(state.explanation, null);
+  });
 });

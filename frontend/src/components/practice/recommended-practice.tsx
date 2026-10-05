@@ -1,21 +1,17 @@
-import { Sparkles } from "lucide-react";
+import { RotateCcw, Sparkles } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 
 type RecommendedPracticeProps = {
-  mistakeCount: number;
-  weakWordCount: number;
-  weakestTopic: string;
+  openMistakes: number;
+  resolvedMistakes: number;
 };
 
 /**
- * The suggested practice session. In Phase 4 this is chosen by transparent rules
- * (recent mistakes + weak words + weakest topic) — not "AI", and labelled honestly.
+ * The suggested practice: a review session of the learner's open mistakes.
+ * Chosen by a transparent rule (wrong answers not yet answered correctly in a review) — not "AI".
  */
-export function RecommendedPractice({
-  mistakeCount,
-  weakWordCount,
-  weakestTopic,
-}: RecommendedPracticeProps) {
+export function RecommendedPractice({ openMistakes, resolvedMistakes }: RecommendedPracticeProps) {
+  const hasMistakes = openMistakes > 0;
   return (
     <section
       aria-labelledby="recommended-title"
@@ -31,23 +27,27 @@ export function RecommendedPractice({
           Recommended for you
         </p>
         <h2 id="recommended-title" className="mt-1 text-3xl font-extrabold">
-          5-minute smart review
+          {hasMistakes ? "Review your mistakes" : "You're all caught up"}
         </h2>
         <p className="mt-2 max-w-lg text-brand-100">
-          A short mix built from your recent mistakes, words that need practice, and your weakest
-          topic.
+          {hasMistakes
+            ? "Answer each one correctly to clear it. Up to 10 per session."
+            : "Every mistake has been reviewed. Keep going with your course."}
         </p>
         <ul className="mt-4 flex flex-wrap gap-2 text-sm font-bold">
-          <li className="rounded-full bg-white/15 px-3 py-1">{mistakeCount} recent mistakes</li>
-          <li className="rounded-full bg-white/15 px-3 py-1">{weakWordCount} weak words</li>
-          <li className="rounded-full bg-white/15 px-3 py-1">{weakestTopic}</li>
+          <li className="rounded-full bg-white/15 px-3 py-1">{openMistakes} to review</li>
+          <li className="rounded-full bg-white/15 px-3 py-1">{resolvedMistakes} cleared</li>
         </ul>
-        <ButtonLink href="/learn" variant="accent" size="lg" className="mt-6">
-          Continue your course
-        </ButtonLink>
-        <p className="mt-3 text-sm text-brand-100">
-          Personalised review sessions arrive in Phase 3.
-        </p>
+        {hasMistakes ? (
+          <ButtonLink href="/review" variant="accent" size="lg" className="mt-6">
+            <RotateCcw aria-hidden="true" className="size-5" />
+            Start review
+          </ButtonLink>
+        ) : (
+          <ButtonLink href="/learn" variant="accent" size="lg" className="mt-6">
+            Continue your course
+          </ButtonLink>
+        )}
       </div>
     </section>
   );

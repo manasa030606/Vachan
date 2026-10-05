@@ -137,43 +137,46 @@ npm run db:seed        # loads demo content + demo user  → "✅ Seed finished.
 
 What each one does:
 
-| Command               | Runs                                     | Meaning                                                                                                                                                                                                |
-| --------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run db:validate` | `prisma validate`                        | Checks the schema file for mistakes. Doesn't touch the database.                                                                                                                                       |
-| `npm run db:migrate`  | `prisma migrate dev` + `prisma generate` | Applies every migration in `backend/prisma/migrations/` to your database (first time: creates all 11 tables). If you change `schema.prisma` later, it asks for a name and **creates a new migration**. |
-| `npm run db:generate` | `prisma generate`                        | Rebuilds the TypeScript database client in `backend/src/generated/prisma` (git-ignored).                                                                                                               |
-| `npm run db:seed`     | `prisma db seed` → `tsx prisma/seed.ts`  | Inserts demo content. Safe to run again.                                                                                                                                                               |
-| `npm run db:deploy`   | `prisma migrate deploy`                  | Applies migrations without creating new ones (used for production in Phase 8).                                                                                                                         |
+| Command               | Runs                                     | Meaning                                                                                                                                                                                                                   |
+| --------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run db:validate` | `prisma validate`                        | Checks the schema file for mistakes. Doesn't touch the database.                                                                                                                                                          |
+| `npm run db:migrate`  | `prisma migrate dev` + `prisma generate` | Applies every migration in `backend/prisma/migrations/` that your database doesn't have yet (first time: creates all 11 tables). If you change `schema.prisma` later, it asks for a name and **creates a new migration**. |
+| `npm run db:generate` | `prisma generate`                        | Rebuilds the TypeScript database client in `backend/src/generated/prisma` (git-ignored).                                                                                                                                  |
+| `npm run db:seed`     | `prisma db seed` → `tsx prisma/seed.ts`  | Inserts demo content. Safe to run again.                                                                                                                                                                                  |
+| `npm run db:deploy`   | `prisma migrate deploy`                  | Applies migrations without creating new ones (used for production in Phase 8).                                                                                                                                            |
 
 Expected seed output:
 
 ```
 🌱 Seeding the Vachan database…
-  ✓ Hindi      3 units · 5 lessons · 18 exercises · 10 vocabulary items
-  ✓ Telugu     3 units · 5 lessons · 18 exercises · 10 vocabulary items
-  ✓ Tamil      3 units · 5 lessons · 18 exercises · 10 vocabulary items
-  ✓ Malayalam  3 units · 5 lessons · 18 exercises · 10 vocabulary items
-  ✓ Kannada    3 units · 5 lessons · 18 exercises · 10 vocabulary items
-  ✓ Bengali    3 units · 5 lessons · 18 exercises · 10 vocabulary items
+  ✓ Hindi      4 units · 16 lessons · 67 exercises · 34 vocabulary items
+  ✓ Telugu     4 units · 16 lessons · 67 exercises · 34 vocabulary items
+  ✓ Tamil      4 units · 16 lessons · 67 exercises · 34 vocabulary items
+  ✓ Malayalam  4 units · 16 lessons · 67 exercises · 34 vocabulary items
+  ✓ Kannada    4 units · 16 lessons · 67 exercises · 34 vocabulary items
+  ✓ Bengali    4 units · 16 lessons · 67 exercises · 34 vocabulary items
   ✓ Demo account  demo@vachan.dev / Vachan2026!  (development only)
 ✅ Seed finished.
 ```
 
 ### What the seed creates
 
-For **each of the six languages**: 1 language row, 1 course ("Telugu for English speakers"), 3 units, 5 lessons, 18 exercises (all six exercise types), 10 vocabulary items.
+For **each of the six languages**: 1 language row, 1 course ("Telugu for English speakers"), 4 units, 16 small lessons, 67 exercises (all seven exercise types), 34 vocabulary items. Totals: 6 courses · 24 units · 96 lessons · 402 exercises · 1,320 options · 204 vocabulary items.
 
-| Unit | Stage            | Lessons                   | Exercise types used                                         |
-| ---- | ---------------- | ------------------------- | ----------------------------------------------------------- |
-| 1    | Foundations      | Vowels · First consonant  | character recognition, multiple choice, matching            |
-| 2    | First Words      | Greetings · Family & food | multiple choice, translation (typed), matching              |
-| 3    | Everyday Phrases | Introductions             | multiple choice, fill in the blank, word order, translation |
+| Unit | Stage            | Lessons (4 each)                                                   | Teaches                                                                  |
+| ---- | ---------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| 1    | Foundations      | Vowels a·aa → i·ii → u·uu → Vowel review (checkpoint)              | 6 vowels, short vs long sounds, pronunciation hints                      |
+| 2    | Foundations      | Consonants ka·ma → na·pa → ra·la → Vowel signs                     | 6 consonants, the built-in vowel, how vowel signs work                   |
+| 3    | First Words      | Greetings → Family & friends → Food & drink → Numbers 1–3          | 14 everyday words                                                        |
+| 4    | Everyday Phrases | Introductions → How are you? → Asking for things → Sentence review | 5 sentences: my name / your name / how are you / I'm fine / I want water |
 
-IDs are readable so you can type them in Postman: language `lang-te`, course `te-course`, unit `te-u2`, lesson `te-u2-l1`, exercise `te-u2-l1-e3`, option `te-u2-l1-e3-o1`.
+The alphabet is never dumped into one lesson: script lessons teach **two letters at a time**. Letters are generated from each script's Unicode block (all six scripts share the same layout), so every alphabet is exact. Each exercise has an `explanation` (the teaching note shown after answering).
+
+IDs are readable so you can type them in Postman: language `lang-te`, course `te-course`, unit `te-u2`, lesson `te-u2-l1`, exercise `te-u2-l1-e3`, option `te-u2-l1-e3-o1`, vocabulary `te-v02-letter-aa`.
 
 Plus one **demo account** for quick testing: `demo@vachan.dev` / `Vachan2026!` (Hindi, onboarding done). Development only.
 
-Running the seed again **updates** languages, **re-creates** courses/vocabulary (which also clears lesson progress and attempts), and **keeps** user accounts.
+Running the seed again **updates** languages, **re-creates** courses/vocabulary and **keeps** user accounts. ⚠️ Re-creating the courses also **clears every learner's lesson progress and answers** (they belong to lessons) — fine in development, but don't re-seed if you want to keep your test progress.
 
 ---
 
@@ -203,7 +206,31 @@ Docker full wipe: `docker compose down -v && npm run db:up && npm run db:migrate
 
 ---
 
-## 9. The schema (11 tables, one set for all languages)
+## 9. Phase 3 migration — what changed
+
+Phase 3 adds one migration: `backend/prisma/migrations/20261005120000_phase3_learning_system/migration.sql`. Apply it with:
+
+```bash
+npm run db:migrate     # applies only the new migration; your users stay
+npm run db:seed        # loads the new 4-unit courses (clears old lesson progress — see above)
+```
+
+| Change                                                                       | Why                                                                                   |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| enum `ExerciseType` + `CHARACTER_SOUND`                                      | New exercise: letter → sound. `CHARACTER_RECOGNITION` is now sound → letter.          |
+| `Exercise.explanation` (text, optional)                                      | Teaching note shown after answering; never sent before.                               |
+| new enum `AttemptSource` (`LESSON`, `REVIEW`) + `UserExerciseAttempt.source` | Separates lesson answers from mistake-review answers.                                 |
+| `UserLessonProgress.runStartedAt`                                            | Start of the current run → resume a half-finished lesson; "practise again" resets it. |
+| `UserLessonProgress.lastActivityAt`                                          | Last activity (resume point, "last active").                                          |
+| `UserLessonProgress.correctAttempts`, `incorrectAttempts`, `accuracy`        | Correct / incorrect counts and accuracy per lesson.                                   |
+| `UserLessonProgress.timesCompleted`                                          | How many full runs the learner finished.                                              |
+| 2 indexes                                                                    | Fast "recent activity" and "attempts per exercise" queries.                           |
+
+The migration also back-fills these counters for any Phase 2 progress rows, so nothing breaks if you migrate without re-seeding.
+
+---
+
+## 10. The schema (11 tables, one set for all languages)
 
 ```
 Language ─┬─ Course ── Unit ── Lesson ─┬─ Exercise ── ExerciseOption
@@ -216,50 +243,97 @@ User ─┬─ UserProfile            (1 : 1)
       └─ UserExerciseAttempt    (one row per submitted answer)
 ```
 
-| Model                 | Purpose                                           | Important fields                                                                      |
-| --------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `User`                | Login account                                     | `email` (unique), `passwordHash` (scrypt), `role`, `tokenVersion` (for logout)        |
-| `UserProfile`         | Learner settings from onboarding/profile          | `displayName`, `currentLanguageId`, `dailyGoal`, `showRomanization`, `onboardingDone` |
-| `Language`            | Hindi, Telugu, Tamil, Malayalam, Kannada, Bengali | `code` (unique: hi/te/ta/ml/kn/bn), `nativeName`, `scriptName`                        |
-| `Course`              | A course for one language                         | `languageId`, `title`, `isPublished`                                                  |
-| `Unit`                | A stage of the learning journey                   | `stage` (FOUNDATIONS…ADVANCED), `sortOrder`                                           |
-| `Lesson`              | A short lesson                                    | `kind` (SCRIPT/VOCABULARY/PHRASES/CHECKPOINT), `introText`, `sortOrder`               |
-| `Exercise`            | One question                                      | `type` (6 types), `instruction`, `prompt`                                             |
-| `ExerciseOption`      | Answer choices / accepted answers / words / pairs | `isCorrect`, `correctPosition` (word order), `matchText` (matching)                   |
-| `VocabularyItem`      | Letters, words and phrases                        | `kind` (LETTER/WORD/PHRASE), `script`, `romanization`, `meaning`                      |
-| `UserLessonProgress`  | Has the learner started/completed a lesson?       | `status` (IN_PROGRESS/COMPLETED), `completedAt`; unique per (user, lesson)            |
-| `UserExerciseAttempt` | Every answer a learner submits                    | `answer` (JSON), `isCorrect`, `lessonId`                                              |
+| Model                 | Purpose                                           | Important fields                                                                                                                                           |
+| --------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `User`                | Login account                                     | `email` (unique), `passwordHash` (scrypt), `role`, `tokenVersion` (for logout)                                                                             |
+| `UserProfile`         | Learner settings from onboarding/profile          | `displayName`, `currentLanguageId`, `dailyGoal`, `showRomanization`, `onboardingDone`                                                                      |
+| `Language`            | Hindi, Telugu, Tamil, Malayalam, Kannada, Bengali | `code` (unique: hi/te/ta/ml/kn/bn), `nativeName`, `scriptName`                                                                                             |
+| `Course`              | A course for one language                         | `languageId`, `title`, `isPublished`                                                                                                                       |
+| `Unit`                | A stage of the learning journey                   | `stage` (FOUNDATIONS…ADVANCED), `sortOrder`                                                                                                                |
+| `Lesson`              | A short lesson                                    | `kind` (SCRIPT/VOCABULARY/PHRASES/CHECKPOINT), `introText`, `sortOrder`                                                                                    |
+| `Exercise`            | One question                                      | `type` (7 types), `instruction`, `prompt`, `explanation`                                                                                                   |
+| `ExerciseOption`      | Answer choices / accepted answers / words / pairs | `isCorrect`, `correctPosition` (word order), `matchText` (matching)                                                                                        |
+| `VocabularyItem`      | Letters, words and phrases                        | `kind` (LETTER/WORD/PHRASE), `script`, `romanization`, `meaning`                                                                                           |
+| `UserLessonProgress`  | Started / completed, counters, resume point       | `status`, `runStartedAt`, `lastActivityAt`, `correctAttempts`, `incorrectAttempts`, `accuracy`, `timesCompleted`, `completedAt`; unique per (user, lesson) |
+| `UserExerciseAttempt` | Every answer a learner submits                    | `answer` (JSON), `isCorrect`, `source` (LESSON/REVIEW), `lessonId`, `createdAt`                                                                            |
 
 **Language-agnostic design:** there are no per-language tables. Every content row points to a `Language`. Adding a seventh language = adding rows (seed or, later, the admin CMS), not changing the schema.
 
-**How the six exercise types fit one `ExerciseOption` table:**
+**How the seven exercise types fit one `ExerciseOption` table:**
 
-| Exercise type                         | What each option row means                                    |
-| ------------------------------------- | ------------------------------------------------------------- |
-| multiple choice / character / fill-in | a choice; exactly one has `isCorrect = true`                  |
-| translation                           | an accepted answer (never sent to the browser)                |
-| word order                            | a word; `correctPosition` = 1, 2, 3… (null = distractor word) |
-| matching                              | a pair: `text` (left) ↔ `matchText` (right)                   |
+| Exercise type                                                         | What each option row means                                    |
+| --------------------------------------------------------------------- | ------------------------------------------------------------- |
+| multiple choice / character recognition / character → sound / fill-in | a choice; exactly one has `isCorrect = true`                  |
+| translation                                                           | an accepted answer (never sent to the browser)                |
+| word order                                                            | a word; `correctPosition` = 1, 2, 3… (null = distractor word) |
+| matching                                                              | a pair: `text` (left) ↔ `matchText` (right)                   |
 
-**Lesson unlocking rule:** lessons unlock in order. A lesson is open when every earlier lesson in the course is completed. A lesson is completed when every one of its exercises has been answered correctly at least once.
+**Lesson rules (Phase 3):** lessons unlock in order. Status per learner: `completed` (every exercise answered correctly in one run), `current` (started, not finished), `available` (unlocked, not started), `locked`. Details: [LEARNING_ENGINE.md](LEARNING_ENGINE.md).
 
-The migration that creates all of this is `backend/prisma/migrations/<timestamp>_init/migration.sql` (plain SQL you can read).
+The migrations are plain SQL you can read: `…_init/migration.sql` (Phase 2) and `…_phase3_learning_system/migration.sql` (Phase 3).
 
 ---
 
-## 10. Database troubleshooting
+## 11. Verify the records yourself (SQL)
 
-| Problem                                                                 | Likely cause                                         | Fix                                                                                                                       |
-| ----------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `Can't reach database server at localhost:5432` / health `503`          | PostgreSQL not running                               | `brew services start postgresql@16` (Docker: `npm run db:up`), then `brew services list`                                  |
-| `role "vachan" does not exist`                                          | You use Homebrew but kept the Docker `DATABASE_URL`  | Use `postgresql://$(whoami)@localhost:5432/vachan_dev?schema=public`                                                      |
-| `database "vachan_dev" does not exist`                                  | Database not created                                 | `createdb vachan_dev`                                                                                                     |
-| `password authentication failed`                                        | Wrong user/password in `DATABASE_URL`                | Homebrew: no password. Docker: `vachan_dev_password`                                                                      |
-| `P1001` / `P1000` from Prisma                                           | Same as the two rows above                           | Check PostgreSQL is running and `DATABASE_URL` is right                                                                   |
-| `Drift detected` / migrate asks to reset                                | Tables were changed by hand, or an old schema exists | Development only: `npm run db:reset` (deletes data)                                                                       |
-| `permission denied to create database` (shadow database)                | Your DB user can't create databases                  | Homebrew users can. Docker: the `vachan` user is a superuser. Otherwise: `psql postgres -c 'ALTER USER <user> CREATEDB;'` |
-| `The table public.Language does not exist` / seed fails                 | Migrations not applied                               | `npm run db:migrate`, then `npm run db:seed`                                                                              |
-| `Cannot find module '../generated/prisma/client'` / types look outdated | Prisma Client not generated after a schema change    | `npm run db:generate`, restart `npm run dev`                                                                              |
-| `prisma generate` fails downloading engines (403 / network)             | Firewall or proxy blocks `binaries.prisma.sh`        | Use another network, then re-run                                                                                          |
-| Seed: `DATABASE_URL is missing`                                         | No `backend/.env`                                    | Step 5                                                                                                                    |
-| `Unique constraint failed` while seeding                                | Rare race / half-finished seed                       | Run `npm run db:seed` again (it cleans up first) or `npm run db:reset`                                                    |
+Open a SQL prompt: `psql "postgresql://vachan:vachan_dev_password@localhost:5432/vachan_dev"` (or use Prisma Studio, section 7). Replace the email with the one you registered in Postman/the app.
+
+**Content loaded?**
+
+```sql
+SELECT (SELECT count(*) FROM "Language") AS languages, (SELECT count(*) FROM "Course") AS courses,
+       (SELECT count(*) FROM "Unit") AS units, (SELECT count(*) FROM "Lesson") AS lessons,
+       (SELECT count(*) FROM "Exercise") AS exercises, (SELECT count(*) FROM "VocabularyItem") AS vocabulary;
+-- expected: 6 | 6 | 24 | 96 | 402 | 204
+```
+
+**Lesson started / completed, counters, accuracy, last activity** (table `UserLessonProgress`):
+
+```sql
+SELECT p."lessonId", p.status, p."timesCompleted", p."correctAttempts", p."incorrectAttempts",
+       p.accuracy, p."startedAt", p."runStartedAt", p."lastActivityAt", p."completedAt"
+FROM "UserLessonProgress" p JOIN "User" u ON u.id = p."userId"
+WHERE u.email = 'you@example.com' ORDER BY p."lessonId";
+```
+
+After the Postman run you should see `te-u1-l1 | COMPLETED | 1 | 4 | 1 | 80 | …`, `te-u1-l2` and `te-u1-l3` COMPLETED, `te-u1-l4` IN_PROGRESS.
+
+**Every answer** (table `UserExerciseAttempt`):
+
+```sql
+SELECT a."exerciseId", a.source, a."isCorrect", a.answer, a."createdAt"
+FROM "UserExerciseAttempt" a JOIN "User" u ON u.id = a."userId"
+WHERE u.email = 'you@example.com' ORDER BY a."createdAt";
+```
+
+**Only the wrong answers** (what the review system reads):
+
+```sql
+SELECT a."exerciseId", a.answer, a."createdAt"
+FROM "UserExerciseAttempt" a JOIN "User" u ON u.id = a."userId"
+WHERE u.email = 'you@example.com' AND a."isCorrect" = false ORDER BY a."createdAt" DESC;
+```
+
+**Passwords are hashed:** `SELECT email, left("passwordHash", 20) FROM "User";` → `scrypt:…`, never the real password.
+
+---
+
+## 12. Database troubleshooting
+
+| Problem                                                                                                   | Likely cause                                                                            | Fix                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `Can't reach database server at localhost:5432` / health `503`                                            | PostgreSQL not running                                                                  | `brew services start postgresql@16` (Docker: `npm run db:up`), then `brew services list`                                  |
+| `role "vachan" does not exist`                                                                            | You use Homebrew but kept the Docker `DATABASE_URL`                                     | Use `postgresql://$(whoami)@localhost:5432/vachan_dev?schema=public`                                                      |
+| `database "vachan_dev" does not exist`                                                                    | Database not created                                                                    | `createdb vachan_dev`                                                                                                     |
+| `password authentication failed`                                                                          | Wrong user/password in `DATABASE_URL`                                                   | Homebrew: no password. Docker: `vachan_dev_password`                                                                      |
+| `P1001` / `P1000` from Prisma                                                                             | Same as the two rows above                                                              | Check PostgreSQL is running and `DATABASE_URL` is right                                                                   |
+| `Drift detected` / migrate asks to reset                                                                  | Tables were changed by hand, or an old schema exists                                    | Development only: `npm run db:reset` (deletes data)                                                                       |
+| `permission denied to create database` (shadow database)                                                  | Your DB user can't create databases                                                     | Homebrew users can. Docker: the `vachan` user is a superuser. Otherwise: `psql postgres -c 'ALTER USER <user> CREATEDB;'` |
+| `The table public.Language does not exist` / seed fails                                                   | Migrations not applied                                                                  | `npm run db:migrate`, then `npm run db:seed`                                                                              |
+| `permission denied for schema public` / `User was denied access`                                          | The database belongs to another user (PostgreSQL 15+ only lets the owner create tables) | `psql postgres -c "ALTER DATABASE vachan_dev OWNER TO vachan;"`                                                           |
+| `column "runStartedAt" does not exist` / `invalid input value for enum "ExerciseType": "CHARACTER_SOUND"` | Phase 3 migration not applied yet                                                       | `npm run db:migrate`                                                                                                      |
+| Lessons still show 3 units / old content                                                                  | Not re-seeded after Phase 3                                                             | `npm run db:seed`                                                                                                         |
+| `Cannot find module '../generated/prisma/client'` / types look outdated                                   | Prisma Client not generated after a schema change                                       | `npm run db:generate`, restart `npm run dev`                                                                              |
+| `prisma generate` fails downloading engines (403 / network)                                               | Firewall or proxy blocks `binaries.prisma.sh`                                           | Use another network, then re-run                                                                                          |
+| Seed: `DATABASE_URL is missing`                                                                           | No `backend/.env`                                                                       | Step 5                                                                                                                    |
+| `Unique constraint failed` while seeding                                                                  | Rare race / half-finished seed                                                          | Run `npm run db:seed` again (it cleans up first) or `npm run db:reset`                                                    |

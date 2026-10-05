@@ -12,6 +12,9 @@ type LessonFooterProps = {
   correctAnswerText: string;
   /** Set when a typed answer had a small spelling mistake but was accepted. */
   typoCorrection: string | null;
+  /** Short teaching note from the server, e.g. "ఆ is “aa”: long “aa”, like the a in “father”." */
+  explanation: string | null;
+
   onCheck: () => void;
   onContinue: () => void;
 };
@@ -24,6 +27,7 @@ export function LessonFooter({
   isChecking,
   correctAnswerText,
   typoCorrection,
+  explanation,
   onCheck,
   onContinue,
 }: LessonFooterProps) {
@@ -56,6 +60,7 @@ export function LessonFooter({
                     <span className="font-bold">{typoCorrection}</span>
                   </p>
                 )}
+                {explanation && <p className="mt-1 text-sm">{explanation}</p>}
               </div>
             </div>
           )}
@@ -68,7 +73,8 @@ export function LessonFooter({
                   <span className="font-bold">Correct answer:</span>{" "}
                   <span className="font-display text-lg font-bold">{correctAnswerText}</span>
                 </p>
-                <p className="text-sm">You&apos;ll see this one again at the end of the lesson.</p>
+                {explanation && <p className="mt-1 text-sm">{explanation}</p>}
+                <p className="mt-1 text-sm font-bold">You&apos;ll see this one again at the end.</p>
               </div>
             </div>
           )}

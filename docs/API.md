@@ -1,4 +1,4 @@
-# Vachan — API reference & Postman testing guide (Phase 2)
+# Vachan — API reference & Postman testing guide (Phase 3)
 
 Base URL: **`http://localhost:4000/api`** · All bodies are JSON · All errors look like:
 
@@ -10,21 +10,25 @@ Base URL: **`http://localhost:4000/api`** · All bodies are JSON · All errors l
 
 ## 1. Endpoint list
 
-| #   | Method | URL                          | Auth         | Purpose                                         |
-| --- | ------ | ---------------------------- | ------------ | ----------------------------------------------- |
-| 0   | GET    | `/api/health`                | none         | API + database status                           |
-| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                 |
-| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                             |
-| 3   | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)               |
-| 4   | GET    | `/api/me`                    | **required** | Current user + profile                          |
-| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language) |
-| 6   | GET    | `/api/languages`             | none         | The six languages                               |
-| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)      |
-| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status            |
-| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers)                 |
-| 10  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer; server checks it              |
-| 11  | GET    | `/api/progress`              | **required** | My overall progress                             |
-| 12  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson                       |
+| #   | Method | URL                          | Auth         | Purpose                                                                 |
+| --- | ------ | ---------------------------- | ------------ | ----------------------------------------------------------------------- |
+| 0   | GET    | `/api/health`                | none         | API + database status                                                   |
+| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                                         |
+| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                                                     |
+| 3   | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)                                       |
+| 4   | GET    | `/api/me`                    | **required** | Current user + profile                                                  |
+| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language)                         |
+| 6   | GET    | `/api/languages`             | none         | The six languages                                                       |
+| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)                              |
+| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status                                    |
+| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers) + my progress                           |
+| 10  | POST   | `/api/lessons/:id/start`     | **required** | **New** · start or resume a lesson                                      |
+| 11  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer (lesson or review); server checks it, returns feedback |
+| 12  | GET    | `/api/progress`              | **required** | My overall progress + resume point                                      |
+| 13  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson (per exercise)                                |
+| 14  | GET    | `/api/review`                | **required** | **New** · open mistakes + words learned                                 |
+| 15  | GET    | `/api/review/attempts`       | **required** | **New** · every incorrect answer                                        |
+| 16  | GET    | `/api/review/session`        | **required** | **New** · open mistakes as exercises to practise                        |
 
 `PATCH /api/me` is from the spec's API table (section 11) and is needed so onboarding and settings are saved.
 
@@ -64,7 +68,7 @@ Logout ──► tokenVersion + 1  ──► every token issued before is now in
 4. The collection's **Authorization** tab is set to **Bearer Token → `{{token}}`**. Every request inherits it, except register/login/health/languages/courses, which use "No Auth".
 5. **You never copy the token by hand:** the **Register** and **Login** requests have a small _Tests_ script that saves `token` automatically.
 
-Run it all at once: right-click the collection → **Run collection** → **Run Vachan API**. All 33 requests should be green (58 tests).
+Run it all at once: right-click the collection → **Run collection** → **Run Vachan API**. All 56 requests should be green (121 tests).
 
 > If "Get me before logging in" returns 200 instead of 401: Postman kept a `vachan_token` cookie from an earlier run. Click **Cookies** (under the Send button) → `localhost` → delete `vachan_token`.
 
@@ -73,11 +77,12 @@ Run it all at once: right-click the collection → **Run collection** → **Run 
 ## 4. Testing order
 
 ```
-Health → Register → Login → Get me → Update me (pick Telugu) → Get languages → Get courses
-→ Get course → Get lesson → Submit answers (wrong, then right) → Check progress → Logout → Get me (401)
+0 Health → 1 Register / Login → 2 Me (pick Telugu) → 3 Languages & courses
+→ 4 Lessons (locked 403, start te-u1-l1) → 5 Attempts (wrong → right → leave → resume → complete → unlock → practise again)
+→ 6 More lessons + typed answers → 7 Review (mistakes → review answer clears one) → 8 Progress → 9 Logout
 ```
 
-Lessons unlock in order, so test attempts on `te-u1-l1` first. The rest of this guide follows that order. For every request: **Headers** = `Content-Type: application/json` (only when there is a body) and, for protected endpoints, `Authorization: Bearer {{token}}`.
+Each folder builds on the one before (lessons unlock in order), so run them top to bottom. Starting again from scratch? Just run the whole collection again — Register creates a brand-new user each time. The rest of this guide follows that order. For every request: **Headers** = `Content-Type: application/json` (only when there is a body) and, for protected endpoints, `Authorization: Bearer {{token}}`.
 
 ---
 
@@ -216,9 +221,9 @@ Errors: `400 UNKNOWN_LANGUAGE` (`"languageCode": "xx"`) · `400 VALIDATION_ERROR
 ```json
 { "courses": [
   { "id": "te-course", "title": "Telugu for English speakers",
-    "description": "Start from the Telugu script letters and build up to your first sentence.",
+    "description": "From your first Telugu script letters to simple everyday sentences.",
     "language": { "id": "lang-te", "code": "te", "name": "Telugu", … },
-    "unitCount": 3, "lessonCount": 5 }
+    "unitCount": 4, "lessonCount": 16 }
 ] }
 ```
 
@@ -226,164 +231,551 @@ Unknown language code → `200` with `"courses": []`. Code not 2 letters → `40
 
 ---
 
-### 8 · Course detail — `GET {{baseUrl}}/courses/te-course`
+### 8 · Course detail — `GET {{baseUrl}}/courses/{{courseId}}`
 
-- Auth: optional (with a token you get **your** lesson statuses; without, only lesson 1 is open)
-- **Expected: `200`**
-
-```json
-{ "course": {
-  "id": "te-course", "title": "Telugu for English speakers", "description": "…",
-  "language": { "code": "te", … },
-  "progress": { "completedLessons": 0, "totalLessons": 5, "currentLessonId": "te-u1-l1" },
-  "units": [
-    { "id": "te-u1", "number": 1, "title": "Script foundations", "stage": "FOUNDATIONS",
-      "description": "Read and pronounce your first Telugu script letters.",
-      "lessons": [
-        { "id": "te-u1-l1", "title": "Vowels", "kind": "SCRIPT", "exerciseCount": 3, "status": "current" },
-        { "id": "te-u1-l2", "title": "First consonant", "kind": "SCRIPT", "exerciseCount": 3, "status": "locked" }
-      ] },
-    … units 2 and 3 …
-  ] } }
-```
-
-`status` is `completed`, `current` or `locked`. Errors: `404 COURSE_NOT_FOUND`.
-
----
-
-### 9 · Lesson — `GET {{baseUrl}}/lessons/te-u1-l1`
-
-- Auth: **Bearer token** · **Expected: `200`**
-
-```json
-{ "lesson": {
-  "id": "te-u1-l1", "title": "Vowels", "introText": "Here are your first two vowels. Say each sound aloud.",
-  "kind": "SCRIPT", "status": "current",
-  "unit": { "id": "te-u1", "number": 1, "title": "Script foundations" },
-  "course": { "id": "te-course", "title": "Telugu for English speakers", "language": { "code": "te", "name": "Telugu" } },
-  "vocabulary": [
-    { "id": "te-v01-letter-a", "kind": "LETTER", "script": "అ", "romanization": "a", "meaning": "Vowel", "topic": "Script" },
-    { "id": "te-v02-letter-aa", "kind": "LETTER", "script": "ఆ", "romanization": "aa", "meaning": "Vowel", "topic": "Script" }
-  ],
-  "exercises": [
-    { "id": "te-u1-l1-e1", "type": "character-recognition", "instruction": "What sound does this letter make?",
-      "character": "ఆ",
-      "options": [ { "id": "te-u1-l1-e1-o1", "text": "ka", "subtext": null },
-                   { "id": "te-u1-l1-e1-o2", "text": "a",  "subtext": null },
-                   { "id": "te-u1-l1-e1-o3", "text": "aa", "subtext": null } ] },
-    …
-  ],
-  "progress": { "completedExerciseIds": [], "totalExercises": 3 }
-} }
-```
-
-Notice: **no `isCorrect`** anywhere — the answers stay on the server.
-
-Exercise shapes by `type`:
-
-| type                    | fields                                               |
-| ----------------------- | ---------------------------------------------------- |
-| `multiple-choice`       | `prompt`, `promptSubtext`, `options[]`               |
-| `character-recognition` | `character`, `options[]`                             |
-| `fill-in-blank`         | `before`, `after`, `translation`, `options[]`        |
-| `translation`           | `prompt`, `promptSubtext` (type the English meaning) |
-| `word-order`            | `prompt` (English sentence), `tokens[]`              |
-| `matching`              | `pairs[]` = `{ id, left, leftSubtext, right }`       |
-
-Errors: `403 LESSON_LOCKED` (try `/lessons/te-u3-l1` as a new user) · `404 LESSON_NOT_FOUND` · `401`.
-
----
-
-### 10 · Submit an answer — `POST {{baseUrl}}/exercises/:id/attempt`
-
-- Auth: **Bearer token** · Path parameter `:id` = exercise id
-- Body — the shape depends on the exercise type:
-
-| Exercise type                                         | Body                                                                                            |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| multiple-choice, character-recognition, fill-in-blank | `{ "answer": { "optionId": "te-u1-l1-e1-o3" } }`                                                |
-| translation                                           | `{ "answer": { "text": "thank you" } }`                                                         |
-| word-order                                            | `{ "answer": { "optionIds": ["te-u3-l1-e3-o3", "te-u3-l1-e3-o4", "te-u3-l1-e3-o1"] } }`         |
-| matching                                              | `{ "answer": { "pairs": [ { "leftId": "te-u1-l2-e2-o1", "rightId": "te-u1-l2-e2-o1" }, … ] } }` |
-
-**Step-by-step for lesson `te-u1-l1`** (Telugu, same ids pattern for every language):
-
-| Request            | URL                              | Body                                       | Expect                                         |
-| ------------------ | -------------------------------- | ------------------------------------------ | ---------------------------------------------- |
-| Wrong answer       | `/exercises/te-u1-l1-e1/attempt` | `{"answer":{"optionId":"te-u1-l1-e1-o1"}}` | 201, `isCorrect: false`, `correctAnswer: "aa"` |
-| Exercise 1 correct | `/exercises/te-u1-l1-e1/attempt` | `{"answer":{"optionId":"te-u1-l1-e1-o3"}}` | 201, `isCorrect: true`                         |
-| Exercise 2 correct | `/exercises/te-u1-l1-e2/attempt` | `{"answer":{"optionId":"te-u1-l1-e2-o3"}}` | 201, `isCorrect: true`                         |
-| Exercise 3 correct | `/exercises/te-u1-l1-e3/attempt` | `{"answer":{"optionId":"te-u1-l1-e3-o2"}}` | 201, `lessonProgress.status: "COMPLETED"`      |
-
-**Expected: `201 Created`**
+- Auth: optional (send the token to see **your** statuses; without it the first lesson is `available`, the rest `locked`)
+- **Expected: `200`** (shortened to 1 unit / 2 lessons):
 
 ```json
 {
-  "attempt": {
-    "id": "cmuuzaq2h000klp7dzqn6hfqu",
-    "exerciseId": "te-u1-l1-e1",
-    "isCorrect": true,
-    "typoCorrection": null,
-    "correctAnswer": "aa",
-    "createdAt": "2026-10-05T08:19:12.377Z"
-  },
-  "lessonProgress": {
-    "lessonId": "te-u1-l1",
-    "status": "IN_PROGRESS",
-    "completedAt": null,
-    "completedExercises": 1,
-    "totalExercises": 3,
-    "accuracy": 100
+  "course": {
+    "id": "te-course",
+    "title": "Telugu for English speakers",
+    "description": "From your first Telugu script letters to simple everyday sentences.",
+    "language": {
+      "id": "lang-te",
+      "code": "te",
+      "name": "Telugu",
+      "nativeName": "తెలుగు",
+      "scriptName": "Telugu script",
+      "description": "The language of Andhra Pradesh and Telangana, known for its rounded letters."
+    },
+    "progress": {
+      "completedLessons": 0,
+      "inProgressLessons": 0,
+      "totalLessons": 16,
+      "currentLessonId": "te-u1-l1"
+    },
+    "units": [
+      {
+        "id": "te-u1",
+        "number": 1,
+        "title": "Vowels",
+        "description": "Read and pronounce six Telugu script vowels.",
+        "stage": "FOUNDATIONS",
+        "status": "active",
+        "completedLessons": 0,
+        "lessons": [
+          {
+            "id": "te-u1-l1",
+            "title": "Vowels: a and aa",
+            "kind": "SCRIPT",
+            "exerciseCount": 4,
+            "status": "available"
+          },
+          {
+            "id": "te-u1-l2",
+            "title": "Vowels: i and ii",
+            "kind": "SCRIPT",
+            "exerciseCount": 4,
+            "status": "locked"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
 
-Typed answers ignore capitals, spaces and punctuation (`"THankyou"` ✓), and accept small typos (`"Thnak you"` ✓ with `"typoCorrection": "thank you"`).
+| Field                      | Meaning                                                                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lessons[].status`         | `completed` · `current` (started, not finished) · `available` (unlocked, not started) · `locked`                                                  |
+| `units[].status`           | `locked` · `active` · `completed`                                                                                                                 |
+| `progress.currentLessonId` | The recommended lesson ("Up next"): the most recently active unfinished lesson, otherwise the first available one; `null` when the course is done |
+
+Errors: `404 COURSE_NOT_FOUND` (`/courses/nope`).
+
+---
+
+### 9 · Lesson — `GET {{baseUrl}}/lessons/{{lessonId}}`
+
+- Auth: **Bearer token** · **Expected: `200`** (shortened to 1 word / 1 exercise):
+
+```json
+{
+  "lesson": {
+    "id": "te-u1-l1",
+    "title": "Vowels: a and aa",
+    "introText": "Your first two vowels. అ is short and ఆ is long — say each one aloud.",
+    "kind": "SCRIPT",
+    "status": "available",
+    "unit": {
+      "id": "te-u1",
+      "number": 1,
+      "title": "Vowels"
+    },
+    "course": {
+      "id": "te-course",
+      "title": "Telugu for English speakers",
+      "language": {
+        "code": "te",
+        "name": "Telugu"
+      }
+    },
+    "vocabulary": [
+      {
+        "id": "te-v01-letter-a",
+        "kind": "LETTER",
+        "script": "అ",
+        "romanization": "a",
+        "meaning": "Vowel: short “a”, like the u in “cup”",
+        "topic": "Vowels"
+      }
+    ],
+    "exercises": [
+      {
+        "id": "te-u1-l1-e3",
+        "type": "character-recognition",
+        "instruction": "Select the letter for this sound",
+        "prompt": "aa",
+        "promptSubtext": "long “aa”, like the a in “father”",
+        "options": [
+          {
+            "id": "te-u1-l1-e3-o1",
+            "text": "ఇ",
+            "subtext": null
+          },
+          {
+            "id": "te-u1-l1-e3-o2",
+            "text": "ఆ",
+            "subtext": null
+          },
+          {
+            "id": "te-u1-l1-e3-o3",
+            "text": "అ",
+            "subtext": null
+          }
+        ]
+      }
+    ],
+    "progress": {
+      "lessonId": "te-u1-l1",
+      "status": "NOT_STARTED",
+      "startedAt": null,
+      "runStartedAt": null,
+      "lastActivityAt": null,
+      "completedAt": null,
+      "timesCompleted": 0,
+      "correctAttempts": 0,
+      "incorrectAttempts": 0,
+      "accuracy": null,
+      "completedExerciseIds": [],
+      "completedExercises": 0,
+      "totalExercises": 4
+    }
+  }
+}
+```
+
+The exercise list **never** contains `isCorrect`, accepted translations, word positions or `explanation`. Exercise shapes by `type`:
+
+| `type`                  | Fields                                                            | Answer to send                                     |
+| ----------------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
+| `character-sound`       | `character` (a letter) + `options` (sounds)                       | `{ "optionId": "…" }`                              |
+| `character-recognition` | `prompt` (a sound) + `promptSubtext` (hint) + `options` (letters) | `{ "optionId": "…" }`                              |
+| `multiple-choice`       | `prompt`, `promptSubtext`, `options`                              | `{ "optionId": "…" }`                              |
+| `fill-in-blank`         | `before`, `after`, `translation`, `options`                       | `{ "optionId": "…" }`                              |
+| `translation`           | `prompt`, `promptSubtext` (type the meaning / the sound)          | `{ "text": "thank you" }`                          |
+| `word-order`            | `prompt` (English), `tokens` (word bank + 1 extra)                | `{ "optionIds": ["…", "…"] }` in order             |
+| `matching`              | `pairs` [`id`, `left`, `right`]                                   | `{ "pairs": [{ "leftId": "…", "rightId": "…" }] }` |
+
+Errors: `403 LESSON_LOCKED` (e.g. `te-u1-l2` before finishing `te-u1-l1`) · `404 LESSON_NOT_FOUND` · `401`.
+
+---
+
+### 10 · Start / resume a lesson — `POST {{baseUrl}}/lessons/{{lessonId}}/start`
+
+- Auth: **Bearer token** · Body: **optional**. `{ "restart": true }` starts the run over instead of resuming.
+- **Expected: `200`**
+
+First time → creates the progress row (**lesson started**):
+
+```json
+{
+  "resumed": false,
+  "progress": {
+    "lessonId": "te-u1-l1",
+    "status": "IN_PROGRESS",
+    "startedAt": "2026-10-05T11:01:32.029Z",
+    "runStartedAt": "2026-10-05T11:01:32.029Z",
+    "lastActivityAt": "2026-10-05T11:01:32.029Z",
+    "completedAt": null,
+    "timesCompleted": 0,
+    "correctAttempts": 0,
+    "incorrectAttempts": 0,
+    "accuracy": null,
+    "completedExerciseIds": [],
+    "completedExercises": 0,
+    "totalExercises": 4
+  }
+}
+```
+
+Coming back later to a lesson you left half-way → `"resumed": true` and the exercises already done:
+
+```json
+{
+  "resumed": true,
+  "progress": {
+    "lessonId": "te-u1-l1",
+    "status": "IN_PROGRESS",
+    "startedAt": "2026-10-05T11:01:32.029Z",
+    "runStartedAt": "2026-10-05T11:01:32.029Z",
+    "lastActivityAt": "2026-10-05T11:01:32.103Z",
+    "completedAt": null,
+    "timesCompleted": 0,
+    "correctAttempts": 2,
+    "incorrectAttempts": 1,
+    "accuracy": 67,
+    "completedExerciseIds": ["te-u1-l1-e1", "te-u1-l1-e2"],
+    "completedExercises": 2,
+    "totalExercises": 4
+  }
+}
+```
+
+On a **completed** lesson it starts a fresh practice run (`"resumed": false`, `completedExerciseIds: []`) and the status stays `COMPLETED`.
+
+Errors: `403 LESSON_LOCKED` · `404 LESSON_NOT_FOUND` · `400 VALIDATION_ERROR` (e.g. `{"restart":"yes"}`).
+
+---
+
+### 11 · Submit an answer — `POST {{baseUrl}}/exercises/:id/attempt`
+
+- Auth: **Bearer token**
+- Body: `{ "answer": { … }, "mode": "lesson" }` — `mode` is optional (`lesson` by default, `review` on the review screen).
+
+Example — **wrong** answer to `te-u1-l1-e1` (the letter అ; option `o2` is "aa"):
+
+```json
+{ "answer": { "optionId": "te-u1-l1-e1-o2" } }
+```
+
+**Expected: `201 Created`** — the attempt is saved and you get feedback:
+
+```json
+{
+  "attempt": {
+    "id": "cmuv53h900003nz7ddh7q179v",
+    "exerciseId": "te-u1-l1-e1",
+    "mode": "lesson",
+    "isCorrect": false,
+    "typoCorrection": null,
+    "correctAnswer": "a",
+    "explanation": "అ is “a”: short “a”, like the u in “cup”.",
+    "createdAt": "2026-10-05T11:01:32.052Z"
+  },
+  "lessonProgress": {
+    "lessonId": "te-u1-l1",
+    "status": "IN_PROGRESS",
+    "startedAt": "2026-10-05T11:01:32.029Z",
+    "runStartedAt": "2026-10-05T11:01:32.029Z",
+    "lastActivityAt": "2026-10-05T11:01:32.044Z",
+    "completedAt": null,
+    "timesCompleted": 0,
+    "correctAttempts": 0,
+    "incorrectAttempts": 1,
+    "accuracy": 0,
+    "completedExerciseIds": [],
+    "completedExercises": 0,
+    "totalExercises": 4,
+    "justCompleted": false
+  }
+}
+```
+
+Answering the **last missing exercise** completes the lesson (`justCompleted: true`, `status: COMPLETED`, the next lesson becomes `available`):
+
+```json
+{
+  "attempt": {
+    "id": "cmuv53hbc0007nz7dxstjlhmw",
+    "exerciseId": "te-u1-l1-e4",
+    "mode": "lesson",
+    "isCorrect": true,
+    "typoCorrection": null,
+    "correctAnswer": "అ",
+    "explanation": "“a” is written అ.",
+    "createdAt": "2026-10-05T11:01:32.136Z"
+  },
+  "lessonProgress": {
+    "lessonId": "te-u1-l1",
+    "status": "COMPLETED",
+    "startedAt": "2026-10-05T11:01:32.029Z",
+    "runStartedAt": "2026-10-05T11:01:32.029Z",
+    "lastActivityAt": "2026-10-05T11:01:32.133Z",
+    "completedAt": "2026-10-05T11:01:32.133Z",
+    "timesCompleted": 1,
+    "correctAttempts": 4,
+    "incorrectAttempts": 1,
+    "accuracy": 80,
+    "completedExerciseIds": ["te-u1-l1-e1", "te-u1-l1-e2", "te-u1-l1-e3", "te-u1-l1-e4"],
+    "completedExercises": 4,
+    "totalExercises": 4,
+    "justCompleted": true
+  }
+}
+```
+
+Correct option ids for the Telugu lessons used in Postman:
+
+| Lesson     | Exercise → correct answer                                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `te-u1-l1` | `e1` → `te-u1-l1-e1-o1` (a) · `e2` → `te-u1-l1-e2-o3` (aa) · `e3` → `te-u1-l1-e3-o2` (ఆ) · `e4` → `te-u1-l1-e4-o1` (అ) |
+| `te-u1-l4` | `e5` (typed) → `"ii"` or `"ee"` (capitals / spaces ignored: `"EE"`, `" i i "`)                                         |
+
+(Postman's folders 5–6 contain every answer, including matching and word order.)
+
+**Answer checking is deterministic** (no AI): choices compare option ids; typed answers ignore capitals, spaces and punctuation, use Unicode NFC normalisation, drop invisible joiners, and allow 1–2 typos on longer answers (`"Thnak you"` → accepted with `typoCorrection`); word order must match exactly; matching needs every pair.
 
 Errors:
 
-| Status | Code                    | Example                                              |
-| ------ | ----------------------- | ---------------------------------------------------- |
-| 400    | `VALIDATION_ERROR`      | `{}` or `{"answer": 5}`                              |
-| 400    | `INVALID_ANSWER_FORMAT` | `{"answer":{"text":"aa"}}` sent to a choice exercise |
-| 400    | `UNKNOWN_OPTION`        | `{"answer":{"optionId":"zzz"}}`                      |
-| 403    | `LESSON_LOCKED`         | exercise in a lesson you haven't unlocked            |
-| 404    | `EXERCISE_NOT_FOUND`    | `/exercises/nope/attempt`                            |
-| 401    | `UNAUTHORIZED`          | no / invalid token                                   |
+| Status | Code                    | When                                                    |
+| ------ | ----------------------- | ------------------------------------------------------- |
+| 400    | `INVALID_ANSWER_FORMAT` | Wrong answer shape, e.g. `{ "text": "a" }` for a choice |
+| 400    | `UNKNOWN_OPTION`        | `optionId` from another exercise                        |
+| 400    | `VALIDATION_ERROR`      | Empty body, empty text, `mode` not lesson/review        |
+| 403    | `LESSON_LOCKED`         | Exercise belongs to a locked lesson                     |
+| 404    | `EXERCISE_NOT_FOUND`    | Unknown exercise id                                     |
+| 401    | `UNAUTHORIZED`          | No / invalid token                                      |
 
 ---
 
-### 11 · My progress — `GET {{baseUrl}}/progress`
+### 12 · My progress — `GET {{baseUrl}}/progress`
 
-- Auth: **Bearer token** · **Expected: `200`**
-
-```json
-{ "progress": {
-  "totals": { "lessonsCompleted": 1, "lessonsStarted": 1, "exercisesAnswered": 4, "correctAnswers": 3, "accuracy": 75 },
-  "courses": [ { "courseId": "te-course", "title": "Telugu for English speakers",
-                 "language": { "code": "te", "name": "Telugu" }, "completedLessons": 1, "totalLessons": 5 }, … ],
-  "lessons": [ { "lessonId": "te-u1-l1", "title": "Vowels", "courseId": "te-course", "languageCode": "te",
-                 "status": "COMPLETED", "startedAt": "…", "completedAt": "…" } ]
-} }
-```
-
-### 12 · Progress in one lesson — `GET {{baseUrl}}/progress/te-u1-l1`
-
-- Auth: **Bearer token** · **Expected: `200`**
+- Auth: **Bearer token** · **Expected: `200`** (`courses` shortened to one):
 
 ```json
-{ "progress": {
-  "lessonId": "te-u1-l1", "title": "Vowels", "status": "COMPLETED",
-  "startedAt": "…", "completedAt": "…", "completedExercises": 3, "totalExercises": 3, "accuracy": 75,
-  "exercises": [ { "exerciseId": "te-u1-l1-e1", "type": "character-recognition", "attempts": 2, "correctAttempts": 1, "solved": true }, … ]
-} }
+{
+  "progress": {
+    "totals": {
+      "lessonsCompleted": 1,
+      "lessonsInProgress": 0,
+      "exercisesAnswered": 6,
+      "correctAnswers": 5,
+      "incorrectAnswers": 1,
+      "accuracy": 83,
+      "lastActivityAt": "2026-10-05T11:01:32.197Z"
+    },
+    "resume": null,
+    "courses": [
+      {
+        "courseId": "te-course",
+        "title": "Telugu for English speakers",
+        "language": {
+          "code": "te",
+          "name": "Telugu"
+        },
+        "completedLessons": 1,
+        "inProgressLessons": 0,
+        "totalLessons": 16
+      }
+    ],
+    "lessons": [
+      {
+        "lessonId": "te-u1-l1",
+        "title": "Vowels: a and aa",
+        "courseId": "te-course",
+        "languageCode": "te",
+        "status": "COMPLETED",
+        "startedAt": "2026-10-05T11:01:32.029Z",
+        "lastActivityAt": "2026-10-05T11:01:32.193Z",
+        "completedAt": "2026-10-05T11:01:32.133Z",
+        "timesCompleted": 1,
+        "correctAttempts": 4,
+        "incorrectAttempts": 1,
+        "accuracy": 80,
+        "totalExercises": 4
+      }
+    ]
+  }
+}
 ```
 
-A lesson you never touched returns `"status": "NOT_STARTED"`. Unknown lesson → `404 LESSON_NOT_FOUND`.
+`resume` = the unfinished lesson you touched last (null when nothing is half-done). `lastActivityAt` = your latest answer or lesson start.
 
 ---
 
-### 3 · Logout — `POST {{baseUrl}}/auth/logout`
+### 13 · Progress in one lesson — `GET {{baseUrl}}/progress/{{lessonId}}`
+
+- Auth: **Bearer token** · **Expected: `200`** — the lesson counters plus one row per exercise:
+
+```json
+{
+  "progress": {
+    "title": "Vowels: a and aa",
+    "lessonId": "te-u1-l1",
+    "status": "COMPLETED",
+    "startedAt": "2026-10-05T11:01:32.029Z",
+    "runStartedAt": "2026-10-05T11:01:32.029Z",
+    "lastActivityAt": "2026-10-05T11:01:32.193Z",
+    "completedAt": "2026-10-05T11:01:32.133Z",
+    "timesCompleted": 1,
+    "correctAttempts": 4,
+    "incorrectAttempts": 1,
+    "accuracy": 80,
+    "completedExerciseIds": ["te-u1-l1-e1", "te-u1-l1-e2", "te-u1-l1-e3", "te-u1-l1-e4"],
+    "completedExercises": 4,
+    "totalExercises": 4,
+    "exercises": [
+      {
+        "exerciseId": "te-u1-l1-e1",
+        "type": "character-sound",
+        "attempts": 2,
+        "correctAttempts": 1,
+        "incorrectAttempts": 1,
+        "reviewAttempts": 1,
+        "solvedInCurrentRun": true,
+        "lastAttemptAt": "2026-10-05T11:01:32.197Z",
+        "lastAttemptCorrect": true
+      }
+    ]
+  }
+}
+```
+
+A lesson you never opened returns `"status": "NOT_STARTED"` with zero counters. Unknown lesson → `404 LESSON_NOT_FOUND`.
+
+---
+
+### 14 · Review — `GET {{baseUrl}}/review?languageCode=te`
+
+- Auth: **Bearer token** · Query: `languageCode` (optional, filters to one language)
+- **Rule:** an exercise is an **open mistake** when you answered it wrong (in a lesson or a review) and have not answered it correctly **in a review** since. Getting it right later in the same lesson doesn't clear it — that's the point of reviewing later.
+- **Expected: `200`**:
+
+```json
+{
+  "review": {
+    "languageCode": "te",
+    "openMistakes": 1,
+    "resolvedMistakes": 0,
+    "mistakes": [
+      {
+        "exerciseId": "te-u1-l1-e1",
+        "type": "character-sound",
+        "instruction": "What sound does this letter make?",
+        "prompt": "అ",
+        "promptSubtext": null,
+        "yourAnswer": "aa",
+        "correctAnswer": "a",
+        "explanation": "అ is “a”: short “a”, like the u in “cup”.",
+        "wrongCount": 1,
+        "lastWrongAt": "2026-10-05T11:01:32.052Z",
+        "lessonId": "te-u1-l1",
+        "lessonTitle": "Vowels: a and aa",
+        "unitTitle": "Vowels",
+        "courseId": "te-course",
+        "languageCode": "te"
+      }
+    ],
+    "learnedVocabulary": [
+      {
+        "id": "te-v01-letter-a",
+        "kind": "LETTER",
+        "script": "అ",
+        "romanization": "a",
+        "meaning": "Vowel: short “a”, like the u in “cup”",
+        "topic": "Vowels"
+      }
+    ]
+  }
+}
+```
+
+`learnedVocabulary` = letters, words and phrases of the lessons you completed.
+
+### 15 · Incorrect attempts — `GET {{baseUrl}}/review/attempts?languageCode=te&limit=20`
+
+Every wrong answer, newest first (`limit` 1–50, default 20). `stillOpen` says whether it is still on the review list.
+
+```json
+{
+  "attempts": [
+    {
+      "attemptId": "cmuv53h900003nz7ddh7q179v",
+      "exerciseId": "te-u1-l1-e1",
+      "source": "LESSON",
+      "prompt": "అ",
+      "promptSubtext": null,
+      "yourAnswer": "aa",
+      "correctAnswer": "a",
+      "createdAt": "2026-10-05T11:01:32.052Z",
+      "stillOpen": true,
+      "lessonId": "te-u1-l1",
+      "lessonTitle": "Vowels: a and aa",
+      "unitTitle": "Vowels",
+      "courseId": "te-course",
+      "languageCode": "te"
+    }
+  ]
+}
+```
+
+### 16 · Review session — `GET {{baseUrl}}/review/session?languageCode=te`
+
+Up to 10 open mistakes as exercises (same shapes as a lesson, **no answers**):
+
+```json
+{
+  "session": {
+    "id": "review",
+    "title": "Review your mistakes",
+    "introText": "Answer each one correctly to clear it from your list.",
+    "totalOpen": 1,
+    "exercises": [
+      {
+        "id": "te-u1-l1-e1",
+        "type": "character-sound",
+        "instruction": "What sound does this letter make?",
+        "character": "అ",
+        "options": [
+          {
+            "id": "te-u1-l1-e1-o1",
+            "text": "a",
+            "subtext": null
+          },
+          {
+            "id": "te-u1-l1-e1-o2",
+            "text": "aa",
+            "subtext": null
+          },
+          {
+            "id": "te-u1-l1-e1-o3",
+            "text": "i",
+            "subtext": null
+          }
+        ],
+        "lessonTitle": "Vowels: a and aa"
+      }
+    ]
+  }
+}
+```
+
+Answer them with **`POST /exercises/:id/attempt`** and `"mode": "review"`:
+
+```json
+{ "answer": { "optionId": "te-u1-l1-e1-o1" }, "mode": "review" }
+```
+
+→ `201` with `"mode": "review"`. A correct review answer clears the mistake (`openMistakes` − 1, `resolvedMistakes` + 1). Review answers are saved (`source = REVIEW`) but **don't** change the lesson's correct/incorrect counters.
+
+Errors for 14–16: `401` without a token · `400 VALIDATION_ERROR` (`languageCode` not 2 letters, `limit` out of range).
+
+---
+
+### 17 · Logout — `POST {{baseUrl}}/auth/logout`
 
 - Auth: **Bearer token** · Body: none · **Expected: `200`**
 
@@ -398,23 +790,26 @@ Then **Get me** again → `401 UNAUTHORIZED` (the token is now invalid). Log in 
 ## 6. Automated version of this guide
 
 ```bash
-npm run test:api     # runs the same flow (15 steps) against your running database
+npm run test:api     # runs the same flow (19 steps) against your database
 ```
 
 ## 7. API troubleshooting
 
-| Symptom                                          | Cause                                             | Fix                                                                                                           |
-| ------------------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Postman: "Could not send request / ECONNREFUSED" | Backend not running                               | `npm run dev` (look for `🚀 Vachan API running at http://localhost:4000`)                                     |
-| Backend exits: `JWT_SECRET is required`          | Phase 2 variable missing                          | `echo "JWT_SECRET=$(openssl rand -hex 32)" >> backend/.env`                                                   |
-| `401 UNAUTHORIZED` on every protected request    | No/old token                                      | Run **Login** again; check the collection **Authorization** is `Bearer {{token}}`                             |
-| `401` right after restarting the backend         | You changed `JWT_SECRET` (old tokens are invalid) | Log in again                                                                                                  |
-| `403 LESSON_LOCKED`                              | Lessons unlock in order                           | Finish the previous lesson (see step 10 table)                                                                |
-| `404 COURSE_NOT_FOUND` / empty `courses`         | Database not seeded                               | `npm run db:seed`                                                                                             |
-| `400 VALIDATION_ERROR`                           | Body doesn't match the rules                      | Read `error.details` — it names the field                                                                     |
-| `400 INVALID_JSON`                               | Typo in the raw body                              | Body tab → **raw** + **JSON**; check quotes and commas                                                        |
-| `500 INTERNAL_SERVER_ERROR`                      | Bug or DB down                                    | Read the backend terminal; check `GET /api/health`                                                            |
-| Website: CORS error in browser console           | `CORS_ORIGIN` doesn't match the website address   | `CORS_ORIGIN=http://localhost:3000` in `backend/.env` (exact, no trailing slash), restart                     |
-| Website: "Can't reach the Vachan server"         | Backend down or wrong `NEXT_PUBLIC_API_URL`       | Start the backend; `frontend/.env.local` → `NEXT_PUBLIC_API_URL=http://localhost:4000`; restart `npm run dev` |
-| Website keeps sending you to /login              | Cookie blocked or `127.0.0.1` vs `localhost` mix  | Open the site at **http://localhost:3000** (not 127.0.0.1) so the cookie is sent                              |
-| `EADDRINUSE` / "Port 4000 is already in use"     | Another backend still running                     | `lsof -i :4000` → `kill <PID>`                                                                                |
+| Symptom                                                            | Cause                                                                  | Fix                                                                                                           |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Postman: "Could not send request / ECONNREFUSED"                   | Backend not running                                                    | `npm run dev` (look for `🚀 Vachan API running at http://localhost:4000`)                                     |
+| Backend exits: `JWT_SECRET is required`                            | Phase 2 variable missing                                               | `echo "JWT_SECRET=$(openssl rand -hex 32)" >> backend/.env`                                                   |
+| `401 UNAUTHORIZED` on every protected request                      | No/old token                                                           | Run **Login** again; check the collection **Authorization** is `Bearer {{token}}`                             |
+| `401` right after restarting the backend                           | You changed `JWT_SECRET` (old tokens are invalid)                      | Log in again                                                                                                  |
+| `403 LESSON_LOCKED`                                                | Lessons unlock in order                                                | Finish the previous lesson (run the folders in order)                                                         |
+| Postman assertion fails on counts (e.g. `openMistakes` expected 2) | Requests run out of order or a folder was run twice with the same user | Run the whole collection from the top (Register makes a fresh user)                                           |
+| `400 INVALID_ANSWER_FORMAT`                                        | Answer shape doesn't match the exercise type                           | See the table in section 9                                                                                    |
+| Old content / 3 units / `CHARACTER_SOUND` error                    | Phase 3 migration or seed missing                                      | `npm run db:migrate && npm run db:seed`                                                                       |
+| `404 COURSE_NOT_FOUND` / empty `courses`                           | Database not seeded                                                    | `npm run db:seed`                                                                                             |
+| `400 VALIDATION_ERROR`                                             | Body doesn't match the rules                                           | Read `error.details` — it names the field                                                                     |
+| `400 INVALID_JSON`                                                 | Typo in the raw body                                                   | Body tab → **raw** + **JSON**; check quotes and commas                                                        |
+| `500 INTERNAL_SERVER_ERROR`                                        | Bug or DB down                                                         | Read the backend terminal; check `GET /api/health`                                                            |
+| Website: CORS error in browser console                             | `CORS_ORIGIN` doesn't match the website address                        | `CORS_ORIGIN=http://localhost:3000` in `backend/.env` (exact, no trailing slash), restart                     |
+| Website: "Can't reach the Vachan server"                           | Backend down or wrong `NEXT_PUBLIC_API_URL`                            | Start the backend; `frontend/.env.local` → `NEXT_PUBLIC_API_URL=http://localhost:4000`; restart `npm run dev` |
+| Website keeps sending you to /login                                | Cookie blocked or `127.0.0.1` vs `localhost` mix                       | Open the site at **http://localhost:3000** (not 127.0.0.1) so the cookie is sent                              |
+| `EADDRINUSE` / "Port 4000 is already in use"                       | Another backend still running                                          | `lsof -i :4000` → `kill <PID>`                                                                                |

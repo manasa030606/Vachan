@@ -1,7 +1,12 @@
 // Languages and courses (the learning path).
 import { notFound } from "../lib/http-error.ts";
 import { prisma } from "../lib/prisma.ts";
-import { computeLessonStatuses, type LessonStatus } from "./lesson-status.ts";
+import {
+  computeLessonStatuses,
+  pickRecommendedLesson,
+  type LessonProgressInfo,
+  type LessonStatus,
+} from "./lesson-status.ts";
 
 const languageSelect = {
   id: true,
@@ -69,6 +74,8 @@ async function loadCourseTree(courseId: string) {
   });
 }
 
+type CourseTree = NonNullable<Awaited<ReturnType<typeof loadCourseTree>>>;
+
 /** Lesson statuses for one learner in one course. Guests see only the first lesson open. */
 export async function getStatusesForCourse(
   courseId: string,
@@ -76,31 +83,41 @@ export async function getStatusesForCourse(
 ): Promise<Map<string, LessonStatus>> {
   const course = await loadCourseTree(courseId);
   if (!course) throw notFound("COURSE_NOT_FOUND", "Course not found");
-  return statusesFor(course, userId);
+  return (await statusesFor(course, userId)).statuses;
 }
 
-async function statusesFor(
-  course: NonNullable<Awaited<ReturnType<typeof loadCourseTree>>>,
-  userId: string | null,
-) {
+async function statusesFor(course: CourseTree, userId: string | null) {
   const orderedLessonIds = course.units.flatMap((unit) => unit.lessons.map((lesson) => lesson.id));
-  const completed = userId
+  const rows = userId
     ? await prisma.userLessonProgress.findMany({
-        where: { userId, status: "COMPLETED", lessonId: { in: orderedLessonIds } },
-        select: { lessonId: true },
+        where: { userId, lessonId: { in: orderedLessonIds } },
+        select: { lessonId: true, status: true, lastActivityAt: true },
       })
     : [];
-  return computeLessonStatuses(orderedLessonIds, new Set(completed.map((row) => row.lessonId)));
+  const progress = new Map<string, LessonProgressInfo>(rows.map((row) => [row.lessonId, row]));
+  const statuses = computeLessonStatuses(orderedLessonIds, progress);
+  return {
+    statuses,
+    recommendedLessonId: pickRecommendedLesson(orderedLessonIds, statuses, progress),
+  };
+}
+
+/** A unit is locked until one of its lessons opens, and completed when every lesson is. */
+function unitStatus(lessonStatuses: LessonStatus[]): "locked" | "active" | "completed" {
+  if (lessonStatuses.every((status) => status === "completed")) return "completed";
+  if (lessonStatuses.every((status) => status === "locked")) return "locked";
+  return "active";
 }
 
 export async function getCourseDetail(courseId: string, userId: string | null) {
   const course = await loadCourseTree(courseId);
   if (!course) throw notFound("COURSE_NOT_FOUND", "Course not found");
 
-  const statuses = await statusesFor(course, userId);
+  const { statuses, recommendedLessonId } = await statusesFor(course, userId);
+  const statusOf = (lessonId: string) => statuses.get(lessonId) ?? "locked";
   const allLessons = course.units.flatMap((unit) => unit.lessons);
-  const completedLessons = allLessons.filter((lesson) => statuses.get(lesson.id) === "completed");
-  const currentLesson = allLessons.find((lesson) => statuses.get(lesson.id) === "current") ?? null;
+  const count = (status: LessonStatus) =>
+    allLessons.filter((lesson) => statusOf(lesson.id) === status).length;
 
   return {
     id: course.id,
@@ -108,23 +125,30 @@ export async function getCourseDetail(courseId: string, userId: string | null) {
     description: course.description,
     language: course.language,
     progress: {
-      completedLessons: completedLessons.length,
+      completedLessons: count("completed"),
+      inProgressLessons: count("current"),
       totalLessons: allLessons.length,
-      currentLessonId: currentLesson?.id ?? null,
+      /** The recommended next lesson ("Up next"); null when the course is finished. */
+      currentLessonId: recommendedLessonId,
     },
-    units: course.units.map((unit) => ({
-      id: unit.id,
-      number: unit.sortOrder,
-      title: unit.title,
-      description: unit.description,
-      stage: unit.stage,
-      lessons: unit.lessons.map((lesson) => ({
-        id: lesson.id,
-        title: lesson.title,
-        kind: lesson.kind,
-        exerciseCount: lesson._count.exercises,
-        status: statuses.get(lesson.id) ?? "locked",
-      })),
-    })),
+    units: course.units.map((unit) => {
+      const lessonStatuses = unit.lessons.map((lesson) => statusOf(lesson.id));
+      return {
+        id: unit.id,
+        number: unit.sortOrder,
+        title: unit.title,
+        description: unit.description,
+        stage: unit.stage,
+        status: unitStatus(lessonStatuses),
+        completedLessons: lessonStatuses.filter((status) => status === "completed").length,
+        lessons: unit.lessons.map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          kind: lesson.kind,
+          exerciseCount: lesson._count.exercises,
+          status: statusOf(lesson.id),
+        })),
+      };
+    }),
   };
 }

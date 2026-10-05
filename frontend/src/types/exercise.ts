@@ -24,9 +24,19 @@ export type MultipleChoiceExercise = ExerciseBase & {
   options: ChoiceOption[];
 };
 
+/** Shows one letter (e.g. "ఆ"); the learner picks the sound it makes. */
+export type CharacterSoundExercise = ExerciseBase & {
+  type: "character-sound";
+  character: string;
+  options: ChoiceOption[];
+};
+
+/** Shows a sound (e.g. "aa"); the learner picks the matching letter. */
 export type CharacterRecognitionExercise = ExerciseBase & {
   type: "character-recognition";
-  character: string;
+  prompt: string;
+  /** How the sound is pronounced, e.g. "long “aa”, like the a in “father”". */
+  promptSubtext?: string;
   options: ChoiceOption[];
 };
 
@@ -67,6 +77,7 @@ export type WordOrderExercise = ExerciseBase & {
 
 export type Exercise =
   | MultipleChoiceExercise
+  | CharacterSoundExercise
   | CharacterRecognitionExercise
   | MatchingExercise
   | FillInBlankExercise
@@ -84,8 +95,12 @@ export type ExerciseAnswer =
 
 export type AnswerResult = "correct" | "incorrect";
 
+export type LessonMode = "lesson" | "review";
+
 export type Lesson = {
   id: string;
+  /** "lesson" = a lesson from the path; "review" = a session of past mistakes. */
+  mode: LessonMode;
   title: string;
   unitTitle: string;
   /** Words introduced before the exercises start ("Short introduction + examples"). */
@@ -93,6 +108,11 @@ export type Lesson = {
   /** Sentence shown on the intro screen. */
   introText: string;
   exercises: Exercise[];
+  /** Saved progress (lessons only): used to resume or to offer "practise again". */
+  progress: {
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    completedExerciseIds: string[];
+  };
 };
 
 /** Common props every exercise component receives. */

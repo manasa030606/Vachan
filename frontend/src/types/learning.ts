@@ -1,5 +1,4 @@
 // Core learning types shared by the API mappers and the UI.
-// In Phase 2 these shapes will come from the backend API instead of local mock files.
 
 export type LanguageCode = "hi" | "te" | "ta" | "ml" | "kn" | "bn";
 
@@ -60,7 +59,8 @@ export type LanguageContent = {
   };
 };
 
-export type LessonStatus = "completed" | "current" | "locked";
+/** completed · current (started, not finished) · available (unlocked, not started) · locked */
+export type LessonStatus = "completed" | "current" | "available" | "locked";
 
 export type LessonIcon = "script" | "words" | "chat" | "star" | "trophy";
 
@@ -81,5 +81,6 @@ export type Unit = {
   description: string;
   stage: string; // learning-journey stage from the spec, e.g. "Foundations"
   color: UnitColor;
+  status: "locked" | "active" | "completed";
   lessons: LessonSummary[];
 };

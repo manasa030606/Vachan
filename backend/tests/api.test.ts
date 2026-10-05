@@ -52,6 +52,17 @@ async function correctAnswerFor(exerciseId: string) {
   }
 }
 
+/** Starts a lesson and answers every exercise correctly. */
+async function completeLesson(lessonId: string) {
+  await call("POST", `/lessons/${lessonId}/start`);
+  const lesson = await call("GET", `/lessons/${lessonId}`);
+  for (const exercise of lesson.body.lesson.exercises) {
+    await call("POST", `/exercises/${exercise.id}/attempt`, {
+      answer: await correctAnswerFor(exercise.id),
+    });
+  }
+}
+
 before(async () => {
   server = createApp().listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
@@ -138,92 +149,179 @@ describe("Vachan API (Postman order)", () => {
     assert.equal(telugu.body.courses[0].id, "te-course");
   });
 
-  it("8. course detail: first lesson current, the rest locked", async () => {
+  it("8. course detail: 4 units, first lesson available, the rest locked", async () => {
     const result = await call("GET", "/courses/te-course");
     assert.equal(result.status, 200);
-    const lessons = result.body.course.units.flatMap((unit: Json) => unit.lessons);
-    assert.equal(lessons[0].status, "current");
+    const course = result.body.course;
+    assert.equal(course.units.length, 4);
+    const lessons = course.units.flatMap((unit: Json) => unit.lessons);
+    assert.equal(lessons.length, 16);
+    assert.equal(lessons[0].status, "available");
     assert.ok(lessons.slice(1).every((lesson: Json) => lesson.status === "locked"));
+    assert.equal(course.progress.currentLessonId, "te-u1-l1");
+    assert.equal(course.units[0].status, "active");
+    assert.equal(course.units[1].status, "locked");
     assert.equal((await call("GET", "/courses/nope")).status, 404);
   });
 
-  it("9. lesson: open lesson returns exercises without answers; locked lesson → 403", async () => {
+  it("9. lesson: exercises without answers; locked lesson → 403; unknown → 404", async () => {
     const lesson = await call("GET", "/lessons/te-u1-l1");
     assert.equal(lesson.status, 200);
     const text = JSON.stringify(lesson.body);
-    assert.ok(
-      !text.includes("isCorrect") && !text.includes("correctPosition"),
-      "answers must not leak",
-    );
-    assert.equal((await call("GET", "/lessons/te-u2-l1")).status, 403);
+    for (const secret of ["isCorrect", "correctPosition", "explanation"]) {
+      assert.ok(!text.includes(secret), `${secret} must not leak`);
+    }
+    assert.equal(lesson.body.lesson.progress.status, "NOT_STARTED");
+    assert.equal(lesson.body.lesson.exercises[0].type, "character-sound");
+    assert.equal((await call("GET", "/lessons/te-u1-l2")).status, 403);
+    assert.equal((await call("POST", "/lessons/te-u1-l2/start")).status, 403);
     assert.equal((await call("GET", "/lessons/does-not-exist")).status, 404);
   });
 
-  it("10. attempts: wrong answer recorded, then completing every exercise completes the lesson", async () => {
+  it("10. starting a lesson records it and makes it 'current'", async () => {
+    const started = await call("POST", "/lessons/te-u1-l1/start");
+    assert.equal(started.status, 200);
+    assert.equal(started.body.resumed, false);
+    assert.equal(started.body.progress.status, "IN_PROGRESS");
+    const course = await call("GET", "/courses/te-course");
+    assert.equal(course.body.course.units[0].lessons[0].status, "current");
+  });
+
+  it("11. attempts are saved with feedback; leaving and coming back resumes the lesson", async () => {
+    const wrongOption = await prisma.exerciseOption.findFirstOrThrow({
+      where: { exerciseId: "te-u1-l1-e1", isCorrect: false },
+    });
     const wrong = await call("POST", "/exercises/te-u1-l1-e1/attempt", {
-      answer: { optionId: "te-u1-l1-e1-o1" },
+      answer: { optionId: wrongOption.id },
     });
     assert.equal(wrong.status, 201);
     assert.equal(wrong.body.attempt.isCorrect, false);
-    assert.equal(wrong.body.attempt.correctAnswer, "aa");
+    assert.equal(wrong.body.attempt.correctAnswer, "a");
+    assert.match(wrong.body.attempt.explanation, /అ is “a”/);
+    assert.equal(wrong.body.lessonProgress.incorrectAttempts, 1);
 
-    const lesson = await call("GET", "/lessons/te-u1-l1");
-    let last: Json = {};
-    for (const exercise of lesson.body.lesson.exercises) {
-      last = await call("POST", `/exercises/${exercise.id}/attempt`, {
-        answer: await correctAnswerFor(exercise.id),
+    for (const id of ["te-u1-l1-e1", "te-u1-l1-e2"]) {
+      const right = await call("POST", `/exercises/${id}/attempt`, {
+        answer: await correctAnswerFor(id),
       });
-      assert.equal(last.status, 201);
-      assert.equal(last.body.attempt.isCorrect, true, exercise.id);
+      assert.equal(right.body.attempt.isCorrect, true, id);
     }
-    assert.equal(last.body.lessonProgress.status, "COMPLETED");
-    assert.equal(last.body.lessonProgress.accuracy, 75); // 3 right out of 4 answers
+
+    // "Come back later": start again → resume with two exercises already done.
+    const resumed = await call("POST", "/lessons/te-u1-l1/start");
+    assert.equal(resumed.body.resumed, true);
+    assert.deepEqual(resumed.body.progress.completedExerciseIds.sort(), [
+      "te-u1-l1-e1",
+      "te-u1-l1-e2",
+    ]);
   });
 
-  it("11. completing a lesson unlocks the next one", async () => {
+  it("12. answering the last exercise completes the lesson", async () => {
+    let last: Json = {};
+    for (const id of ["te-u1-l1-e3", "te-u1-l1-e4"]) {
+      last = await call("POST", `/exercises/${id}/attempt`, { answer: await correctAnswerFor(id) });
+    }
+    const progress = last.body.lessonProgress;
+    assert.equal(progress.justCompleted, true);
+    assert.equal(progress.status, "COMPLETED");
+    assert.equal(progress.timesCompleted, 1);
+    assert.equal(progress.correctAttempts, 4);
+    assert.equal(progress.incorrectAttempts, 1);
+    assert.equal(progress.accuracy, 80); // 4 right out of 5 answers
+  });
+
+  it("13. completing a lesson unlocks the next one", async () => {
     const course = await call("GET", "/courses/te-course");
     const lessons = course.body.course.units.flatMap((unit: Json) => unit.lessons);
     assert.equal(lessons[0].status, "completed");
-    assert.equal(lessons[1].status, "current");
+    assert.equal(lessons[1].status, "available");
+    assert.equal(lessons[2].status, "locked");
+    assert.equal(course.body.course.progress.currentLessonId, "te-u1-l2");
     assert.equal((await call("GET", "/lessons/te-u1-l2")).status, 200);
   });
 
-  it("12. translation accepts capitals, missing spaces and small typos", async () => {
-    // Unlock unit 2 quickly by completing lesson 2.
-    const lesson2 = await call("GET", "/lessons/te-u1-l2");
-    for (const exercise of lesson2.body.lesson.exercises) {
-      await call("POST", `/exercises/${exercise.id}/attempt`, {
-        answer: await correctAnswerFor(exercise.id),
-      });
-    }
-    for (const text of ["THANKYOU", "Thnak you"]) {
-      const result = await call("POST", "/exercises/te-u2-l1-e3/attempt", { answer: { text } });
+  it("14. practising a completed lesson starts a fresh run and keeps it completed", async () => {
+    const again = await call("POST", "/lessons/te-u1-l1/start");
+    assert.equal(again.body.resumed, false);
+    assert.equal(again.body.progress.status, "COMPLETED");
+    assert.deepEqual(again.body.progress.completedExerciseIds, []);
+  });
+
+  it("15. typed answers ignore capitals and spaces; wrong format → 400", async () => {
+    await completeLesson("te-u1-l2");
+    await completeLesson("te-u1-l3");
+    for (const text of ["EE", " i i "]) {
+      const result = await call("POST", "/exercises/te-u1-l4-e5/attempt", { answer: { text } });
       assert.equal(result.body.attempt.isCorrect, true, text);
     }
-    const wrong = await call("POST", "/exercises/te-u2-l1-e3/attempt", {
-      answer: { text: "water" },
-    });
+    const wrong = await call("POST", "/exercises/te-u1-l4-e5/attempt", { answer: { text: "u" } });
     assert.equal(wrong.body.attempt.isCorrect, false);
+    const badFormat = await call("POST", "/exercises/te-u1-l1-e1/attempt", {
+      answer: { text: "aa" },
+    });
+    assert.equal(badFormat.status, 400);
+    assert.equal(badFormat.body.error.code, "INVALID_ANSWER_FORMAT");
   });
 
-  it("13. rejects an answer in the wrong format (400)", async () => {
-    const result = await call("POST", "/exercises/te-u1-l1-e1/attempt", { answer: { text: "aa" } });
-    assert.equal(result.status, 400);
-    assert.equal(result.body.error.code, "INVALID_ANSWER_FORMAT");
+  it("16. review lists open mistakes and incorrect attempts (no answers in the session)", async () => {
+    const review = await call("GET", "/review?languageCode=te");
+    assert.equal(review.status, 200);
+    assert.equal(review.body.review.openMistakes, 2);
+    const ids = review.body.review.mistakes.map((mistake: Json) => mistake.exerciseId);
+    assert.deepEqual(ids, ["te-u1-l4-e5", "te-u1-l1-e1"]); // newest first
+    assert.equal(review.body.review.mistakes[0].yourAnswer, "u");
+    assert.equal(review.body.review.mistakes[0].correctAnswer, "ii");
+    assert.ok(review.body.review.learnedVocabulary.length >= 6);
+
+    const attempts = await call("GET", "/review/attempts?languageCode=te&limit=10");
+    assert.equal(attempts.body.attempts.length, 2);
+
+    const session = await call("GET", "/review/session?languageCode=te");
+    assert.equal(session.body.session.exercises.length, 2);
+    assert.ok(!JSON.stringify(session.body).includes("isCorrect"));
+    assert.equal((await call("GET", "/review", undefined, false)).status, 401);
   });
 
-  it("14. progress summary and per-lesson progress", async () => {
+  it("17. a correct review answer clears the mistake without changing lesson counters", async () => {
+    const before = await call("GET", "/progress/te-u1-l1");
+    const result = await call("POST", "/exercises/te-u1-l1-e1/attempt", {
+      answer: await correctAnswerFor("te-u1-l1-e1"),
+      mode: "review",
+    });
+    assert.equal(result.status, 201);
+    assert.equal(result.body.attempt.mode, "review");
+    const afterwards = await call("GET", "/progress/te-u1-l1");
+    assert.equal(afterwards.body.progress.correctAttempts, before.body.progress.correctAttempts);
+    assert.equal(afterwards.body.progress.exercises[0].reviewAttempts, 1);
+
+    const review = await call("GET", "/review?languageCode=te");
+    assert.equal(review.body.review.openMistakes, 1);
+    assert.equal(review.body.review.resolvedMistakes, 1);
+  });
+
+  it("18. progress summary, resume point and per-lesson progress", async () => {
+    await call("POST", "/lessons/te-u1-l4/start");
     const summary = await call("GET", "/progress");
     assert.equal(summary.status, 200);
-    assert.equal(summary.body.progress.totals.lessonsCompleted, 2);
+    const { totals, resume, courses } = summary.body.progress;
+    assert.equal(totals.lessonsCompleted, 3);
+    assert.equal(totals.lessonsInProgress, 1);
+    assert.ok(totals.incorrectAnswers >= 2);
+    assert.ok(totals.lastActivityAt);
+    assert.equal(resume.lessonId, "te-u1-l4");
+    assert.equal(
+      courses.find((course: Json) => course.courseId === "te-course").completedLessons,
+      3,
+    );
+
     const lesson = await call("GET", "/progress/te-u1-l1");
     assert.equal(lesson.body.progress.status, "COMPLETED");
-    assert.equal(lesson.body.progress.completedExercises, 3);
+    assert.equal(lesson.body.progress.exercises.length, 4);
     const untouched = await call("GET", "/progress/hi-u1-l1");
     assert.equal(untouched.body.progress.status, "NOT_STARTED");
   });
 
-  it("15. logout invalidates the token", async () => {
+  it("19. logout invalidates the token", async () => {
     const result = await call("POST", "/auth/logout");
     assert.equal(result.status, 200);
     assert.equal((await call("GET", "/me")).status, 401);

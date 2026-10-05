@@ -10,14 +10,15 @@ export function OutOfHearts() {
       </div>
       <h1 className="mt-6 text-3xl font-extrabold text-ink">You&apos;re out of hearts</h1>
       <p className="mt-2 text-lg text-slate-600">
-        Mistakes are part of learning! Review your weak words in Practice to earn hearts back.
+        Mistakes are part of learning! Your answers so far are saved — open the lesson again to
+        continue where you stopped, or review your mistakes in Practice.
       </p>
       <p className="mt-2 text-sm text-slate-500">
         (Hearts refilling is added with gamification in Phase 4.)
       </p>
       <div className="mt-8 flex w-full flex-col gap-3">
         <ButtonLink href="/practice" size="lg" fullWidth autoFocus>
-          Practise to earn hearts
+          Review mistakes
         </ButtonLink>
         <ButtonLink href="/learn" variant="secondary" size="lg" fullWidth>
           Back to Learn

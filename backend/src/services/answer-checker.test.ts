@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { checkAnswer, editDistance, toComparable, type CheckableOption } from "./answer-checker.ts";
+import {
+  checkAnswer,
+  correctAnswerText,
+  describeAnswer,
+  editDistance,
+  normalizeText,
+  toComparable,
+  type CheckableOption,
+} from "./answer-checker.ts";
 
 const option = (
   id: string,
@@ -97,5 +105,40 @@ describe("text helpers", () => {
   });
   it("editDistance counts a swap as one edit", () => {
     assert.equal(editDistance("thnak", "thank"), 1);
+  });
+});
+
+describe("Phase 3 checking", () => {
+  const letterChoice = {
+    type: "CHARACTER_SOUND" as const,
+    options: [
+      { id: "o1", text: "ka", isCorrect: false, correctPosition: null, matchText: null },
+      { id: "o2", text: "kaa", isCorrect: true, correctPosition: null, matchText: null },
+    ],
+  };
+
+  it("checks character → sound like any single choice", () => {
+    assert.equal(checkAnswer(letterChoice, { optionId: "o2" }).isCorrect, true);
+    assert.equal(checkAnswer(letterChoice, { optionId: "o1" }).correctAnswer, "kaa");
+  });
+
+  it("normalizes Unicode, invisible joiners and the Devanagari full stop", () => {
+    assert.equal(normalizeText("नमस्ते।"), "नमस्ते");
+    assert.equal(normalizeText("క‍ా"), "కా");
+    assert.equal(normalizeText("é"), "é"); // decomposed → composed (NFC)
+  });
+
+  it("describes stored answers and correct answers as text", () => {
+    assert.equal(describeAnswer(letterChoice, { optionId: "o1" }), "ka");
+    assert.equal(describeAnswer(letterChoice, { text: "Kaa" }), "Kaa");
+    assert.equal(correctAnswerText(letterChoice), "kaa");
+    const matching = {
+      type: "MATCHING" as const,
+      options: [
+        { id: "m1", text: "అ", isCorrect: false, correctPosition: null, matchText: "a" },
+        { id: "m2", text: "ఆ", isCorrect: false, correctPosition: null, matchText: "aa" },
+      ],
+    };
+    assert.equal(describeAnswer(matching, { pairs: [{ leftId: "m1", rightId: "m2" }] }), "అ = aa");
   });
 });

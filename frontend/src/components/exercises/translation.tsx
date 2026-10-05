@@ -5,7 +5,10 @@ import type { ExerciseComponentProps, TranslationExercise } from "@/types/exerci
 import { cn } from "@/lib/cn";
 import { ExerciseHeading, ScriptPrompt } from "./exercise-heading";
 
-/** Shows a word in an Indian script; the learner types its English meaning. */
+/**
+ * Shows a word or sentence in an Indian script; the learner types its English meaning.
+ * Also used for "Type the sound this letter makes" (a single letter, answered in Latin letters).
+ */
 export function Translation({
   exercise,
   answer,
@@ -16,6 +19,8 @@ export function Translation({
 }: ExerciseComponentProps<TranslationExercise>) {
   const inputId = useId();
   const value = answer?.type === "text" ? answer.value : "";
+  // A single letter (1–3 code points, e.g. "ఈ" or "కా") asks for its sound, not a translation.
+  const isLetter = [...exercise.prompt].length <= 3 && !exercise.promptSubtext;
 
   return (
     <div className="space-y-6">
@@ -24,10 +29,11 @@ export function Translation({
         text={exercise.prompt}
         subtext={exercise.promptSubtext}
         showSubtext={showRomanization}
+        size={isLetter ? "xl" : "md"}
       />
       <div>
         <label htmlFor={inputId} className="mb-2 block font-bold text-slate-700">
-          Your translation
+          {isLetter ? "The sound" : "Your translation"}
         </label>
         <textarea
           id={inputId}
@@ -37,7 +43,7 @@ export function Translation({
           autoComplete="off"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder="Type in English…"
+          placeholder={isLetter ? "Type the sound, e.g. aa…" : "Type in English…"}
           onKeyDown={(event) => {
             // Enter submits (handled by the lesson player); Shift+Enter would add a new line.
             if (event.key === "Enter" && !event.shiftKey) event.preventDefault();

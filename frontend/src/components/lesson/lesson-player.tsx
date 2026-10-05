@@ -1,15 +1,20 @@
 "use client";
 
-// Runs a lesson: intro → exercises (check / feedback / continue) → complete screen.
-// "Check" sends the answer to the backend (POST /api/exercises/:id/attempt), which
-// decides if it is right and saves the attempt. The lesson rules live in lessonReducer.
+// Runs a lesson (or a mistake review): intro → exercises (check / feedback / continue) → complete.
+//
+//  - "Start" calls POST /api/lessons/:id/start. The server answers with the exercises already
+//    done in this run, so a lesson left half-way resumes where the learner stopped.
+//  - "Check" sends the answer to POST /api/exercises/:id/attempt; the server decides if it is
+//    right, saves the attempt and returns feedback (correct answer + explanation).
+//  - Review mode sends answers with mode "review" and costs no hearts.
+// The lesson rules live in lessonReducer.
 import { useCallback, useEffect, useReducer, useState } from "react";
 import type { ExerciseAnswer, Lesson } from "@/types/exercise";
 import { ExerciseRenderer } from "@/components/exercises/exercise-renderer";
 import { MOCK_PROGRESS } from "@/data/mock-user";
 import { ApiError } from "@/lib/api/client";
-import { submitAttempt } from "@/lib/api/endpoints";
-import type { LessonProgressDto } from "@/lib/api/types";
+import { startLesson, submitAttempt } from "@/lib/api/endpoints";
+import type { AttemptResultDto } from "@/lib/api/types";
 import { isAnswerReady, toAttemptAnswer } from "@/lib/exercises/check-answer";
 import {
   createInitialLessonState,
@@ -27,18 +32,63 @@ type LessonPlayerProps = {
   showRomanization: boolean;
 };
 
+/** Hearts are demo values until gamification (Phase 4). */
+const START_HEARTS = MOCK_PROGRESS.hearts;
+
 export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
+  const isReview = lesson.mode === "review";
   const [state, dispatch] = useReducer(
     lessonReducer,
-    createInitialLessonState(lesson.exercises, MOCK_PROGRESS.hearts),
+    createInitialLessonState(lesson.exercises, START_HEARTS, {
+      heartsEnabled: !isReview,
+      alreadyCompletedIds:
+        lesson.progress.status === "IN_PROGRESS" ? lesson.progress.completedExerciseIds : [],
+    }),
   );
+  const [isStarting, setIsStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [checkError, setCheckError] = useState<string | null>(null);
-  /** Latest progress from the server (status, accuracy) — shown on the complete screen. */
-  const [serverProgress, setServerProgress] = useState<LessonProgressDto | null>(null);
+  /** Latest lesson progress from the server — shown on the complete screen. */
+  const [serverProgress, setServerProgress] = useState<AttemptResultDto["lessonProgress"] | null>(
+    null,
+  );
+  const [firstCompletion, setFirstCompletion] = useState(false);
+  const [resumed, setResumed] = useState(false);
 
   const exercise = state.queue[state.position];
   const canCheck = exercise ? isAnswerReady(exercise, state.answer) && !isChecking : false;
+  const exitHref = isReview ? "/practice" : "/learn";
+
+  const begin = useCallback(
+    async (restart: boolean) => {
+      if (isReview) {
+        dispatch({ type: "START" });
+        return;
+      }
+      setIsStarting(true);
+      setStartError(null);
+      try {
+        const { progress, resumed: wasResumed } = await startLesson(lesson.id, restart);
+        setResumed(wasResumed && progress.completedExerciseIds.length > 0);
+        dispatch({
+          type: "BEGIN",
+          exercises: lesson.exercises,
+          hearts: START_HEARTS,
+          alreadyCompletedIds: progress.completedExerciseIds,
+        });
+      } catch (error) {
+        setStartError(
+          error instanceof ApiError
+            ? error.message
+            : "Couldn't start the lesson. Please try again.",
+        );
+      } finally {
+        setIsStarting(false);
+      }
+    },
+    [isReview, lesson.id, lesson.exercises],
+  );
 
   const handleAnswerChange = useCallback(
     (answer: ExerciseAnswer | null) => dispatch({ type: "ANSWER_CHANGED", answer }),
@@ -53,13 +103,18 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
       const { attempt, lessonProgress } = await submitAttempt(
         exercise.id,
         toAttemptAnswer(state.answer),
+        isReview ? "review" : "lesson",
       );
       setServerProgress(lessonProgress);
+      if (lessonProgress.justCompleted && lessonProgress.timesCompleted === 1) {
+        setFirstCompletion(true);
+      }
       dispatch({
         type: "CHECK",
         isCorrect: attempt.isCorrect,
         typoCorrection: attempt.typoCorrection,
         correctAnswer: attempt.correctAnswer,
+        explanation: attempt.explanation,
       });
     } catch (error) {
       setCheckError(
@@ -68,7 +123,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
     } finally {
       setIsChecking(false);
     }
-  }, [exercise, state.answer, state.result, isChecking]);
+  }, [exercise, state.answer, state.result, isChecking, isReview]);
 
   // Keyboard: Enter = Check, then Enter again = Continue.
   useEffect(() => {
@@ -94,7 +149,13 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
         words={lesson.newWords}
         introText={lesson.introText}
         showRomanization={showRomanization}
-        onStart={() => dispatch({ type: "START" })}
+        status={lesson.progress.status}
+        doneCount={state.completedIds.length}
+        totalCount={state.totalExercises}
+        exitHref={exitHref}
+        isStarting={isStarting}
+        startError={startError}
+        onStart={(restart) => void begin(restart)}
       />
     );
   }
@@ -107,16 +168,23 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
     return (
       <LessonComplete
         lessonTitle={lesson.title}
-        exercisesCompleted={serverProgress?.completedExercises ?? state.totalExercises}
-        totalExercises={serverProgress?.totalExercises ?? state.totalExercises}
-        accuracy={getAccuracy(state)}
-        heartsLeft={state.hearts}
+        mode={lesson.mode}
+        exercisesCompleted={serverProgress?.completedExercises ?? state.completedIds.length}
+        totalExercises={
+          isReview ? state.totalExercises : (serverProgress?.totalExercises ?? state.totalExercises)
+        }
+        // Lessons show the saved accuracy (includes answers given before leaving and resuming).
+        accuracy={isReview ? getAccuracy(state) : (serverProgress?.accuracy ?? getAccuracy(state))}
+        resumed={resumed}
+        heartsLeft={isReview ? null : state.hearts}
         mistakesReviewed={state.mistakeIds.length}
         savedAsCompleted={serverProgress?.status === "COMPLETED"}
+        firstCompletion={firstCompletion}
         words={lesson.newWords}
-        onPracticeAgain={() =>
-          dispatch({ type: "RESTART", exercises: lesson.exercises, hearts: MOCK_PROGRESS.hearts })
-        }
+        onPracticeAgain={() => {
+          setFirstCompletion(false);
+          void begin(true);
+        }}
       />
     );
   }
@@ -128,7 +196,8 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
       <LessonTopBar
         completed={state.completedIds.length}
         total={state.totalExercises}
-        hearts={state.hearts}
+        hearts={state.heartsEnabled ? state.hearts : null}
+        exitHref={exitHref}
       />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:py-12">
@@ -162,6 +231,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
           isChecking={isChecking}
           correctAnswerText={state.correctAnswer ?? ""}
           typoCorrection={state.typoCorrection}
+          explanation={state.explanation}
           onCheck={() => void check()}
           onContinue={() => dispatch({ type: "CONTINUE" })}
         />

@@ -6,7 +6,11 @@
 //                    out-of-hearts ◀── hearts reach 0                          └─▶ complete
 //
 // A wrong answer costs one heart and puts that exercise again at the end of the
-// queue ("mini review of mistakes", spec section 5).
+// queue ("mini review of mistakes", spec section 5). Hearts can be switched off
+// (the mistake review does not cost hearts).
+//
+// Resuming: exercises the learner already answered correctly in this run
+// (`alreadyCompletedIds`, from the server) are skipped and counted as done.
 //
 // The reducer does NOT decide whether an answer is right: the server does
 // (POST /api/exercises/:id/attempt) and the result is passed in with the CHECK action.
@@ -26,7 +30,10 @@ export type LessonState = {
   typoCorrection: string | null;
   /** The correct answer text from the server, shown after "Check". */
   correctAnswer: string | null;
+  /** Short teaching note from the server, shown after "Check". */
+  explanation: string | null;
   hearts: number;
+  heartsEnabled: boolean;
   totalExercises: number;
   /** Ids of exercises answered correctly at least once (drives the progress bar). */
   completedIds: string[];
@@ -39,22 +46,43 @@ export type LessonState = {
 export type LessonAction =
   | { type: "START" }
   | { type: "ANSWER_CHANGED"; answer: ExerciseAnswer | null }
-  | { type: "CHECK"; isCorrect: boolean; typoCorrection: string | null; correctAnswer: string }
+  | {
+      type: "CHECK";
+      isCorrect: boolean;
+      typoCorrection: string | null;
+      correctAnswer: string;
+      explanation?: string | null;
+    }
   | { type: "CONTINUE" }
-  | { type: "RESTART"; exercises: Exercise[]; hearts: number };
+  | { type: "RESTART"; exercises: Exercise[]; hearts: number }
+  /** Leave the intro with the server's view of this run (resume or fresh start). */
+  | { type: "BEGIN"; exercises: Exercise[]; hearts: number; alreadyCompletedIds: string[] };
 
-export function createInitialLessonState(exercises: Exercise[], hearts: number): LessonState {
+type InitialOptions = {
+  /** Exercises already answered correctly in this run (resume). */
+  alreadyCompletedIds?: string[];
+  heartsEnabled?: boolean;
+};
+
+export function createInitialLessonState(
+  exercises: Exercise[],
+  hearts: number,
+  { alreadyCompletedIds = [], heartsEnabled = true }: InitialOptions = {},
+): LessonState {
+  const done = exercises.filter((exercise) => alreadyCompletedIds.includes(exercise.id));
   return {
     phase: "intro",
-    queue: exercises,
+    queue: exercises.filter((exercise) => !alreadyCompletedIds.includes(exercise.id)),
     position: 0,
     answer: null,
     result: null,
     typoCorrection: null,
     correctAnswer: null,
+    explanation: null,
     hearts,
+    heartsEnabled,
     totalExercises: exercises.length,
-    completedIds: [],
+    completedIds: done.map((exercise) => exercise.id),
     mistakeIds: [],
     correctAnswers: 0,
     totalAnswers: 0,
@@ -64,7 +92,7 @@ export function createInitialLessonState(exercises: Exercise[], hearts: number):
 export function lessonReducer(state: LessonState, action: LessonAction): LessonState {
   switch (action.type) {
     case "START":
-      return { ...state, phase: "exercise" };
+      return { ...state, phase: state.queue.length > 0 ? "exercise" : "complete" };
 
     case "ANSWER_CHANGED":
       // Answers can't change after "Check".
@@ -81,6 +109,7 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
           result: "correct",
           typoCorrection: action.typoCorrection,
           correctAnswer: action.correctAnswer,
+          explanation: action.explanation ?? null,
           correctAnswers: state.correctAnswers + 1,
           totalAnswers: state.totalAnswers + 1,
           completedIds: state.completedIds.includes(exercise.id)
@@ -92,7 +121,8 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
         ...state,
         result: "incorrect",
         correctAnswer: action.correctAnswer,
-        hearts: Math.max(0, state.hearts - 1),
+        explanation: action.explanation ?? null,
+        hearts: state.heartsEnabled ? Math.max(0, state.hearts - 1) : state.hearts,
         totalAnswers: state.totalAnswers + 1,
         mistakeIds: state.mistakeIds.includes(exercise.id)
           ? state.mistakeIds
@@ -104,7 +134,7 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
 
     case "CONTINUE": {
       if (!state.result) return state;
-      if (state.hearts === 0) return { ...state, phase: "out-of-hearts" };
+      if (state.heartsEnabled && state.hearts === 0) return { ...state, phase: "out-of-hearts" };
 
       const nextPosition = state.position + 1;
       const isFinished = nextPosition >= state.queue.length;
@@ -115,12 +145,26 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
         result: null,
         typoCorrection: null,
         correctAnswer: null,
+        explanation: null,
         phase: isFinished ? "complete" : "exercise",
       };
     }
 
+    case "BEGIN": {
+      const fresh = createInitialLessonState(action.exercises, action.hearts, {
+        alreadyCompletedIds: action.alreadyCompletedIds,
+        heartsEnabled: state.heartsEnabled,
+      });
+      return { ...fresh, phase: fresh.queue.length > 0 ? "exercise" : "complete" };
+    }
+
     case "RESTART":
-      return { ...createInitialLessonState(action.exercises, action.hearts), phase: "exercise" };
+      return {
+        ...createInitialLessonState(action.exercises, action.hearts, {
+          heartsEnabled: state.heartsEnabled,
+        }),
+        phase: "exercise",
+      };
   }
 }
 

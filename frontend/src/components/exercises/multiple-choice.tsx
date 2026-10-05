@@ -14,8 +14,10 @@ export function MultipleChoice({
   showRomanization,
 }: ExerciseComponentProps<MultipleChoiceExercise>) {
   const selectedId = answer?.type === "choice" ? answer.optionId : null;
-  // Options written in an Indian script have a romanized subtext; show them larger.
-  const optionsAreScript = exercise.options.some((option) => option.subtext);
+  // Options written in an Indian script (Unicode 0900–0DFF) are shown larger.
+  const optionsAreScript = exercise.options.some(
+    (option) => option.subtext || /[\u0900-\u0DFF]/.test(option.text),
+  );
 
   return (
     <div className="space-y-6">

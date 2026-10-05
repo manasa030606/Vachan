@@ -2,6 +2,7 @@
 import { apiFetch } from "./client";
 import type {
   AttemptAnswerDto,
+  AttemptMode,
   AttemptResultDto,
   CourseDetailDto,
   CourseSummaryDto,
@@ -9,6 +10,9 @@ import type {
   LessonDto,
   ProfileUpdate,
   ProgressSummaryDto,
+  ReviewDto,
+  ReviewSessionDto,
+  StartLessonDto,
   UserDto,
 } from "./types";
 
@@ -43,11 +47,31 @@ export const getCourse = (courseId: string) =>
 export const getLesson = (lessonId: string) =>
   apiFetch<{ lesson: LessonDto }>(`/lessons/${encodeURIComponent(lessonId)}`);
 
-export const submitAttempt = (exerciseId: string, answer: AttemptAnswerDto) =>
+/** Starts or resumes a lesson. `restart` starts the run over from the first exercise. */
+export const startLesson = (lessonId: string, restart = false) =>
+  apiFetch<StartLessonDto>(`/lessons/${encodeURIComponent(lessonId)}/start`, {
+    method: "POST",
+    body: { restart },
+  });
+
+export const submitAttempt = (
+  exerciseId: string,
+  answer: AttemptAnswerDto,
+  mode: AttemptMode = "lesson",
+) =>
   apiFetch<AttemptResultDto>(`/exercises/${encodeURIComponent(exerciseId)}/attempt`, {
     method: "POST",
-    body: { answer },
+    body: { answer, mode },
   });
 
 // ── Progress ──
 export const getProgress = () => apiFetch<{ progress: ProgressSummaryDto }>("/progress");
+
+// ── Review ──
+export const getReview = (languageCode: string) =>
+  apiFetch<{ review: ReviewDto }>(`/review?languageCode=${encodeURIComponent(languageCode)}`);
+
+export const getReviewSession = (languageCode: string) =>
+  apiFetch<{ session: ReviewSessionDto }>(
+    `/review/session?languageCode=${encodeURIComponent(languageCode)}`,
+  );

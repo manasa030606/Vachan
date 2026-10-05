@@ -5,6 +5,7 @@
 // and add one `case` here.
 import type { Exercise, ExerciseComponentProps } from "@/types/exercise";
 import { CharacterRecognition } from "./character-recognition";
+import { CharacterSound } from "./character-sound";
 import { FillInBlank } from "./fill-in-blank";
 import { Matching } from "./matching";
 import { MultipleChoice } from "./multiple-choice";
@@ -17,6 +18,8 @@ export function ExerciseRenderer(props: ExerciseComponentProps<Exercise>) {
   switch (exercise.type) {
     case "multiple-choice":
       return <MultipleChoice exercise={exercise} {...rest} />;
+    case "character-sound":
+      return <CharacterSound exercise={exercise} {...rest} />;
     case "character-recognition":
       return <CharacterRecognition exercise={exercise} {...rest} />;
     case "matching":

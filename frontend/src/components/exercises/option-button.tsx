@@ -15,6 +15,8 @@ type OptionButtonProps = {
   shortcut?: number;
   /** Use bigger text, e.g. when the option is written in an Indian script. */
   large?: boolean;
+  /** A single letter: very large and centred. */
+  glyph?: boolean;
   showSubtext?: boolean;
 };
 
@@ -33,6 +35,7 @@ export function OptionButton({
   disabled,
   shortcut,
   large,
+  glyph,
   showSubtext = true,
 }: OptionButtonProps) {
   return (
@@ -55,9 +58,16 @@ export function OptionButton({
           {shortcut}
         </span>
       )}
-      <span className="flex-1">
+      <span className={cn("flex-1", glyph && "text-center")}>
         <span
-          className={cn("block font-bold", large ? "font-display text-xl sm:text-2xl" : "text-lg")}
+          className={cn(
+            "block font-bold",
+            glyph
+              ? "font-display text-5xl leading-tight sm:text-6xl"
+              : large
+                ? "font-display text-xl sm:text-2xl"
+                : "text-lg",
+          )}
         >
           {option.text}
         </span>

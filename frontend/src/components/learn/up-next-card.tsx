@@ -9,7 +9,7 @@ type UpNextCardProps = {
   lesson: LessonSummary;
 };
 
-/** "Continue where you left off" — the recommended next lesson. */
+/** "Continue where you left off" — the recommended next lesson (in progress, or the next one to start). */
 export function UpNextCard({ language, unit, lesson }: UpNextCardProps) {
   return (
     <section
@@ -20,7 +20,8 @@ export function UpNextCard({ language, unit, lesson }: UpNextCardProps) {
         <LanguageTile language={language} />
         <div>
           <p className="text-sm font-bold tracking-wide text-brand-600 uppercase">
-            Up next · {language.name}
+            {lesson.status === "current" ? "Continue where you left off" : "Up next"} ·{" "}
+            {language.name}
           </p>
           <p className="text-xl font-extrabold text-ink">{lesson.title}</p>
           <p className="text-sm text-slate-500">
@@ -30,7 +31,7 @@ export function UpNextCard({ language, unit, lesson }: UpNextCardProps) {
       </div>
       <ButtonLink href={`/lesson/${lesson.id}`} size="lg">
         <Play aria-hidden="true" className="size-5 fill-white" />
-        Continue
+        {lesson.status === "current" ? "Continue" : "Start"}
       </ButtonLink>
     </section>
   );

@@ -1,4 +1,4 @@
-// Prisma schema for Vachan (Phase 2).
+// Prisma schema for Vachan (Phase 3 — real learning system).
 //
 // One set of tables serves ALL languages. Every piece of content belongs to a
 // Language row (Hindi, Telugu, …), so adding a seventh language later means
@@ -10,7 +10,7 @@
 //
 //   User ── UserProfile
 //   User ── UserLessonProgress  (one row per user per lesson)
-//   User ── UserExerciseAttempt (one row per submitted answer)
+//   User ── UserExerciseAttempt (one row per submitted answer, from a lesson or a review)
 //
 // The connection URL is NOT written here. It is read from DATABASE_URL
 // in backend/prisma.config.ts (Prisma CLI) and backend/src/lib/prisma.ts (the app).
@@ -62,7 +62,10 @@ enum LessonKind {
 
 enum ExerciseType {
   MULTIPLE_CHOICE
+  /// Shows a sound ("aa"); the learner picks the matching letter.
   CHARACTER_RECOGNITION
+  /// Shows a letter ("ఆ"); the learner picks the sound it makes.
+  CHARACTER_SOUND
   MATCHING
   FILL_IN_BLANK
   TRANSLATION
@@ -78,6 +81,12 @@ enum VocabularyKind {
 enum LessonProgressStatus {
   IN_PROGRESS
   COMPLETED
+}
+
+/// Where an answer was given: inside a lesson, or in the mistake review.
+enum AttemptSource {
+  LESSON
+  REVIEW
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -203,6 +212,8 @@ model Exercise {
   sentenceBefore String?
   sentenceAfter  String?
   translation    String?
+  /// Short teaching note shown AFTER the learner answers (never sent before).
+  explanation    String?
 
   lesson   Lesson                @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   options  ExerciseOption[]
@@ -212,7 +223,7 @@ model Exercise {
 }
 
 /// One row per answer choice. How the fields are used depends on the exercise type:
-///   MULTIPLE_CHOICE / CHARACTER_RECOGNITION / FILL_IN_BLANK → `isCorrect` marks the right option
+///   MULTIPLE_CHOICE / CHARACTER_RECOGNITION / CHARACTER_SOUND / FILL_IN_BLANK → `isCorrect` marks the right option
 ///   TRANSLATION → every row is an accepted answer (`isCorrect` = true), never sent to the browser
 ///   WORD_ORDER  → each row is a word; `correctPosition` is its place in the sentence (null = distractor)
 ///   MATCHING    → each row is a pair: `text` (left) ↔ `matchText` (right)
@@ -252,19 +263,33 @@ model VocabularyItem {
 // Learner progress
 // ─────────────────────────────────────────────────────────────
 
+/// One row per learner per lesson. Created when the lesson is started.
+/// COMPLETED stays COMPLETED when the learner practises the lesson again.
 model UserLessonProgress {
-  id          String               @id @default(cuid())
-  userId      String
-  lessonId    String
-  status      LessonProgressStatus @default(IN_PROGRESS)
-  startedAt   DateTime             @default(now())
-  completedAt DateTime?
-  updatedAt   DateTime             @updatedAt
+  id                String               @id @default(cuid())
+  userId            String
+  lessonId          String
+  status            LessonProgressStatus @default(IN_PROGRESS)
+  startedAt         DateTime             @default(now())
+  /// Start of the current run through the lesson. Resuming keeps it; "practise again" resets it.
+  runStartedAt      DateTime             @default(now())
+  /// Last time the learner started or answered something in this lesson.
+  lastActivityAt    DateTime             @default(now())
+  completedAt       DateTime?
+  /// How many times every exercise was finished in one run (first completion = 1).
+  timesCompleted    Int                  @default(0)
+  /// Lesson answers only (review answers are not counted here).
+  correctAttempts   Int                  @default(0)
+  incorrectAttempts Int                  @default(0)
+  /// correctAttempts / all attempts, 0–100 (null until the first answer).
+  accuracy          Int?
+  updatedAt         DateTime             @updatedAt
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
+  @@index([userId, lastActivityAt])
 }
 
 model UserExerciseAttempt {
@@ -276,10 +301,12 @@ model UserExerciseAttempt {
   /// The learner's answer exactly as submitted (JSON).
   answer     Json
   isCorrect  Boolean
-  createdAt  DateTime @default(now())
+  source     AttemptSource @default(LESSON)
+  createdAt  DateTime      @default(now())
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
 
   @@index([userId, lessonId])
+  @@index([userId, exerciseId])
 }

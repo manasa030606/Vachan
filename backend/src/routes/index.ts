@@ -8,6 +8,7 @@ import { languagesRouter } from "./languages.routes.ts";
 import { lessonsRouter } from "./lessons.routes.ts";
 import { meRouter } from "./me.routes.ts";
 import { progressRouter } from "./progress.routes.ts";
+import { reviewRouter } from "./review.routes.ts";
 
 export const apiRouter = Router();
 
@@ -19,3 +20,4 @@ apiRouter.use("/courses", coursesRouter);
 apiRouter.use("/lessons", lessonsRouter);
 apiRouter.use("/exercises", exercisesRouter);
 apiRouter.use("/progress", progressRouter);
+apiRouter.use("/review", reviewRouter);
