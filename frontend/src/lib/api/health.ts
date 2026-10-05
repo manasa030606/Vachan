@@ -1,5 +1,5 @@
 // Small typed helpers for calling the Vachan backend.
-import { API_URL } from "./config";
+import { API_URL } from "@/lib/config";
 
 /** Shape of GET /api/health (mirrors backend/src/routes/health.routes.ts). */
 export type HealthResponse = {

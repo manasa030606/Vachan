@@ -3,7 +3,7 @@
 // Shows whether the frontend can reach the backend (and whether the backend can reach PostgreSQL).
 // Phase 0 uses this to prove that frontend ↔ backend ↔ database are wired together correctly.
 import { useEffect, useState } from "react";
-import { fetchHealth, type HealthResponse } from "@/lib/api";
+import { fetchHealth, type HealthResponse } from "@/lib/api/health";
 import { API_URL } from "@/lib/config";
 
 type CheckState =

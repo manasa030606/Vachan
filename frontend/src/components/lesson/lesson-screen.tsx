@@ -1,52 +1,87 @@
 "use client";
 
-// Loads the (mock) lesson for the current language and shows the player.
-// Phase 3 replaces buildDemoLesson() with GET /api/lessons/:id.
-import { useMemo } from "react";
-import { Lock } from "lucide-react";
-import { ButtonLink } from "@/components/ui/button";
-import { LANGUAGES } from "@/data/languages";
-import { findLesson } from "@/data/mock-course";
-import { buildDemoLesson } from "@/data/mock-lessons";
+// Loads a lesson from the backend (GET /api/lessons/:id) and shows the player.
+import { Lock, SearchX } from "lucide-react";
+import type { ReactNode } from "react";
+import { LogoMark } from "@/components/brand/logo";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { useApi } from "@/hooks/use-api";
+import { getLesson } from "@/lib/api/endpoints";
+import { toLesson } from "@/lib/api/mappers";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
-import type { LanguageCode } from "@/types/learning";
 import { LessonPlayer } from "./lesson-player";
 
-/** Lesson ids start with the language code, e.g. "te-u2-l2". Practice ids don't. */
-function languageFromLessonId(lessonId: string): LanguageCode | null {
-  const prefix = lessonId.split("-")[0];
-  return LANGUAGES.find((language) => language.code === prefix)?.code ?? null;
-}
-
 export function LessonScreen({ lessonId }: { lessonId: string }) {
-  const preferences = useLearnerPreferences();
-  const languageCode = languageFromLessonId(lessonId) ?? preferences.languageCode;
-  const lesson = useMemo(() => buildDemoLesson(languageCode, lessonId), [languageCode, lessonId]);
-  const isLocked = findLesson(languageCode, lessonId)?.lesson.status === "locked";
+  const { showRomanization } = useLearnerPreferences();
+  const { data, error, isLoading, reload } = useApi(
+    async () => toLesson((await getLesson(lessonId)).lesson),
+    `lesson:${lessonId}`,
+  );
 
-  if (isLocked) {
+  if (isLoading) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center">
-        <div className="flex size-20 items-center justify-center rounded-full bg-slate-200">
-          <Lock aria-hidden="true" className="size-9 text-slate-500" />
-        </div>
-        <h1 className="mt-6 text-3xl font-extrabold">This lesson is locked</h1>
-        <p className="mt-2 text-slate-600">
-          Complete the earlier lessons in your path to unlock it.
-        </p>
-        <ButtonLink href="/learn" size="lg" className="mt-8">
-          Back to Learn
-        </ButtonLink>
+      <div className="flex min-h-dvh items-center justify-center" aria-busy="true">
+        <LogoMark className="size-12 animate-pulse" />
+        <span className="sr-only">Loading lesson…</span>
       </div>
     );
   }
 
-  // `key` restarts the player if the language changes.
+  if (error?.code === "LESSON_LOCKED") {
+    return (
+      <Message
+        icon={<Lock aria-hidden="true" className="size-9 text-slate-500" />}
+        title="This lesson is locked"
+      >
+        Complete the earlier lessons in your path to unlock it.
+      </Message>
+    );
+  }
+
+  if (error?.status === 404) {
+    return (
+      <Message
+        icon={<SearchX aria-hidden="true" className="size-9 text-slate-500" />}
+        title="Lesson not found"
+      >
+        This lesson doesn&apos;t exist. Pick a lesson from your learning path.
+      </Message>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <Message icon={<LogoMark className="size-10" />} title="Couldn't load this lesson">
+        {error?.message ?? "Something went wrong."}
+        <Button variant="secondary" className="mt-6" onClick={reload}>
+          Try again
+        </Button>
+      </Message>
+    );
+  }
+
+  return <LessonPlayer key={data.id} lesson={data} showRomanization={showRomanization} />;
+}
+
+function Message({
+  icon,
+  title,
+  children,
+}: {
+  icon: ReactNode;
+  title: string;
+  children: ReactNode;
+}) {
   return (
-    <LessonPlayer
-      key={lesson.id + languageCode}
-      lesson={lesson}
-      showRomanization={preferences.showRomanization}
-    />
+    <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center">
+      <div className="flex size-20 items-center justify-center rounded-full bg-slate-200">
+        {icon}
+      </div>
+      <h1 className="mt-6 text-3xl font-extrabold">{title}</h1>
+      <div className="mt-2 flex flex-col items-center text-slate-600">{children}</div>
+      <ButtonLink href="/learn" size="lg" className="mt-8">
+        Back to Learn
+      </ButtonLink>
+    </div>
   );
 }

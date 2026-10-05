@@ -11,6 +11,7 @@ export function FillInBlank({
   answer,
   onAnswerChange,
   isLocked,
+  correctAnswer,
   result,
   showRomanization,
 }: ExerciseComponentProps<FillInBlankExercise>) {
@@ -48,7 +49,7 @@ export function FillInBlank({
         layout="row"
         options={exercise.options}
         selectedId={selectedId}
-        correctId={exercise.correctOptionId}
+        correctAnswer={correctAnswer}
         isLocked={isLocked}
         large
         showSubtext={showRomanization}

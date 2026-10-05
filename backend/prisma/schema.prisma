@@ -1,10 +1,19 @@
-// Prisma schema for Vachan.
+// Prisma schema for Vachan (Phase 2).
 //
-// Phase 0: only the database connection and client generator are configured.
-// The data models (User, Language, Course, Unit, Lesson, ...) are added in Phase 2.
+// One set of tables serves ALL languages. Every piece of content belongs to a
+// Language row (Hindi, Telugu, …), so adding a seventh language later means
+// adding rows, not new tables.
+//
+//   Language ─┬─ Course ── Unit ── Lesson ─┬─ Exercise ── ExerciseOption
+//             │                            └─ VocabularyItem (words introduced, many-to-many)
+//             └─ VocabularyItem
+//
+//   User ── UserProfile
+//   User ── UserLessonProgress  (one row per user per lesson)
+//   User ── UserExerciseAttempt (one row per submitted answer)
 //
 // The connection URL is NOT written here. It is read from DATABASE_URL
-// in backend/prisma.config.ts (for the Prisma CLI) and backend/src/lib/prisma.ts (for the app).
+// in backend/prisma.config.ts (Prisma CLI) and backend/src/lib/prisma.ts (the app).
 
 generator client {
   provider = "prisma-client"
@@ -13,4 +22,264 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum UserRole {
+  LEARNER
+  ADMIN // used by the admin dashboard in Phase 8
+}
+
+enum DailyGoal {
+  CASUAL
+  REGULAR
+  SERIOUS
+  INTENSE
+}
+
+/// The learning-journey stages from the spec (section 4).
+enum LearningStage {
+  FOUNDATIONS
+  FIRST_WORDS
+  EVERYDAY_PHRASES
+  SENTENCE_BUILDING
+  GRAMMAR
+  LISTENING
+  SPEAKING
+  CONVERSATION
+  ADVANCED
+}
+
+enum LessonKind {
+  SCRIPT // letters and sounds
+  VOCABULARY // new words
+  PHRASES // sentences and phrases
+  CHECKPOINT // unit review
+}
+
+enum ExerciseType {
+  MULTIPLE_CHOICE
+  CHARACTER_RECOGNITION
+  MATCHING
+  FILL_IN_BLANK
+  TRANSLATION
+  WORD_ORDER
+}
+
+enum VocabularyKind {
+  LETTER
+  WORD
+  PHRASE
+}
+
+enum LessonProgressStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+// ─────────────────────────────────────────────────────────────
+// Users
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  /// scrypt hash — the plain-text password is NEVER stored.
+  passwordHash String
+  role         UserRole @default(LEARNER)
+  /// Increased on logout. Tokens issued before that stop working.
+  tokenVersion Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile          UserProfile?
+  lessonProgress   UserLessonProgress[]
+  exerciseAttempts UserExerciseAttempt[]
+}
+
+model UserProfile {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  displayName       String
+  /// The language the learner is currently studying (null until onboarding).
+  currentLanguageId String?
+  /// Interface language. Only English ("en") for now (spec section 3).
+  interfaceLanguage String    @default("en")
+  learningGoal      String?
+  dailyGoal         DailyGoal @default(REGULAR)
+  /// Answer to the onboarding self-assessment question.
+  selfAssessment    String?
+  showRomanization  Boolean   @default(true)
+  soundEffects      Boolean   @default(true)
+  onboardingDone    Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentLanguage Language? @relation(fields: [currentLanguageId], references: [id], onDelete: SetNull)
+}
+
+// ─────────────────────────────────────────────────────────────
+// Learning content (language-agnostic)
+// ─────────────────────────────────────────────────────────────
+
+model Language {
+  id          String  @id @default(cuid())
+  /// ISO 639-1 code: hi, te, ta, ml, kn, bn
+  code        String  @unique
+  name        String
+  nativeName  String
+  scriptName  String
+  description String
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  courses    Course[]
+  vocabulary VocabularyItem[]
+  learners   UserProfile[]
+}
+
+model Course {
+  id          String  @id @default(cuid())
+  languageId  String
+  title       String
+  description String
+  sortOrder   Int     @default(0)
+  isPublished Boolean @default(true)
+
+  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  units    Unit[]
+
+  @@index([languageId])
+}
+
+model Unit {
+  id          String        @id @default(cuid())
+  courseId    String
+  title       String
+  description String
+  stage       LearningStage
+  sortOrder   Int
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@unique([courseId, sortOrder])
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  unitId      String
+  title       String
+  /// Short text shown on the lesson intro screen.
+  introText   String
+  kind        LessonKind
+  sortOrder   Int
+  isPublished Boolean    @default(true)
+
+  unit       Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  exercises  Exercise[]
+  /// Words/letters introduced at the start of the lesson.
+  vocabulary VocabularyItem[]
+  progress   UserLessonProgress[]
+
+  @@unique([unitId, sortOrder])
+}
+
+model Exercise {
+  id             String       @id @default(cuid())
+  lessonId       String
+  type           ExerciseType
+  sortOrder      Int
+  /// e.g. "Select the correct meaning"
+  instruction    String
+  /// The main thing shown to the learner: a word, a letter, or an English sentence.
+  prompt         String
+  promptSubtext  String?
+  /// FILL_IN_BLANK only: sentence text before/after the blank, and its meaning.
+  sentenceBefore String?
+  sentenceAfter  String?
+  translation    String?
+
+  lesson   Lesson                @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  options  ExerciseOption[]
+  attempts UserExerciseAttempt[]
+
+  @@unique([lessonId, sortOrder])
+}
+
+/// One row per answer choice. How the fields are used depends on the exercise type:
+///   MULTIPLE_CHOICE / CHARACTER_RECOGNITION / FILL_IN_BLANK → `isCorrect` marks the right option
+///   TRANSLATION → every row is an accepted answer (`isCorrect` = true), never sent to the browser
+///   WORD_ORDER  → each row is a word; `correctPosition` is its place in the sentence (null = distractor)
+///   MATCHING    → each row is a pair: `text` (left) ↔ `matchText` (right)
+model ExerciseOption {
+  id              String  @id @default(cuid())
+  exerciseId      String
+  text            String
+  subtext         String?
+  isCorrect       Boolean @default(false)
+  correctPosition Int?
+  matchText       String?
+  /// Order in which the option is displayed.
+  sortOrder       Int
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseId])
+}
+
+model VocabularyItem {
+  id           String         @id @default(cuid())
+  languageId   String
+  kind         VocabularyKind @default(WORD)
+  /// The word/letter in its native script, e.g. "నమస్కారం"
+  script       String
+  romanization String
+  meaning      String
+  topic        String
+
+  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+
+  @@unique([languageId, script])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Learner progress
+// ─────────────────────────────────────────────────────────────
+
+model UserLessonProgress {
+  id          String               @id @default(cuid())
+  userId      String
+  lessonId    String
+  status      LessonProgressStatus @default(IN_PROGRESS)
+  startedAt   DateTime             @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime             @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+model UserExerciseAttempt {
+  id         String   @id @default(cuid())
+  userId     String
+  exerciseId String
+  /// Copied from the exercise so lesson progress can be calculated with one query.
+  lessonId   String
+  /// The learner's answer exactly as submitted (JSON).
+  answer     Json
+  isCorrect  Boolean
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lessonId])
 }

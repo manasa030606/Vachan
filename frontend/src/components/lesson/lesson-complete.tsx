@@ -1,5 +1,5 @@
 // Shown when every exercise has been answered correctly.
-import { Heart, RotateCcw, Target, Zap } from "lucide-react";
+import { CloudCheck, Heart, ListChecks, RotateCcw, Target } from "lucide-react";
 import type { VocabularyWord } from "@/types/learning";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Confetti } from "./confetti";
@@ -7,9 +7,11 @@ import { ResultTile } from "./result-tile";
 
 type LessonCompleteProps = {
   lessonTitle: string;
-  xpEarned: number;
-  perfectBonusXp: number;
+  exercisesCompleted: number;
+  totalExercises: number;
   accuracy: number;
+  /** True when the backend confirmed the lesson is saved as completed. */
+  savedAsCompleted: boolean;
   heartsLeft: number;
   mistakesReviewed: number;
   words: VocabularyWord[];
@@ -18,9 +20,10 @@ type LessonCompleteProps = {
 
 export function LessonComplete({
   lessonTitle,
-  xpEarned,
-  perfectBonusXp,
+  exercisesCompleted,
+  totalExercises,
   accuracy,
+  savedAsCompleted,
   heartsLeft,
   mistakesReviewed,
   words,
@@ -39,13 +42,18 @@ export function LessonComplete({
           ? ` You reviewed ${mistakesReviewed} ${mistakesReviewed === 1 ? "mistake" : "mistakes"} along the way.`
           : " Not a single mistake — brilliant!"}
       </p>
+      {savedAsCompleted && (
+        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
+          <CloudCheck aria-hidden="true" className="size-4" />
+          Progress saved — the next lesson is unlocked
+        </p>
+      )}
 
       <div className="mt-8 grid w-full grid-cols-3 gap-3">
         <ResultTile
-          icon={<Zap aria-hidden="true" className="size-6 fill-marigold-400 text-marigold-500" />}
-          label="XP earned"
-          value={`+${xpEarned}`}
-          note={perfectBonusXp > 0 ? `incl. +${perfectBonusXp} perfect bonus` : undefined}
+          icon={<ListChecks aria-hidden="true" className="size-6 text-marigold-600" />}
+          label="Exercises"
+          value={`${exercisesCompleted}/${totalExercises}`}
           tone="marigold"
         />
         <ResultTile

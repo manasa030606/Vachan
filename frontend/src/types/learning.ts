@@ -1,4 +1,4 @@
-// Core learning types shared by the mock data and the UI.
+// Core learning types shared by the API mappers and the UI.
 // In Phase 2 these shapes will come from the backend API instead of local mock files.
 
 export type LanguageCode = "hi" | "te" | "ta" | "ml" | "kn" | "bn";
@@ -68,8 +68,8 @@ export type LessonSummary = {
   id: string;
   title: string;
   status: LessonStatus;
-  xpReward: number;
   icon: LessonIcon;
+  exerciseCount: number;
 };
 
 export type UnitColor = "brand" | "teal" | "rose";

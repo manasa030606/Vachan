@@ -1,5 +1,5 @@
-// Mock learner progress used across Learn, Practice and Profile.
-// In Phase 2/4 this comes from the backend (progress, streak, XP and achievement tables).
+// Demo gamification values (streak, XP, hearts, achievements) shown in the UI.
+// Real lesson progress comes from the backend since Phase 2; these values are replaced in Phase 4.
 
 export const MOCK_PROGRESS = {
   username: "learner_2026",
@@ -79,11 +79,3 @@ export const MOCK_ACHIEVEMENTS: Achievement[] = [
     progressLabel: "12 / 30 days",
   },
 ];
-
-/**
- * Gamification values used by the mock lesson flow.
- * The spec requires these to live in backend logic — they move there in Phase 4.
- */
-export const MOCK_GAMIFICATION_RULES = {
-  perfectLessonBonusXp: 5,
-} as const;

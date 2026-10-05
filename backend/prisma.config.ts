@@ -7,6 +7,8 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Run by `npx prisma db seed` (or `npm run db:seed`).
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
     // `prisma generate` does not need a real URL, so a missing value is allowed here.

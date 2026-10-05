@@ -11,7 +11,7 @@ import { OptionButton, getOptionState } from "./option-button";
 type ChoiceListProps = {
   options: ChoiceOption[];
   selectedId: string | null;
-  correctId: string;
+  correctAnswer: string | null;
   isLocked: boolean;
   onSelect: (optionId: string) => void;
   large?: boolean;
@@ -23,7 +23,7 @@ type ChoiceListProps = {
 export function ChoiceList({
   options,
   selectedId,
-  correctId,
+  correctAnswer,
   isLocked,
   onSelect,
   large,
@@ -58,7 +58,7 @@ export function ChoiceList({
           showSubtext={showSubtext}
           disabled={isLocked}
           onSelect={() => onSelect(option.id)}
-          state={getOptionState({ optionId: option.id, selectedId, correctId, isLocked })}
+          state={getOptionState({ option, selectedId, correctAnswer, isLocked })}
         />
       ))}
     </div>

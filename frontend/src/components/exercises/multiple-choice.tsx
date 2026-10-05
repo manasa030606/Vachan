@@ -10,6 +10,7 @@ export function MultipleChoice({
   answer,
   onAnswerChange,
   isLocked,
+  correctAnswer,
   showRomanization,
 }: ExerciseComponentProps<MultipleChoiceExercise>) {
   const selectedId = answer?.type === "choice" ? answer.optionId : null;
@@ -28,7 +29,7 @@ export function MultipleChoice({
         label="Answer options"
         options={exercise.options}
         selectedId={selectedId}
-        correctId={exercise.correctOptionId}
+        correctAnswer={correctAnswer}
         isLocked={isLocked}
         large={optionsAreScript}
         showSubtext={showRomanization}

@@ -1,49 +1,46 @@
 "use client";
 
-// Learner settings. Phase 1: saved in the browser only. Phase 2 saves them via PATCH /api/me.
+// Learner settings, saved to the database with PATCH /api/me.
 import { useId } from "react";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { DAILY_GOALS, type DailyGoalId } from "@/data/onboarding-options";
-import {
-  resetPreferences,
-  updatePreferences,
-  useLearnerPreferences,
-} from "@/lib/learner-preferences";
+import { useSession } from "@/components/session/session-provider";
+import { useLearnerPreferences, useUpdatePreferences } from "@/lib/learner-preferences";
 
 const selectClasses =
   "h-11 w-full rounded-2xl border-2 border-slate-200 bg-white px-3 font-bold text-ink outline-none focus:border-brand-400 disabled:bg-slate-50 disabled:text-slate-500";
 
 export function SettingsCard() {
   const preferences = useLearnerPreferences();
-  const router = useRouter();
   const dailyGoalId = useId();
   const interfaceLanguageId = useId();
 
-  function handleLogout() {
-    resetPreferences();
-    router.push("/");
+  const updatePreferences = useUpdatePreferences();
+  const { logout } = useSession();
+
+  async function handleLogout() {
+    await logout(); // POST /api/auth/logout — the old token stops working, then go to "/"
   }
 
   return (
     <Card>
-      <CardHeader title="Settings" description="Changes are saved on this device (demo mode)." />
+      <CardHeader title="Settings" description="Changes are saved to your account." />
 
       <div className="divide-y divide-slate-100">
         <Switch
           label="Show romanization"
           description="Show pronunciation in Latin letters under Indian scripts"
           checked={preferences.showRomanization}
-          onChange={(checked) => updatePreferences({ showRomanization: checked })}
+          onChange={(checked) => void updatePreferences({ showRomanization: checked })}
         />
         <Switch
           label="Sound effects"
           description="Play sounds for correct and incorrect answers"
           checked={preferences.soundEffects}
-          onChange={(checked) => updatePreferences({ soundEffects: checked })}
+          onChange={(checked) => void updatePreferences({ soundEffects: checked })}
         />
 
         <div className="grid gap-4 py-4 sm:grid-cols-2">
@@ -56,7 +53,7 @@ export function SettingsCard() {
               className={selectClasses}
               value={preferences.dailyGoalId}
               onChange={(event) =>
-                updatePreferences({ dailyGoalId: event.target.value as DailyGoalId })
+                void updatePreferences({ dailyGoal: event.target.value as DailyGoalId })
               }
             >
               {DAILY_GOALS.map((goal) => (
@@ -78,7 +75,7 @@ export function SettingsCard() {
         </div>
       </div>
 
-      <Button variant="secondary" onClick={handleLogout} className="mt-2">
+      <Button variant="secondary" onClick={() => void handleLogout()} className="mt-2">
         <LogOut aria-hidden="true" className="size-4" />
         Log out
       </Button>

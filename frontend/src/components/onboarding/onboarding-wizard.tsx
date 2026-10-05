@@ -9,6 +9,8 @@ import { ArrowLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { getLanguage } from "@/data/languages";
+import { useLanguages } from "@/hooks/use-languages";
+import { ApiError } from "@/lib/api/client";
 import {
   LEARNING_GOALS,
   getDailyGoal,
@@ -17,7 +19,7 @@ import {
   type LearningGoalId,
   type SelfAssessmentId,
 } from "@/data/onboarding-options";
-import { updatePreferences } from "@/lib/learner-preferences";
+import { useUpdatePreferences } from "@/lib/learner-preferences";
 import type { LanguageCode } from "@/types/learning";
 import { StepDailyGoal } from "./step-daily-goal";
 import { StepLanguage } from "./step-language";
@@ -36,6 +38,10 @@ const STEPS = ["language", "goal", "daily-goal", "level", "summary"] as const;
 
 export function OnboardingWizard() {
   const router = useRouter();
+  const updatePreferences = useUpdatePreferences();
+  const { languages, isLoading: languagesLoading, error: languagesError } = useLanguages();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>({
     languageCode: null,
@@ -45,7 +51,9 @@ export function OnboardingWizard() {
   });
 
   const step = STEPS[stepIndex];
-  const language = getLanguage(answers.languageCode ?? "hi");
+  const language =
+    languages.find((item) => item.code === answers.languageCode) ??
+    getLanguage(answers.languageCode ?? "hi");
 
   // Is the current step answered?
   const canContinue =
@@ -55,20 +63,30 @@ export function OnboardingWizard() {
     (step === "level" && answers.selfAssessmentId !== null) ||
     step === "summary";
 
-  function goNext() {
+  async function goNext() {
     if (step !== "summary") {
       setStepIndex(stepIndex + 1);
       window.scrollTo({ top: 0 });
       return;
     }
-    // Finish: save the choices (Phase 2 will send them to PATCH /api/me).
-    updatePreferences({
-      languageCode: answers.languageCode ?? "hi",
-      learningGoalId: answers.learningGoalId,
-      dailyGoalId: answers.dailyGoalId ?? "regular",
-      selfAssessmentId: answers.selfAssessmentId,
-    });
-    router.push("/learn");
+    // Finish: save the choices to the learner's profile (PATCH /api/me).
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await updatePreferences({
+        languageCode: answers.languageCode ?? "hi",
+        learningGoal: answers.learningGoalId,
+        dailyGoal: answers.dailyGoalId ?? "regular",
+        selfAssessment: answers.selfAssessmentId,
+        onboardingDone: true,
+      });
+      router.push("/learn");
+    } catch (error) {
+      setSaveError(
+        error instanceof ApiError ? error.message : "Couldn't save your choices. Try again.",
+      );
+      setIsSaving(false);
+    }
   }
 
   const level = answers.selfAssessmentId ? getSelfAssessmentLevel(answers.selfAssessmentId) : null;
@@ -109,6 +127,9 @@ export function OnboardingWizard() {
         </p>
         {step === "language" && (
           <StepLanguage
+            languages={languages}
+            isLoading={languagesLoading}
+            error={languagesError?.message ?? null}
             value={answers.languageCode}
             onChange={(languageCode) => setAnswers({ ...answers, languageCode })}
           />
@@ -142,6 +163,14 @@ export function OnboardingWizard() {
             startHint={level?.startHint ?? "Start from the script"}
           />
         )}
+        {saveError && (
+          <p
+            role="alert"
+            className="mt-6 rounded-2xl bg-rose-50 px-4 py-3 text-center font-bold text-rose-700"
+          >
+            {saveError}
+          </p>
+        )}
       </main>
 
       <div className="sticky bottom-0 border-t-2 border-slate-200 bg-white">
@@ -152,7 +181,7 @@ export function OnboardingWizard() {
             disabled={!canContinue}
             className="w-full sm:w-auto sm:min-w-44"
           >
-            {step === "summary" ? "Start learning" : "Continue"}
+            {step !== "summary" ? "Continue" : isSaving ? "Saving…" : "Start learning"}
           </Button>
         </div>
       </div>

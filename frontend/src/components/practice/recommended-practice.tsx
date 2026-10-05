@@ -42,9 +42,12 @@ export function RecommendedPractice({
           <li className="rounded-full bg-white/15 px-3 py-1">{weakWordCount} weak words</li>
           <li className="rounded-full bg-white/15 px-3 py-1">{weakestTopic}</li>
         </ul>
-        <ButtonLink href="/lesson/practice-recommended" variant="accent" size="lg" className="mt-6">
-          Start practice
+        <ButtonLink href="/learn" variant="accent" size="lg" className="mt-6">
+          Continue your course
         </ButtonLink>
+        <p className="mt-3 text-sm text-brand-100">
+          Personalised review sessions arrive in Phase 3.
+        </p>
       </div>
     </section>
   );

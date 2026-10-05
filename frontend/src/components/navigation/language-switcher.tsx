@@ -1,16 +1,19 @@
 "use client";
 
-// Small menu to switch the course language (mock: saves the choice in the browser).
+// Small menu to switch the course language. Saves the choice to the profile (PATCH /api/me).
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { LANGUAGES, getLanguage } from "@/data/languages";
-import { updatePreferences, useLearnerPreferences } from "@/lib/learner-preferences";
+import { getLanguage } from "@/data/languages";
+import { useLanguages } from "@/hooks/use-languages";
+import { useLearnerPreferences, useUpdatePreferences } from "@/lib/learner-preferences";
 import { cn } from "@/lib/cn";
 import { LanguageTile } from "@/components/ui/language-tile";
 
 export function LanguageSwitcher() {
   const { languageCode } = useLearnerPreferences();
   const current = getLanguage(languageCode);
+  const { languages } = useLanguages();
+  const updatePreferences = useUpdatePreferences();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -48,17 +51,17 @@ export function LanguageSwitcher() {
       {isOpen && (
         <div className="absolute left-0 z-40 mt-2 w-64 animate-pop rounded-2xl border-2 border-slate-200 bg-white p-2 shadow-xl">
           <p className="px-3 pt-1 pb-2 text-xs font-bold tracking-wide text-slate-500 uppercase">
-            My courses
+            Switch language
           </p>
           <ul>
-            {LANGUAGES.map((language) => {
+            {languages.map((language) => {
               const isCurrent = language.code === languageCode;
               return (
                 <li key={language.code}>
                   <button
                     type="button"
                     onClick={() => {
-                      updatePreferences({ languageCode: language.code });
+                      void updatePreferences({ languageCode: language.code });
                       setIsOpen(false);
                     }}
                     className={cn(

@@ -10,6 +10,7 @@ export function CharacterRecognition({
   answer,
   onAnswerChange,
   isLocked,
+  correctAnswer,
 }: ExerciseComponentProps<CharacterRecognitionExercise>) {
   const selectedId = answer?.type === "choice" ? answer.optionId : null;
 
@@ -22,7 +23,7 @@ export function CharacterRecognition({
         layout="row"
         options={exercise.options}
         selectedId={selectedId}
-        correctId={exercise.correctOptionId}
+        correctAnswer={correctAnswer}
         isLocked={isLocked}
         showSubtext={false}
         onSelect={(optionId) => onAnswerChange({ type: "choice", optionId })}

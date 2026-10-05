@@ -15,6 +15,15 @@ const envSchema = z.object({
     }),
   // Comma-separated list of frontend URLs allowed to call this API from the browser.
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  // Secret used to sign login tokens (JWT). Long and random; never share or commit it.
+  JWT_SECRET: z
+    .string({ error: "JWT_SECRET is required. See backend/.env.example." })
+    .min(32, "JWT_SECRET must be at least 32 characters long (see backend/.env.example)"),
+  // How long a login lasts, e.g. "7d", "12h".
+  JWT_EXPIRES_IN: z
+    .string()
+    .regex(/^\d+[smhd]$/, 'JWT_EXPIRES_IN must look like "7d", "12h" or "30m"')
+    .default("7d"),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -35,6 +44,12 @@ function loadEnv(): Env {
 }
 
 export const env = loadEnv();
+
+if (env.JWT_SECRET.startsWith("replace-this")) {
+  console.warn(
+    "⚠️  JWT_SECRET is still the example value. Generate your own: openssl rand -hex 32",
+  );
+}
 
 /** CORS_ORIGIN split into a clean array, e.g. ["http://localhost:3000"]. */
 export const allowedOrigins = env.CORS_ORIGIN.split(",")

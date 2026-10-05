@@ -7,6 +7,8 @@ import { cn } from "@/lib/cn";
 type LessonFooterProps = {
   result: AnswerResult | null;
   canCheck: boolean;
+  /** True while the answer is being sent to the server. */
+  isChecking: boolean;
   correctAnswerText: string;
   /** Set when a typed answer had a small spelling mistake but was accepted. */
   typoCorrection: string | null;
@@ -19,6 +21,7 @@ const CORRECT_MESSAGES = ["Great job!", "Excellent!", "You got it!", "Nicely don
 export function LessonFooter({
   result,
   canCheck,
+  isChecking,
   correctAnswerText,
   typoCorrection,
   onCheck,
@@ -83,7 +86,7 @@ export function LessonFooter({
           </Button>
         ) : (
           <Button size="lg" onClick={onCheck} disabled={!canCheck} className="sm:min-w-44">
-            Check
+            {isChecking ? "Checking…" : "Check"}
           </Button>
         )}
       </div>

@@ -52,7 +52,7 @@ export function SidebarNav() {
         </nav>
 
         <p className="mt-auto hidden px-2 text-xs text-slate-400 lg:block">
-          Demo mode · mock data (Phase 1)
+          Phase 2 · real accounts &amp; progress
         </p>
       </div>
     </aside>

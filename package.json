@@ -2,7 +2,7 @@
   "name": "vachan",
   "version": "0.1.0",
   "private": true,
-  "description": "Vachan — AI-powered Indian language learning platform",
+  "description": "Vachan \u2014 AI-powered Indian language learning platform",
   "workspaces": [
     "frontend",
     "backend"
@@ -19,13 +19,19 @@
     "start:frontend": "npm run start -w frontend",
     "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend",
     "lint": "npm run lint -w backend && npm run lint -w frontend",
-    "test": "npm run test -w frontend",
+    "test": "npm run test -w backend && npm run test -w frontend",
+    "test:api": "npm run test:api -w backend",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
+    "db:validate": "npm run db:validate -w backend",
     "db:generate": "npm run db:generate -w backend",
+    "db:migrate": "npm run db:migrate -w backend",
+    "db:deploy": "npm run db:deploy -w backend",
+    "db:seed": "npm run db:seed -w backend",
+    "db:reset": "npm run db:reset -w backend",
     "db:studio": "npm run db:studio -w backend"
   },
   "devDependencies": {

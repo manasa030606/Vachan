@@ -4,7 +4,7 @@ import { LanguageTile } from "@/components/ui/language-tile";
 
 type ProfileHeaderProps = {
   displayName: string;
-  username: string;
+  email: string;
   joinedLabel: string;
   language: Language;
 };
@@ -18,12 +18,7 @@ function initials(name: string): string {
     .join("");
 }
 
-export function ProfileHeader({
-  displayName,
-  username,
-  joinedLabel,
-  language,
-}: ProfileHeaderProps) {
+export function ProfileHeader({ displayName, email, joinedLabel, language }: ProfileHeaderProps) {
   return (
     <section className="flex flex-col items-center gap-5 rounded-card border border-slate-200 bg-white p-6 text-center sm:flex-row sm:text-left">
       <div
@@ -34,7 +29,7 @@ export function ProfileHeader({
       </div>
       <div className="flex-1">
         <h1 className="text-3xl font-extrabold text-ink">{displayName}</h1>
-        <p className="text-slate-500">@{username}</p>
+        <p className="text-slate-500">{email}</p>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-slate-600 sm:justify-start">
           <CalendarDays aria-hidden="true" className="size-4" />
           Joined {joinedLabel}

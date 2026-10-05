@@ -2,16 +2,21 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/components/session/session-provider";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
-import { updatePreferences } from "@/lib/learner-preferences";
-import { fakeNetworkDelay, getFieldErrors, registerSchema } from "@/lib/validation/auth-schemas";
+import { ApiError } from "@/lib/api/client";
+import { registerAccount } from "@/lib/api/endpoints";
+import { getFieldErrors, registerSchema } from "@/lib/validation/auth-schemas";
+import { FormError } from "./form-error";
 import { PasswordField } from "./password-field";
 
 type Values = { name: string; email: string; password: string };
 
 export function RegisterForm() {
   const router = useRouter();
+  const { setUser } = useSession();
+  const [formError, setFormError] = useState<string | null>(null);
   const [values, setValues] = useState<Values>({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,16 +29,37 @@ export function RegisterForm() {
     event.preventDefault();
     const fieldErrors = getFieldErrors(registerSchema, values);
     setErrors(fieldErrors);
+    setFormError(null);
     if (Object.keys(fieldErrors).length > 0) return;
 
     setIsSubmitting(true);
-    await fakeNetworkDelay(); // Phase 2: POST /api/auth/register
-    updatePreferences({ displayName: values.name.trim() });
-    router.push("/onboarding");
+    try {
+      // POST /api/auth/register — creates the account and logs in (httpOnly cookie).
+      const { user } = await registerAccount({ ...values, name: values.name.trim() });
+      setUser(user);
+      router.push("/onboarding");
+    } catch (error) {
+      if (error instanceof ApiError && error.code === "EMAIL_ALREADY_REGISTERED") {
+        setErrors({ email: "An account with this email already exists. Try logging in." });
+      } else if (error instanceof ApiError && error.details?.length) {
+        // Server-side validation errors → show them under the matching fields.
+        setErrors(
+          Object.fromEntries(
+            error.details.map((detail) => [detail.field, detail.message]),
+          ) as typeof errors,
+        );
+      } else {
+        setFormError(
+          error instanceof ApiError ? error.message : "Something went wrong. Please try again.",
+        );
+      }
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <FormError message={formError} />
       <TextField
         label="Your name"
         autoComplete="name"

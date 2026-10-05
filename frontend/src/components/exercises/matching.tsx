@@ -49,7 +49,7 @@ export function Matching({
       const nextMatched = [...matchedIds, leftId];
       setMatchedIds(nextMatched);
       if (nextMatched.length === exercise.pairs.length) {
-        onAnswerChange({ type: "matching", complete: true });
+        onAnswerChange({ type: "matching", complete: true, matchedIds: nextMatched });
       }
     } else {
       setWrongPair({ left: leftId, right: rightId });

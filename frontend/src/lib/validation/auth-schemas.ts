@@ -1,4 +1,4 @@
-// Zod schemas for the auth forms. Phase 2 reuses the same rules on the backend.
+// Zod schemas for the auth forms. The backend checks the same rules again (backend/src/schemas/auth.schemas.ts).
 import { z } from "zod";
 
 const email = z.email("Enter a valid email address");
@@ -35,7 +35,7 @@ export function getFieldErrors<T extends Record<string, unknown>>(
   return errors;
 }
 
-/** Pretend to call the server (Phase 1 has no real auth). */
+/** Pretend to call the server. Only used by "Forgot password" (sending emails is not built yet). */
 export function fakeNetworkDelay(ms = 700): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -7,10 +7,10 @@ import { LanguageTile } from "@/components/ui/language-tile";
 /** The learner's current course and a way to start another language. */
 export function LanguageCard({
   language,
-  currentUnitTitle,
+  progressLabel,
 }: {
   language: Language;
-  currentUnitTitle: string;
+  progressLabel: string;
 }) {
   return (
     <Card>
@@ -22,7 +22,7 @@ export function LanguageCard({
             {language.name}{" "}
             <span className="font-display text-brand-700">{language.nativeName}</span>
           </p>
-          <p className="text-sm text-slate-600">Currently on: {currentUnitTitle}</p>
+          <p className="text-sm text-slate-600">{progressLabel}</p>
         </div>
       </div>
       <ButtonLink href="/onboarding" variant="ghost" size="sm" className="mt-3">

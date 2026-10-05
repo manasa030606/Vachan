@@ -11,7 +11,7 @@ export default function StatusPage() {
       <Logo />
       <BackendStatus />
       <p className="max-w-md text-center text-sm text-slate-500">
-        Developer page. Phase 1 screens use mock data and do not call the backend.
+        Developer page. Checks that the frontend can reach the backend API.
       </p>
     </main>
   );

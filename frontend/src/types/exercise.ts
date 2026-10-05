@@ -1,5 +1,7 @@
 // Exercise types. Each exercise has a `type` field so TypeScript (and the
 // ExerciseRenderer) knows exactly which shape and which component to use.
+// Since Phase 2 the correct answers are NOT sent to the browser: the backend
+// checks every answer (POST /api/exercises/:id/attempt).
 import type { VocabularyWord } from "./learning";
 
 export type ChoiceOption = {
@@ -20,14 +22,12 @@ export type MultipleChoiceExercise = ExerciseBase & {
   prompt: string;
   promptSubtext?: string;
   options: ChoiceOption[];
-  correctOptionId: string;
 };
 
 export type CharacterRecognitionExercise = ExerciseBase & {
   type: "character-recognition";
   character: string;
   options: ChoiceOption[];
-  correctOptionId: string;
 };
 
 export type MatchingPair = {
@@ -49,15 +49,12 @@ export type FillInBlankExercise = ExerciseBase & {
   after: string;
   translation: string;
   options: ChoiceOption[];
-  correctOptionId: string;
 };
 
 export type TranslationExercise = ExerciseBase & {
   type: "translation";
   prompt: string;
   promptSubtext?: string;
-  /** Any of these (case/punctuation-insensitive) counts as correct. */
-  acceptedAnswers: string[];
 };
 
 export type WordOrderExercise = ExerciseBase & {
@@ -66,8 +63,6 @@ export type WordOrderExercise = ExerciseBase & {
   prompt: string;
   /** Word bank (already shuffled, may include extra distractor words). */
   tokens: ChoiceOption[];
-  /** Token ids in the correct order. */
-  correctOrder: string[];
 };
 
 export type Exercise =
@@ -85,7 +80,7 @@ export type ExerciseAnswer =
   | { type: "choice"; optionId: string }
   | { type: "text"; value: string }
   | { type: "order"; tokenIds: string[] }
-  | { type: "matching"; complete: boolean };
+  | { type: "matching"; complete: boolean; matchedIds: string[] };
 
 export type AnswerResult = "correct" | "incorrect";
 
@@ -93,7 +88,6 @@ export type Lesson = {
   id: string;
   title: string;
   unitTitle: string;
-  xpReward: number;
   /** Words introduced before the exercises start ("Short introduction + examples"). */
   newWords: VocabularyWord[];
   /** Sentence shown on the intro screen. */
@@ -109,6 +103,8 @@ export type ExerciseComponentProps<TExercise extends Exercise> = {
   /** True after the learner pressed "Check": the answer can no longer change. */
   isLocked: boolean;
   result: AnswerResult | null;
+  /** The correct answer text from the server after "Check" (used to highlight the right option). */
+  correctAnswer: string | null;
   /** Show Latin-letter pronunciation under Indian-script text (a learner setting). */
   showRomanization: boolean;
 };

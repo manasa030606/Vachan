@@ -1,24 +1,33 @@
 import { LanguageTile } from "@/components/ui/language-tile";
 import { LANGUAGE_CONTENT } from "@/data/language-content";
-import { LANGUAGES } from "@/data/languages";
-import type { LanguageCode } from "@/types/learning";
+import type { Language, LanguageCode } from "@/types/learning";
 import { ChoiceCard } from "./choice-card";
 import { StepHeading } from "./step-heading";
 
 type StepLanguageProps = {
+  /** Languages from GET /api/languages */
+  languages: Language[];
+  isLoading: boolean;
+  error: string | null;
   value: LanguageCode | null;
   onChange: (code: LanguageCode) => void;
 };
 
-export function StepLanguage({ value, onChange }: StepLanguageProps) {
+export function StepLanguage({ languages, isLoading, error, value, onChange }: StepLanguageProps) {
   return (
     <fieldset>
       <StepHeading
         title="What would you like to learn?"
         subtitle="You're learning from English. You can add more languages later."
       />
+      {isLoading && <p className="text-slate-500">Loading languages…</p>}
+      {error && (
+        <p role="alert" className="rounded-2xl bg-rose-50 px-4 py-3 font-bold text-rose-700">
+          {error}
+        </p>
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
-        {LANGUAGES.map((language) => (
+        {languages.map((language) => (
           <ChoiceCard
             key={language.code}
             name="language"

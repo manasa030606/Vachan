@@ -25,7 +25,10 @@ export function PracticeView() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-extrabold text-ink">Practice</h1>
-        <p className="text-slate-600">
+        <p className="mt-2 inline-block rounded-full bg-marigold-50 px-3 py-1 text-sm font-bold text-marigold-700">
+          Preview · demo data until review is built in Phase 3
+        </p>
+        <p className="mt-2 text-slate-600">
           Strengthen your {language.name} — review what you&apos;ve learned.
         </p>
       </div>

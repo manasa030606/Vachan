@@ -17,12 +17,22 @@ const exercises: Exercise[] = ["e1", "e2"].map((id) => ({
     { id: "right", text: "Right" },
     { id: "wrong", text: "Wrong" },
   ],
-  correctOptionId: "right",
 }));
+
+/** Simulates the server's verdict: "right" is the correct option in these tests. */
+function check(state: LessonState): LessonState {
+  const isCorrect = state.answer?.type === "choice" && state.answer.optionId === "right";
+  return lessonReducer(state, {
+    type: "CHECK",
+    isCorrect,
+    typoCorrection: null,
+    correctAnswer: "Right",
+  });
+}
 
 function answer(state: LessonState, optionId: string): LessonState {
   let next = lessonReducer(state, { type: "ANSWER_CHANGED", answer: { type: "choice", optionId } });
-  next = lessonReducer(next, { type: "CHECK" });
+  next = check(next);
   return lessonReducer(next, { type: "CONTINUE" });
 }
 
@@ -60,7 +70,7 @@ describe("lessonReducer", () => {
       type: "ANSWER_CHANGED",
       answer: { type: "choice", optionId: "right" },
     });
-    state = lessonReducer(state, { type: "CHECK" });
+    state = check(state);
     const after = lessonReducer(state, {
       type: "ANSWER_CHANGED",
       answer: { type: "choice", optionId: "wrong" },

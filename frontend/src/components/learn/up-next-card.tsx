@@ -24,7 +24,7 @@ export function UpNextCard({ language, unit, lesson }: UpNextCardProps) {
           </p>
           <p className="text-xl font-extrabold text-ink">{lesson.title}</p>
           <p className="text-sm text-slate-500">
-            Unit {unit.number}: {unit.title} · +{lesson.xpReward} XP
+            Unit {unit.number}: {unit.title} · {lesson.exerciseCount} exercises
           </p>
         </div>
       </div>

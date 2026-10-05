@@ -1,12 +1,16 @@
 "use client";
 
 // Runs a lesson: intro → exercises (check / feedback / continue) → complete screen.
-// All rules live in lessonReducer; this component only connects state to the UI.
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+// "Check" sends the answer to the backend (POST /api/exercises/:id/attempt), which
+// decides if it is right and saves the attempt. The lesson rules live in lessonReducer.
+import { useCallback, useEffect, useReducer, useState } from "react";
 import type { ExerciseAnswer, Lesson } from "@/types/exercise";
 import { ExerciseRenderer } from "@/components/exercises/exercise-renderer";
-import { MOCK_GAMIFICATION_RULES, MOCK_PROGRESS } from "@/data/mock-user";
-import { getCorrectAnswerText, isAnswerReady } from "@/lib/exercises/check-answer";
+import { MOCK_PROGRESS } from "@/data/mock-user";
+import { ApiError } from "@/lib/api/client";
+import { submitAttempt } from "@/lib/api/endpoints";
+import type { LessonProgressDto } from "@/lib/api/types";
+import { isAnswerReady, toAttemptAnswer } from "@/lib/exercises/check-answer";
 import {
   createInitialLessonState,
   getAccuracy,
@@ -28,18 +32,43 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
     lessonReducer,
     createInitialLessonState(lesson.exercises, MOCK_PROGRESS.hearts),
   );
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkError, setCheckError] = useState<string | null>(null);
+  /** Latest progress from the server (status, accuracy) — shown on the complete screen. */
+  const [serverProgress, setServerProgress] = useState<LessonProgressDto | null>(null);
 
   const exercise = state.queue[state.position];
-  const canCheck = exercise ? isAnswerReady(exercise, state.answer) : false;
-  const correctAnswerText = useMemo(
-    () => (exercise ? getCorrectAnswerText(exercise) : ""),
-    [exercise],
-  );
+  const canCheck = exercise ? isAnswerReady(exercise, state.answer) && !isChecking : false;
 
   const handleAnswerChange = useCallback(
     (answer: ExerciseAnswer | null) => dispatch({ type: "ANSWER_CHANGED", answer }),
     [],
   );
+
+  const check = useCallback(async () => {
+    if (!exercise || !state.answer || state.result || isChecking) return;
+    setIsChecking(true);
+    setCheckError(null);
+    try {
+      const { attempt, lessonProgress } = await submitAttempt(
+        exercise.id,
+        toAttemptAnswer(state.answer),
+      );
+      setServerProgress(lessonProgress);
+      dispatch({
+        type: "CHECK",
+        isCorrect: attempt.isCorrect,
+        typoCorrection: attempt.typoCorrection,
+        correctAnswer: attempt.correctAnswer,
+      });
+    } catch (error) {
+      setCheckError(
+        error instanceof ApiError ? error.message : "Couldn't check your answer. Please try again.",
+      );
+    } finally {
+      setIsChecking(false);
+    }
+  }, [exercise, state.answer, state.result, isChecking]);
 
   // Keyboard: Enter = Check, then Enter again = Continue.
   useEffect(() => {
@@ -50,12 +79,12 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
       // A focused button already reacts to Enter by itself.
       if ((event.target as HTMLElement | null)?.tagName === "BUTTON") return;
       if (state.result) dispatch({ type: "CONTINUE" });
-      else if (canCheck) dispatch({ type: "CHECK" });
+      else if (canCheck) void check();
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [state.phase, state.result, canCheck]);
+  }, [state.phase, state.result, canCheck, check]);
 
   if (state.phase === "intro") {
     return (
@@ -75,16 +104,15 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   }
 
   if (state.phase === "complete") {
-    const isPerfect = state.mistakeIds.length === 0;
-    const bonus = isPerfect ? MOCK_GAMIFICATION_RULES.perfectLessonBonusXp : 0;
     return (
       <LessonComplete
         lessonTitle={lesson.title}
-        xpEarned={lesson.xpReward + bonus}
-        perfectBonusXp={bonus}
+        exercisesCompleted={serverProgress?.completedExercises ?? state.totalExercises}
+        totalExercises={serverProgress?.totalExercises ?? state.totalExercises}
         accuracy={getAccuracy(state)}
         heartsLeft={state.hearts}
         mistakesReviewed={state.mistakeIds.length}
+        savedAsCompleted={serverProgress?.status === "COMPLETED"}
         words={lesson.newWords}
         onPracticeAgain={() =>
           dispatch({ type: "RESTART", exercises: lesson.exercises, hearts: MOCK_PROGRESS.hearts })
@@ -115,19 +143,26 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
           exercise={exercise}
           answer={state.answer}
           onAnswerChange={handleAnswerChange}
-          isLocked={state.result !== null}
+          isLocked={state.result !== null || isChecking}
           result={state.result}
+          correctAnswer={state.correctAnswer}
           showRomanization={showRomanization}
         />
+        {checkError && (
+          <p role="alert" className="mt-4 rounded-2xl bg-rose-50 px-4 py-3 font-bold text-rose-700">
+            {checkError}
+          </p>
+        )}
       </main>
 
       <div className="sticky bottom-0">
         <LessonFooter
           result={state.result}
           canCheck={canCheck}
-          correctAnswerText={correctAnswerText}
+          isChecking={isChecking}
+          correctAnswerText={state.correctAnswer ?? ""}
           typoCorrection={state.typoCorrection}
-          onCheck={() => dispatch({ type: "CHECK" })}
+          onCheck={() => void check()}
           onContinue={() => dispatch({ type: "CONTINUE" })}
         />
       </div>

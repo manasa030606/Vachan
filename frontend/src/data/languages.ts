@@ -1,4 +1,6 @@
-// The six languages Vachan supports (see spec section 2).
+// The six languages Vachan supports (spec section 2).
+// The backend database is the source of truth for names and descriptions (GET /api/languages);
+// this file adds the visual theme and is also used by the static landing page.
 import type { Language, LanguageCode } from "@/types/learning";
 
 export const LANGUAGES: Language[] = [
@@ -62,4 +64,29 @@ export const DEFAULT_LANGUAGE_CODE: LanguageCode = "hi";
 
 export function getLanguage(code: LanguageCode): Language {
   return LANGUAGES.find((language) => language.code === code) ?? LANGUAGES[0];
+}
+
+export function isLanguageCode(code: string): code is LanguageCode {
+  return LANGUAGES.some((language) => language.code === code);
+}
+
+/**
+ * Combines a language from the API (names, descriptions — stored in the database)
+ * with its visual theme (glyph tile colours — a frontend concern).
+ */
+export function withTheme(language: {
+  code: string;
+  name: string;
+  nativeName: string;
+  scriptName: string;
+  description: string;
+}): Language {
+  const fallback = isLanguageCode(language.code) ? getLanguage(language.code) : LANGUAGES[0];
+  return {
+    ...fallback,
+    name: language.name,
+    nativeName: language.nativeName,
+    scriptName: language.scriptName,
+    description: language.description,
+  };
 }

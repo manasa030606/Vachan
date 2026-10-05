@@ -81,16 +81,19 @@ export function OptionButton({
   );
 }
 
-/** Works out how an option should look before and after the answer is checked. */
+/**
+ * Works out how an option should look before and after the answer is checked.
+ * After "Check", the server tells us the correct answer as text, so we compare texts.
+ */
 export function getOptionState(params: {
-  optionId: string;
+  option: ChoiceOption;
   selectedId: string | null;
-  correctId: string;
+  correctAnswer: string | null;
   isLocked: boolean;
 }): OptionState {
-  const { optionId, selectedId, correctId, isLocked } = params;
-  if (!isLocked) return optionId === selectedId ? "selected" : "idle";
-  if (optionId === correctId) return "correct";
-  if (optionId === selectedId) return "incorrect";
+  const { option, selectedId, correctAnswer, isLocked } = params;
+  if (!isLocked) return option.id === selectedId ? "selected" : "idle";
+  if (option.text === correctAnswer) return "correct";
+  if (option.id === selectedId) return "incorrect";
   return "dimmed";
 }

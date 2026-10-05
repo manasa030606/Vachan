@@ -7,8 +7,10 @@
 //
 // A wrong answer costs one heart and puts that exercise again at the end of the
 // queue ("mini review of mistakes", spec section 5).
+//
+// The reducer does NOT decide whether an answer is right: the server does
+// (POST /api/exercises/:id/attempt) and the result is passed in with the CHECK action.
 import type { AnswerResult, Exercise, ExerciseAnswer } from "@/types/exercise";
-import { evaluateAnswer } from "./check-answer";
 
 export type LessonPhase = "intro" | "exercise" | "complete" | "out-of-hearts";
 
@@ -22,6 +24,8 @@ export type LessonState = {
   result: AnswerResult | null;
   /** Set when a typed answer was accepted despite a small spelling mistake. */
   typoCorrection: string | null;
+  /** The correct answer text from the server, shown after "Check". */
+  correctAnswer: string | null;
   hearts: number;
   totalExercises: number;
   /** Ids of exercises answered correctly at least once (drives the progress bar). */
@@ -35,7 +39,7 @@ export type LessonState = {
 export type LessonAction =
   | { type: "START" }
   | { type: "ANSWER_CHANGED"; answer: ExerciseAnswer | null }
-  | { type: "CHECK" }
+  | { type: "CHECK"; isCorrect: boolean; typoCorrection: string | null; correctAnswer: string }
   | { type: "CONTINUE" }
   | { type: "RESTART"; exercises: Exercise[]; hearts: number };
 
@@ -47,6 +51,7 @@ export function createInitialLessonState(exercises: Exercise[], hearts: number):
     answer: null,
     result: null,
     typoCorrection: null,
+    correctAnswer: null,
     hearts,
     totalExercises: exercises.length,
     completedIds: [],
@@ -70,12 +75,12 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
       const exercise = state.queue[state.position];
       if (!exercise || state.result || !state.answer) return state;
 
-      const evaluation = evaluateAnswer(exercise, state.answer);
-      if (evaluation.isCorrect) {
+      if (action.isCorrect) {
         return {
           ...state,
           result: "correct",
-          typoCorrection: evaluation.typoCorrection ?? null,
+          typoCorrection: action.typoCorrection,
+          correctAnswer: action.correctAnswer,
           correctAnswers: state.correctAnswers + 1,
           totalAnswers: state.totalAnswers + 1,
           completedIds: state.completedIds.includes(exercise.id)
@@ -86,6 +91,7 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
       return {
         ...state,
         result: "incorrect",
+        correctAnswer: action.correctAnswer,
         hearts: Math.max(0, state.hearts - 1),
         totalAnswers: state.totalAnswers + 1,
         mistakeIds: state.mistakeIds.includes(exercise.id)
@@ -108,6 +114,7 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
         answer: null,
         result: null,
         typoCorrection: null,
+        correctAnswer: null,
         phase: isFinished ? "complete" : "exercise",
       };
     }

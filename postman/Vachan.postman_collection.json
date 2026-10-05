@@ -1,22 +1,51 @@
 {
   "info": {
     "name": "Vachan API",
-    "description": "Postman collection for the Vachan backend. Phase 0 contains only the health check. Set the `baseUrl` collection variable if your backend runs on a different port.",
+    "description": "Phase 2 API. Run the requests from top to bottom (folders 0 → 8).\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:4000",
-      "type": "string"
+      "value": "http://localhost:4000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": "learn1234"
+    },
+    {
+      "key": "courseId",
+      "value": "te-course"
+    },
+    {
+      "key": "lessonId",
+      "value": "te-u1-l1"
     }
   ],
   "item": [
     {
-      "name": "Health",
+      "name": "0. Health",
       "item": [
         {
-          "name": "GET Health check",
+          "name": "Health check",
           "request": {
             "method": "GET",
             "header": [
@@ -26,11 +55,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/health",
+              "raw": "{{baseUrl}}/health",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "health"]
+              "path": ["health"]
             },
-            "description": "Returns 200 when the API and PostgreSQL are both working. Returns 503 with status \"degraded\" when the API is running but PostgreSQL is not reachable."
+            "description": "200 when API + database work; 503 when the database is down.",
+            "auth": {
+              "type": "noauth"
+            }
           },
           "event": [
             {
@@ -38,27 +70,137 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
-                  "const body = pm.response.json();",
-                  "pm.test(\"API status is ok\", () => pm.expect(body.status).to.eql(\"ok\"));",
-                  "pm.test(\"Service name is vachan-backend\", () => pm.expect(body.service).to.eql(\"vachan-backend\"));",
-                  "pm.test(\"Database is connected\", () => pm.expect(body.database.status).to.eql(\"connected\"));"
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Database connected\", () => pm.expect(pm.response.json().database.status).to.eql(\"connected\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Get me before logging in (401)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "description": "No token yet → 401 UNAUTHORIZED. (If you already logged in earlier, Postman may still hold a 'vachan_token' cookie for localhost — delete it under Cookies, or this returns 200.)",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Creates an account and logs in. A new random email is generated each time (pre-request script).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Manasa\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"email\", `learner${Date.now()}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", json.token);",
+                  "pm.test(\"No password hash in the response\", () => pm.expect(JSON.stringify(json)).to.not.include(\"passwordHash\"));"
                 ]
               }
             }
           ]
         },
         {
-          "name": "GET Unknown route (404 example)",
+          "name": "Register again with the same email (409)",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/does-not-exist",
+              "raw": "{{baseUrl}}/auth/register",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "does-not-exist"]
+              "path": ["auth", "register"]
             },
-            "description": "Shows the JSON error format used for routes that do not exist."
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Manasa\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
           },
           "event": [
             {
@@ -66,9 +208,1114 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));",
-                  "pm.test(\"Error code is NOT_FOUND\", () => pm.expect(pm.response.json().error.code).to.eql(\"NOT_FOUND\"));"
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"EMAIL_ALREADY_REGISTERED\", () => pm.expect(pm.response.json().error.code).to.eql(\"EMAIL_ALREADY_REGISTERED\"));"
                 ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register with invalid data (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"M\",\n  \"email\": \"not-an-email\",\n  \"password\": \"short\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"VALIDATION_ERROR\", () => pm.expect(pm.response.json().error.code).to.eql(\"VALIDATION_ERROR\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login with wrong password (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"wrong-password1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"INVALID_CREDENTIALS\", () => pm.expect(pm.response.json().error.code).to.eql(\"INVALID_CREDENTIALS\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Returns the user and a token. The token is saved automatically for the next requests.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"token\", pm.response.json().token);",
+                  "pm.test(\"Token received\", () => pm.expect(pm.response.json().token).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Current user",
+      "item": [
+        {
+          "name": "Get me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Has profile\", () => pm.expect(pm.response.json().user.profile).to.be.an(\"object\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update me (onboarding choices)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"languageCode\": \"te\",\n  \"learningGoal\": \"travel\",\n  \"dailyGoal\": \"regular\",\n  \"selfAssessment\": \"new\",\n  \"onboardingDone\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Language is Telugu\", () => pm.expect(pm.response.json().user.profile.currentLanguage.code).to.eql(\"te\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Languages & courses",
+      "item": [
+        {
+          "name": "Get languages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/languages",
+              "host": ["{{baseUrl}}"],
+              "path": ["languages"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Six languages\", () => pm.expect(pm.response.json().languages.length).to.eql(6));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get courses for one language",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses?languageCode=te",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"],
+              "query": [
+                {
+                  "key": "languageCode",
+                  "value": "te"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Telugu course\", () => pm.expect(pm.response.json().courses[0].id).to.eql(\"te-course\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get course (with my lesson statuses)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", "{{courseId}}"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const lessons = pm.response.json().course.units.flatMap(u => u.lessons);",
+                  "pm.test(\"First lesson is current\", () => pm.expect(lessons[0].status).to.be.oneOf([\"current\",\"completed\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get course that does not exist (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/no-such-course",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", "no-such-course"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Lessons",
+      "item": [
+        {
+          "name": "Get lesson",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lessons", "{{lessonId}}"]
+            },
+            "description": "Exercises come WITHOUT correct answers."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"No answers leaked\", () => pm.expect(pm.response.text()).to.not.include(\"isCorrect\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get locked lesson (403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/te-u3-l1",
+              "host": ["{{baseUrl}}"],
+              "path": ["lessons", "te-u3-l1"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"LESSON_LOCKED\", () => pm.expect(pm.response.json().error.code).to.eql(\"LESSON_LOCKED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get lesson that does not exist (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/no-such-lesson",
+              "host": ["{{baseUrl}}"],
+              "path": ["lessons", "no-such-lesson"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Exercise attempts (lesson te-u1-l1)",
+      "item": [
+        {
+          "name": "Wrong answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l1-e1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l1-e1", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"te-u1-l1-e1-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is false\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Correct answer — exercise 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l1-e1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l1-e1", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"te-u1-l1-e1-o3\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is true\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Correct answer — exercise 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l1-e2/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l1-e2", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"te-u1-l1-e2-o3\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is true\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Correct answer — exercise 3 (completes the lesson)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l1-e3/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l1-e3", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"te-u1-l1-e3-o2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Lesson completed\", () => pm.expect(pm.response.json().lessonProgress.status).to.eql(\"COMPLETED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Answer in the wrong format (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l1-e1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l1-e1", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"text\": \"aa\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Empty body (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l1-e1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l1-e1", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. More answer formats (lesson te-u1-l2 → te-u2-l1)",
+      "item": [
+        {
+          "name": "Choice — exercise te-u1-l2-e1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l2-e1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l2-e1", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"te-u1-l2-e1-o2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is true\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Matching — exercise te-u1-l2-e2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l2-e2/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l2-e2", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"pairs\": [\n      {\n        \"leftId\": \"te-u1-l2-e2-o1\",\n        \"rightId\": \"te-u1-l2-e2-o1\"\n      },\n      {\n        \"leftId\": \"te-u1-l2-e2-o2\",\n        \"rightId\": \"te-u1-l2-e2-o2\"\n      },\n      {\n        \"leftId\": \"te-u1-l2-e2-o3\",\n        \"rightId\": \"te-u1-l2-e2-o3\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is true\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Choice — exercise te-u1-l2-e3 (completes lesson 2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u1-l2-e3/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u1-l2-e3", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"optionId\": \"te-u1-l2-e3-o1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is true\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Typed translation — te-u2-l1-e3 (capitals/spaces ignored)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u2-l1-e3/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u2-l1-e3", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"text\": \"THankyou\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"isCorrect is true\", () => pm.expect(pm.response.json().attempt.isCorrect).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Typed translation with a small typo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exercises/te-u2-l1-e3/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["exercises", "te-u2-l1-e3", "attempt"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer\": {\n    \"text\": \"Thnak you\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Accepted with spelling hint\", () => pm.expect(pm.response.json().attempt.typoCorrection).to.eql(\"thank you\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Progress",
+      "item": [
+        {
+          "name": "Get my progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Two lessons completed\", () => pm.expect(pm.response.json().progress.totals.lessonsCompleted).to.eql(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get progress for one lesson",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/{{lessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress", "{{lessonId}}"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Completed\", () => pm.expect(pm.response.json().progress.status).to.eql(\"COMPLETED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get progress for an untouched lesson",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/progress/hi-u1-l1",
+              "host": ["{{baseUrl}}"],
+              "path": ["progress", "hi-u1-l1"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"NOT_STARTED\", () => pm.expect(pm.response.json().progress.status).to.eql(\"NOT_STARTED\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Logout",
+      "item": [
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get me after logout (401 — old token no longer works)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"]
               }
             }
           ]

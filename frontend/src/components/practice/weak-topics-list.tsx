@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import type { WeakTopic } from "@/data/mock-practice";
@@ -12,10 +10,7 @@ export function WeakTopicsList({ topics }: { topics: WeakTopic[] }) {
       <ul className="space-y-3">
         {topics.map((topic) => (
           <li key={topic.id}>
-            <Link
-              href={`/lesson/practice-topic-${topic.id}`}
-              className="flex items-center gap-3 rounded-2xl border-2 border-slate-100 p-3 transition hover:border-brand-200 hover:bg-brand-50"
-            >
+            <div className="flex items-center gap-3 rounded-2xl border-2 border-slate-100 p-3">
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="font-bold text-ink">{topic.title}</p>
@@ -31,9 +26,7 @@ export function WeakTopicsList({ topics }: { topics: WeakTopic[] }) {
                 />
                 <p className="mt-1 text-xs text-slate-500">{topic.reason}</p>
               </div>
-              <ChevronRight aria-hidden="true" className="size-5 text-slate-400" />
-              <span className="sr-only">Practise {topic.title}</span>
-            </Link>
+            </div>
           </li>
         ))}
       </ul>
