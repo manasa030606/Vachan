@@ -166,6 +166,11 @@ git add . && git commit -m "…" && git push
 - **Neon free** pauses the database when idle and wakes in about a second on the next query.
 - Render free has no shell access → run migrations/seed from your Mac (Step 2) or rely on the build.
 
+## 5b. Phase 5 (RAG) on the deployed site
+
+- The next Render build applies the Phase 5 migration on Neon automatically (pgvector is built into Neon).
+- **Knowledge-base search stays off on Render free** (`NODE_ENV=production` → `RAG_ENABLED` defaults to `false`, `POST /api/rag/search` → `503 RAG_DISABLED`): the embedding model needs ≈ 550 MB of RAM and the free plan has 512 MB. The rest of the app is unaffected. Details and how to enable it later: [RAG.md §8](RAG.md#8-deployment).
+
 ## 6. Troubleshooting
 
 | Problem                                                                      | Why                                                                                     | Fix                                                                                                                                          |

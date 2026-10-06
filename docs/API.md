@@ -10,33 +10,35 @@ Base URL: **`http://localhost:4000/api`** locally · **`https://vachan-api.onren
 
 ## 1. Endpoint list
 
-| #   | Method | URL                          | Auth         | Purpose                                                                                 |
-| --- | ------ | ---------------------------- | ------------ | --------------------------------------------------------------------------------------- |
-| 0   | GET    | `/api/health`                | none         | API + database status                                                                   |
-| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                                                         |
-| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                                                                     |
-| 27  | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)                                                       |
-| 4   | GET    | `/api/me`                    | **required** | Current user + profile                                                                  |
-| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language)                                         |
-| 6   | GET    | `/api/languages`             | none         | The six languages                                                                       |
-| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)                                              |
-| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status                                                    |
-| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers) + my progress                                           |
-| 10  | POST   | `/api/lessons/:id/start`     | **required** | start or resume a lesson                                                                |
-| 11  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer (lesson or review); server checks it, returns feedback + rewards (§18) |
-| 12  | GET    | `/api/progress`              | **required** | My overall progress + resume point                                                      |
-| 13  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson (per exercise)                                                |
-| 14  | GET    | `/api/review`                | **required** | open mistakes + words learned                                                           |
-| 15  | GET    | `/api/review/attempts`       | **required** | every incorrect answer                                                                  |
-| 16  | GET    | `/api/review/session`        | **required** | Open mistakes as exercises to practise                                                  |
-| 19  | GET    | `/api/stats`                 | **required** | **Phase 4** · XP, level, streak, hearts, daily goal, recent badges                      |
-| 20  | GET    | `/api/streak`                | **required** | **Phase 4** · current/longest streak + last 7 days                                      |
-| 21  | GET    | `/api/achievements`          | **required** | **Phase 4** · all badges with progress                                                  |
-| 22  | GET    | `/api/recommendations`       | **required** | **Phase 4** · practice recommendations (transparent rules)                              |
-| 23  | POST   | `/api/placement/start`       | **required** | **Phase 4** · start a placement test                                                    |
-| 24  | POST   | `/api/placement/answer`      | **required** | **Phase 4** · answer one placement question                                             |
-| 25  | GET    | `/api/placement/result`      | **required** | **Phase 4** · score per unit + recommended unit                                         |
-| 26  | POST   | `/api/placement/decide`      | **required** | **Phase 4** · start at the recommended unit or Unit 1                                   |
+| #   | Method | URL                          | Auth         | Purpose                                                                                                 |
+| --- | ------ | ---------------------------- | ------------ | ------------------------------------------------------------------------------------------------------- |
+| 0   | GET    | `/api/health`                | none         | API + database status                                                                                   |
+| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                                                                         |
+| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                                                                                     |
+| 27  | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)                                                                       |
+| 4   | GET    | `/api/me`                    | **required** | Current user + profile                                                                                  |
+| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language)                                                         |
+| 6   | GET    | `/api/languages`             | none         | The six languages                                                                                       |
+| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)                                                              |
+| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status                                                                    |
+| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers) + my progress                                                           |
+| 10  | POST   | `/api/lessons/:id/start`     | **required** | start or resume a lesson                                                                                |
+| 11  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer (lesson or review); server checks it, returns feedback + rewards (§18)                 |
+| 12  | GET    | `/api/progress`              | **required** | My overall progress + resume point                                                                      |
+| 13  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson (per exercise)                                                                |
+| 14  | GET    | `/api/review`                | **required** | open mistakes + words learned                                                                           |
+| 15  | GET    | `/api/review/attempts`       | **required** | every incorrect answer                                                                                  |
+| 16  | GET    | `/api/review/session`        | **required** | Open mistakes as exercises to practise                                                                  |
+| 19  | GET    | `/api/stats`                 | **required** | **Phase 4** · XP, level, streak, hearts, daily goal, recent badges                                      |
+| 20  | GET    | `/api/streak`                | **required** | **Phase 4** · current/longest streak + last 7 days                                                      |
+| 21  | GET    | `/api/achievements`          | **required** | **Phase 4** · all badges with progress                                                                  |
+| 22  | GET    | `/api/recommendations`       | **required** | **Phase 4** · practice recommendations (transparent rules)                                              |
+| 23  | POST   | `/api/placement/start`       | **required** | **Phase 4** · start a placement test                                                                    |
+| 24  | POST   | `/api/placement/answer`      | **required** | **Phase 4** · answer one placement question                                                             |
+| 25  | GET    | `/api/placement/result`      | **required** | **Phase 4** · score per unit + recommended unit                                                         |
+| 26  | POST   | `/api/placement/decide`      | **required** | **Phase 4** · start at the recommended unit or Unit 1                                                   |
+| 28  | POST   | `/api/rag/search`            | **required** | **Phase 5** · knowledge-base retrieval: chunks + metadata + relevance ([RAG.md §7](RAG.md#7-retrieval)) |
+| 29  | GET    | `/api/rag/stats`             | **required** | **Phase 5** · what is indexed (per language / type / level, topics)                                     |
 
 `PATCH /api/me` is from the spec's API table (section 11) and is needed so onboarding and settings are saved.
 
@@ -1257,6 +1259,22 @@ Errors: `409 PLACEMENT_INCOMPLETE` · `409 PLACEMENT_ALREADY_DECIDED` · `400 VA
 Then **Get me** again → `401 UNAUTHORIZED` (the token is now invalid). Log in again to get a new one.
 
 ---
+
+## 5b. RAG knowledge base (Phase 5) — folder 12
+
+Prerequisite: `npm run rag:index -w backend` (see [RAG.md §2](RAG.md#2-setup-pgvector-model-index)). Log in (folder 1), then run folder **12. RAG knowledge base**.
+
+| Request            | Body                                                                                                                                          | Expected                                                                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /rag/stats`   | —                                                                                                                                             | `200`, `knowledgeBase.chunks` = 394, six languages, `chunksWithoutEmbedding` 0, `dimensions` 384                                        |
+| `POST /rag/search` | `{"query": "How do I say hello in Telugu?"}`                                                                                                  | `200`, `filters.language` = `{code: "te", source: "named-in-query"}`, `te/phrases#hello-namaskaaram` first, `retrieval.sufficient` true |
+| `POST /rag/search` | `{"query": "What is this Telugu word? అమ్మ", "limit": 3}`                                                                                     | family-vocabulary chunk first, `relevance.matchedTerms` = `["అమ్మ"]`                                                                    |
+| `POST /rag/search` | `{"query": "Explain this beginner grammar concept: why does the verb come at the end of a sentence?", "language": "te", "level": "beginner"}` | `te/grammar#word-order-subject-object-verb` first, no `levelMatch: "harder"` in the top 3                                               |
+| `POST /rag/search` | `{"query": "What is the word for water?", "language": "ta", "topic": "food"}`                                                                 | Tamil food chunk first with `topicMatch: true`                                                                                          |
+| `POST /rag/search` | `{"query": "What is the capital of France?"}`                                                                                                 | `200` with `retrieval.sufficient: false`                                                                                                |
+| `POST /rag/search` | `{"query": ""}` or `{"query": "hello", "language": "fr"}`                                                                                     | `400 VALIDATION_ERROR`                                                                                                                  |
+
+The first search after the server starts takes ~3 s (the embedding model loads). The full response format and more examples: [RAG.md §7](RAG.md#7-retrieval).
 
 ## 6. Automated version of this guide
 

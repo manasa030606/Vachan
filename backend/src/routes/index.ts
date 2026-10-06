@@ -15,6 +15,7 @@ import { lessonsRouter } from "./lessons.routes.ts";
 import { meRouter } from "./me.routes.ts";
 import { placementRouter } from "./placement.routes.ts";
 import { progressRouter } from "./progress.routes.ts";
+import { ragRouter } from "./rag.routes.ts";
 import { reviewRouter } from "./review.routes.ts";
 
 export const apiRouter = Router();
@@ -33,3 +34,4 @@ apiRouter.use("/stats", statsRouter);
 apiRouter.use("/streak", streakRouter);
 apiRouter.use("/achievements", achievementsRouter);
 apiRouter.use("/recommendations", recommendationsRouter);
+apiRouter.use("/rag", ragRouter);

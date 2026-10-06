@@ -1,0 +1,560 @@
+{
+  "description": "Retrieval evaluation for the Vachan RAG knowledge base (Phase 5). Each case lists the chunk ids that count as a correct answer; a case is a hit@k if ANY of them appears in the top k results. Out-of-scope questions must come back with sufficient=false. Cases with id 'hard-*' were added after the first run as harder paraphrased / native-language questions, so the score is not measured only on questions written next to the content.",
+  "thresholds": {
+    "hitAt3": 0.85,
+    "mrr": 0.7,
+    "languagePrecision": 1.0,
+    "inScopeSufficient": 0.9,
+    "outOfScopeRejected": 0.8
+  },
+  "cases": [
+    {
+      "id": "te-hello",
+      "category": "phrase",
+      "query": "How do I say hello in Telugu?",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/phrases#hello-namaskaaram",
+        "course/te/vocabulary#course-vocabulary-greetings"
+      ]
+    },
+    {
+      "id": "te-word-amma",
+      "category": "word-meaning",
+      "query": "What is this Telugu word? అమ్మ",
+      "expectLanguage": "te",
+      "relevant": ["te/vocabulary#family-words", "course/te/vocabulary#course-vocabulary-family"]
+    },
+    {
+      "id": "te-grammar-word-order",
+      "category": "grammar",
+      "query": "Explain this beginner grammar concept: why does the verb come at the end of a Telugu sentence?",
+      "level": "beginner",
+      "expectLanguage": "te",
+      "relevant": ["te/grammar#word-order-subject-object-verb"]
+    },
+    {
+      "id": "te-we-inclusive",
+      "category": "grammar",
+      "query": "What is the difference between మేము and మనం?",
+      "expectLanguage": "te",
+      "relevant": ["te/grammar#personal-pronouns", "te/grammar#possessives-my-your-our"]
+    },
+    {
+      "id": "te-want-water",
+      "category": "phrase",
+      "query": "How do I say I want water?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/examples#i-want-water",
+        "te/grammar#i-want-i-like-i-know-the-dative-construction",
+        "te/phrases#shopping-and-directions-idi-enta"
+      ]
+    },
+    {
+      "id": "te-talakattu",
+      "category": "alphabet",
+      "query": "What is the talakattu?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": ["te/alphabet#vowel-signs-and-the-talakattu-guninthaalu"]
+    },
+    {
+      "id": "te-past-go",
+      "category": "verb-form",
+      "query": "past tense of the verb to go",
+      "language": "te",
+      "level": "intermediate",
+      "expectLanguage": "te",
+      "relevant": ["te/verbs#past-tense-vellu-to-go"]
+    },
+    {
+      "id": "te-idiom",
+      "category": "idiom",
+      "query": "What does andani draaksha pullana mean?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": ["te/idioms#andani-draaksha-pullana"]
+    },
+    {
+      "id": "te-postpositions",
+      "category": "grammar",
+      "query": "Explain postpositions in Telugu",
+      "level": "elementary",
+      "expectLanguage": "te",
+      "relevant": ["te/grammar#case-endings-postpositions"]
+    },
+    {
+      "id": "hi-thanks",
+      "category": "phrase",
+      "query": "How do I say thank you in Hindi?",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/phrases#thank-you-dhanyavaad",
+        "course/hi/vocabulary#course-vocabulary-greetings"
+      ]
+    },
+    {
+      "id": "hi-schwa",
+      "category": "pronunciation",
+      "query": "Why is कमरा pronounced kamraa and not kamaraa?",
+      "expectLanguage": "hi",
+      "relevant": ["hi/pronunciation#silent-a-schwa-deletion"]
+    },
+    {
+      "id": "hi-ne",
+      "category": "grammar",
+      "query": "When do I use ने in a Hindi sentence?",
+      "level": "intermediate",
+      "expectLanguage": "hi",
+      "relevant": ["hi/verbs#past-tense-with-ne-the-ergative"]
+    },
+    {
+      "id": "hi-gender",
+      "category": "grammar",
+      "query": "Is a book masculine or feminine?",
+      "language": "hi",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/grammar#grammatical-gender-masculine-and-feminine-nouns",
+        "hi/beginner-guide#learn-every-noun-with-its-gender",
+        "hi/grammar#verb-agreement-with-gender"
+      ]
+    },
+    {
+      "id": "hi-you-forms",
+      "category": "grammar",
+      "query": "What is the difference between aap, tum and tu?",
+      "language": "hi",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/grammar#three-forms-of-you",
+        "hi/beginner-guide#formal-and-informal-you",
+        "hi/culture#showing-respect-and"
+      ]
+    },
+    {
+      "id": "hi-no",
+      "category": "phrase",
+      "query": "How do I say no?",
+      "language": "hi",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/phrases#yes-and-no-haan-nahin",
+        "hi/grammar#saying-not-and",
+        "course/hi/vocabulary#course-vocabulary-greetings"
+      ]
+    },
+    {
+      "id": "ta-greet",
+      "category": "phrase",
+      "query": "How do I greet someone in Tamil?",
+      "expectLanguage": "ta",
+      "relevant": ["ta/phrases#hello-vanakkam", "course/ta/vocabulary#course-vocabulary-greetings"]
+    },
+    {
+      "id": "ta-zha",
+      "category": "pronunciation",
+      "query": "How do I pronounce ழ?",
+      "expectLanguage": "ta",
+      "relevant": ["ta/pronunciation#the-special-sound-zha", "ta/pronunciation#three-l-sounds"]
+    },
+    {
+      "id": "ta-word-nandri",
+      "category": "word-meaning",
+      "query": "What does நன்றி mean?",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/phrases#thank-you-nandri",
+        "course/ta/vocabulary#course-vocabulary-greetings"
+      ]
+    },
+    {
+      "id": "ta-numbers",
+      "category": "vocabulary",
+      "query": "Tamil numbers from one to ten",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/vocabulary#numbers-1-to-10",
+        "course/ta/vocabulary#course-vocabulary-numbers"
+      ]
+    },
+    {
+      "id": "ta-pongal",
+      "category": "culture",
+      "query": "What is Pongal?",
+      "language": "ta",
+      "expectLanguage": "ta",
+      "relevant": ["ta/culture#festivals-pongal-and-puthandu"]
+    },
+    {
+      "id": "ta-water-topic",
+      "category": "topic-filter",
+      "query": "What is the word for water?",
+      "language": "ta",
+      "topic": "food",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/vocabulary#food-and-drink",
+        "course/ta/vocabulary#course-vocabulary-food-drink",
+        "ta/examples#i-want-water"
+      ]
+    },
+    {
+      "id": "ml-chillu",
+      "category": "alphabet",
+      "query": "What are chillu letters in Malayalam?",
+      "expectLanguage": "ml",
+      "relevant": ["ml/alphabet#chillu-letters-chillaksharangal"]
+    },
+    {
+      "id": "ml-verb-person",
+      "category": "grammar",
+      "query": "Do Malayalam verbs change for I, you and he?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
+        "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone",
+        "ml/verbs#simple-present-tense-unnu"
+      ]
+    },
+    {
+      "id": "ml-how-are-you",
+      "category": "phrase",
+      "query": "How do I ask how are you in Malayalam?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/phrases#how-are-you-ningalkku-sukhamaano",
+        "ml/examples#how-are-you-i-am-fine"
+      ]
+    },
+    {
+      "id": "ml-word-vellam",
+      "category": "word-meaning",
+      "query": "What does വെള്ളം mean?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/vocabulary#food-and-drink",
+        "course/ml/vocabulary#course-vocabulary-food-drink",
+        "ml/examples#i-want-water"
+      ]
+    },
+    {
+      "id": "ml-onam",
+      "category": "culture",
+      "query": "What is Onam?",
+      "language": "ml",
+      "expectLanguage": "ml",
+      "relevant": ["ml/culture#festivals-onam-and-vishu"]
+    },
+    {
+      "id": "kn-my-name",
+      "category": "phrase",
+      "query": "How do I say my name is in Kannada?",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/phrases#my-name-is-nanna-hesaru",
+        "kn/examples#my-name-is-asha",
+        "course/kn/vocabulary#course-vocabulary-introductions"
+      ]
+    },
+    {
+      "id": "kn-family",
+      "category": "vocabulary",
+      "query": "Kannada words for mother and father",
+      "expectLanguage": "kn",
+      "relevant": ["kn/vocabulary#family-words", "course/kn/vocabulary#course-vocabulary-family"]
+    },
+    {
+      "id": "kn-idiom",
+      "category": "idiom",
+      "query": "What does ಕೈ ಕೆಸರಾದರೆ ಬಾಯಿ ಮೊಸರು mean?",
+      "expectLanguage": "kn",
+      "relevant": ["kn/idioms#kai-kesaraadare-baayi-mosaru"]
+    },
+    {
+      "id": "kn-gender",
+      "category": "grammar",
+      "query": "How do Kannada verbs show he, she and it?",
+      "level": "intermediate",
+      "expectLanguage": "kn",
+      "relevant": ["kn/grammar#gender-in-kannada-verbs", "kn/verbs#past-tense-hogu-to-go"]
+    },
+    {
+      "id": "kn-ottakshara",
+      "category": "alphabet",
+      "query": "What is ottakshara?",
+      "language": "kn",
+      "expectLanguage": "kn",
+      "relevant": ["kn/alphabet#conjunct-letters-ottakshara"]
+    },
+    {
+      "id": "kn-goodbye",
+      "category": "phrase",
+      "query": "How do I say goodbye?",
+      "language": "kn",
+      "expectLanguage": "kn",
+      "relevant": ["kn/phrases#goodbye-hogi-baruttene"]
+    },
+    {
+      "id": "kn-start",
+      "category": "explanation",
+      "query": "How should a complete beginner start learning Kannada?",
+      "expectLanguage": "kn",
+      "relevant": ["kn/beginner-guide#how-to-start-learning-kannada"]
+    },
+    {
+      "id": "bn-hello",
+      "category": "phrase",
+      "query": "How do I say hello in Bengali?",
+      "expectLanguage": "bn",
+      "relevant": ["bn/phrases#hello-nomoshkar", "course/bn/vocabulary#course-vocabulary-greetings"]
+    },
+    {
+      "id": "bn-inherent-o",
+      "category": "pronunciation",
+      "query": "Why is অ pronounced like o?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/pronunciation#the-inherent-vowel-is-read-o",
+        "bn/alphabet#vowels-shoroborno",
+        "bn/alphabet#how-bengali-writing-works"
+      ]
+    },
+    {
+      "id": "bn-you-forms",
+      "category": "grammar",
+      "query": "What is the difference between তুমি and আপনি?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/grammar#three-levels-of-you",
+        "bn/beginner-guide#formal-and-informal-you",
+        "bn/culture#showing-respect-and"
+      ]
+    },
+    {
+      "id": "bn-no-gender",
+      "category": "grammar",
+      "query": "Do Bengali verbs change for he and she?",
+      "expectLanguage": "bn",
+      "relevant": ["bn/grammar#no-gender-in-bengali-verbs"]
+    },
+    {
+      "id": "bn-classifier",
+      "category": "grammar",
+      "query": "What does টা mean at the end of a word?",
+      "expectLanguage": "bn",
+      "relevant": ["bn/grammar#classifiers"]
+    },
+    {
+      "id": "bn-21-feb",
+      "category": "culture",
+      "query": "Why is 21 February important for Bengali speakers?",
+      "expectLanguage": "bn",
+      "relevant": ["bn/culture#international-mother-language-day-21-february"]
+    },
+    {
+      "id": "bn-future",
+      "category": "verb-form",
+      "query": "How do I form the future tense?",
+      "language": "bn",
+      "level": "elementary",
+      "expectLanguage": "bn",
+      "relevant": ["bn/verbs#future-tense-jaabo"]
+    },
+    {
+      "id": "hard-te-native-question",
+      "category": "native-language-question",
+      "query": "నమస్కారం అంటే ఏమిటి?",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/phrases#hello-namaskaaram",
+        "course/te/vocabulary#course-vocabulary-greetings"
+      ]
+    },
+    {
+      "id": "hard-te-grandmother",
+      "category": "paraphrase",
+      "query": "How should I talk politely to my grandmother?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/beginner-guide#formal-and-informal-you",
+        "te/culture#showing-respect-and-family-words",
+        "te/grammar#personal-pronouns"
+      ]
+    },
+    {
+      "id": "hard-te-new-year",
+      "category": "paraphrase",
+      "query": "Which festival is the Telugu new year?",
+      "expectLanguage": "te",
+      "relevant": ["te/culture#festivals-ugadi-and-sankranti"]
+    },
+    {
+      "id": "hard-hi-want",
+      "category": "paraphrase",
+      "query": "Which word means 'need' or 'want' in Hindi?",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/grammar#i-want-i-like-i-know-the-dative-construction",
+        "hi/examples#i-want-water"
+      ]
+    },
+    {
+      "id": "hard-hi-native-question",
+      "category": "native-language-question",
+      "query": "मुझे हिंदी ठीक से नहीं आती का मतलब क्या है?",
+      "expectLanguage": "hi",
+      "relevant": ["hi/examples#i-dont-know-hindi-well"]
+    },
+    {
+      "id": "hard-hi-colours",
+      "category": "level-filter",
+      "query": "colour words",
+      "language": "hi",
+      "level": "beginner",
+      "expectLanguage": "hi",
+      "relevant": ["hi/vocabulary#colours"]
+    },
+    {
+      "id": "hard-ta-spoken",
+      "category": "paraphrase",
+      "query": "Do people speak Tamil the same way it is written?",
+      "expectLanguage": "ta",
+      "relevant": ["ta/beginner-guide#spoken-and-written-tamil"]
+    },
+    {
+      "id": "hard-ta-sorry",
+      "category": "paraphrase",
+      "query": "how to apologise",
+      "language": "ta",
+      "expectLanguage": "ta",
+      "relevant": ["ta/phrases#please-and-sorry"]
+    },
+    {
+      "id": "hard-ml-count",
+      "category": "paraphrase",
+      "query": "How do I count to five in Malayalam?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/vocabulary#numbers-1-to-10",
+        "course/ml/vocabulary#course-vocabulary-numbers"
+      ]
+    },
+    {
+      "id": "hard-ml-half-u",
+      "category": "word-meaning",
+      "query": "Why does രണ്ട് end with a short half u sound?",
+      "expectLanguage": "ml",
+      "relevant": ["ml/alphabet#the-chandrakkala-and-the-half-u", "ml/vocabulary#numbers-1-to-10"]
+    },
+    {
+      "id": "hard-kn-milk",
+      "category": "vocabulary",
+      "query": "What is the Kannada word for milk?",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/vocabulary#food-and-drink",
+        "course/kn/vocabulary#course-vocabulary-food-drink"
+      ]
+    },
+    {
+      "id": "hard-kn-shop",
+      "category": "paraphrase",
+      "query": "How do I tell a shopkeeper that I need water?",
+      "language": "kn",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/examples#i-want-water",
+        "kn/grammar#i-want-i-like-i-know-the-dative-construction",
+        "kn/phrases#shopping-and-directions-idu-eshtu"
+      ]
+    },
+    {
+      "id": "hard-bn-jol-paani",
+      "category": "paraphrase",
+      "query": "Is water called jol or paani?",
+      "language": "bn",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/vocabulary#food-and-drink",
+        "course/bn/vocabulary#course-vocabulary-food-drink"
+      ]
+    },
+    {
+      "id": "hard-bn-leaving",
+      "category": "paraphrase",
+      "query": "What do Bengali people say when they leave someone's house?",
+      "expectLanguage": "bn",
+      "relevant": ["bn/phrases#goodbye-aashi", "bn/culture#everyday-etiquette"]
+    },
+    {
+      "id": "hard-bn-native-question",
+      "category": "native-language-question",
+      "query": "আপনি কেমন আছেন মানে কী?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/phrases#how-are-you-aapni-kemon-aachhen",
+        "bn/examples#how-are-you-i-am-fine"
+      ]
+    }
+  ],
+  "outOfScope": [
+    {
+      "id": "oos-capital",
+      "query": "What is the capital of France?"
+    },
+    {
+      "id": "oos-bicycle",
+      "query": "How do I fix a flat bicycle tyre?"
+    },
+    {
+      "id": "oos-python",
+      "query": "Write a Python function that sorts a list"
+    },
+    {
+      "id": "oos-stocks",
+      "query": "What will the stock market do tomorrow?"
+    },
+    {
+      "id": "oos-weather",
+      "query": "Will it rain in London next week?"
+    },
+    {
+      "id": "oos-cricket",
+      "query": "Who won the cricket world cup in 2011?",
+      "language": "hi"
+    },
+    {
+      "id": "oos-circle",
+      "query": "What is the formula for the area of a circle?",
+      "language": "te"
+    },
+    {
+      "id": "oos-laptop",
+      "query": "Recommend a good laptop for programming",
+      "language": "ta"
+    },
+    {
+      "id": "oos-planets",
+      "query": "How many planets are in the solar system?",
+      "language": "kn"
+    },
+    {
+      "id": "oos-photosynthesis",
+      "query": "Explain photosynthesis",
+      "language": "ml"
+    },
+    {
+      "id": "oos-recipe",
+      "query": "Give me a recipe for chocolate cake",
+      "language": "bn"
+    },
+    {
+      "id": "oos-interview",
+      "query": "How do I prepare for a job interview?"
+    }
+  ]
+}

@@ -3,7 +3,8 @@
 # If you installed PostgreSQL another way (Postgres.app, Homebrew), you don't need this file.
 services:
   postgres:
-    image: postgres:16-alpine
+    # PostgreSQL 16 with the pgvector extension pre-installed (needed since Phase 5 — RAG).
+    image: pgvector/pgvector:pg16
     container_name: vachan-postgres
     restart: unless-stopped
     environment:

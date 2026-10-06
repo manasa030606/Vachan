@@ -1,0 +1,2532 @@
+{
+  "generatedAt": "2026-10-06T05:50:11.055Z",
+  "model": "Xenova/multilingual-e5-small",
+  "k": 5,
+  "chunksIndexed": 394,
+  "summary": {
+    "full": {
+      "hitAt1": 0.945,
+      "hitAt3": 0.982,
+      "hitAt5": 0.982,
+      "mrr": 0.961,
+      "languagePrecision": 1,
+      "inScopeSufficient": 1
+    },
+    "vectorOnly": {
+      "hitAt1": 0.745,
+      "hitAt3": 0.836,
+      "hitAt5": 0.927,
+      "mrr": 0.805,
+      "languagePrecision": 0.618,
+      "inScopeSufficient": 1
+    },
+    "outOfScopeRejected": 0.9166666666666666,
+    "harderInTop3": 1
+  },
+  "checks": [
+    {
+      "name": "hit@3",
+      "value": 0.982,
+      "min": 0.85,
+      "passed": true
+    },
+    {
+      "name": "MRR@5",
+      "value": 0.961,
+      "min": 0.7,
+      "passed": true
+    },
+    {
+      "name": "language precision@5",
+      "value": 1,
+      "min": 1,
+      "passed": true
+    },
+    {
+      "name": "in-scope marked sufficient",
+      "value": 1,
+      "min": 0.9,
+      "passed": true
+    },
+    {
+      "name": "out-of-scope rejected",
+      "value": 0.9166666666666666,
+      "min": 0.8,
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "te-hello",
+      "category": "phrase",
+      "query": "How do I say hello in Telugu?",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/phrases#hello-namaskaaram",
+        "course/te/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9152,
+        "top3": [
+          {
+            "id": "te/phrases#hello-namaskaaram",
+            "score": 0.9152,
+            "similarity": 0.9152
+          },
+          {
+            "id": "te/phrases#thank-you-dhanyavaadaalu",
+            "score": 0.899,
+            "similarity": 0.899
+          },
+          {
+            "id": "te/phrases#how-are-you-meeru-elaa-unnaaru",
+            "score": 0.8956,
+            "similarity": 0.8956
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "te-word-amma",
+      "category": "word-meaning",
+      "query": "What is this Telugu word? అమ్మ",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/vocabulary#family-words",
+        "course/te/vocabulary#course-vocabulary-family"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9193,
+        "top3": [
+          {
+            "id": "te/vocabulary#family-words",
+            "score": 0.9593,
+            "similarity": 0.9193
+          },
+          {
+            "id": "course/te/vocabulary#course-vocabulary-family",
+            "score": 0.945,
+            "similarity": 0.905
+          },
+          {
+            "id": "te/pronunciation#double-consonants-are-held-longer",
+            "score": 0.9235,
+            "similarity": 0.8835
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "te-grammar-word-order",
+      "category": "grammar",
+      "query": "Explain this beginner grammar concept: why does the verb come at the end of a Telugu sentence?",
+      "level": "beginner",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/grammar#word-order-subject-object-verb"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8848,
+        "top3": [
+          {
+            "id": "te/grammar#word-order-subject-object-verb",
+            "score": 0.9148,
+            "similarity": 0.8848
+          },
+          {
+            "id": "te/pronunciation#words-end-in-vowels",
+            "score": 0.909,
+            "similarity": 0.879
+          },
+          {
+            "id": "te/grammar#possessives-my-your-our",
+            "score": 0.9029,
+            "similarity": 0.8729
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 4,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "te-we-inclusive",
+      "category": "grammar",
+      "query": "What is the difference between మేము and మనం?",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/grammar#personal-pronouns",
+        "te/grammar#possessives-my-your-our"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8444,
+        "top3": [
+          {
+            "id": "te/grammar#personal-pronouns",
+            "score": 0.8844,
+            "similarity": 0.8444
+          },
+          {
+            "id": "te/verbs#to-be-to-stay-undu",
+            "score": 0.8489,
+            "similarity": 0.8089
+          },
+          {
+            "id": "te/verbs#habitual-and-future-tense-tinu-to-eat",
+            "score": 0.8419,
+            "similarity": 0.8019
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "te-want-water",
+      "category": "phrase",
+      "query": "How do I say I want water?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/examples#i-want-water",
+        "te/grammar#i-want-i-like-i-know-the-dative-construction",
+        "te/phrases#shopping-and-directions-idi-enta"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8898,
+        "top3": [
+          {
+            "id": "te/examples#i-want-water",
+            "score": 0.8898,
+            "similarity": 0.8898
+          },
+          {
+            "id": "te/grammar#i-want-i-like-i-know-the-dative-construction",
+            "score": 0.8573,
+            "similarity": 0.8573
+          },
+          {
+            "id": "te/phrases#shopping-and-directions-idi-enta",
+            "score": 0.8568,
+            "similarity": 0.8568
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": null,
+        "languagePrecision": 0
+      }
+    },
+    {
+      "id": "te-talakattu",
+      "category": "alphabet",
+      "query": "What is the talakattu?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/alphabet#vowel-signs-and-the-talakattu-guninthaalu"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8406,
+        "top3": [
+          {
+            "id": "te/alphabet#vowel-signs-and-the-talakattu-guninthaalu",
+            "score": 0.8406,
+            "similarity": 0.8406
+          },
+          {
+            "id": "te/phrases#yes-and-no",
+            "score": 0.8017,
+            "similarity": 0.8017
+          },
+          {
+            "id": "te/culture#festivals-ugadi-and-sankranti",
+            "score": 0.7988,
+            "similarity": 0.7988
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "te-past-go",
+      "category": "verb-form",
+      "query": "past tense of the verb to go",
+      "language": "te",
+      "level": "intermediate",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/verbs#past-tense-vellu-to-go"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8769,
+        "top3": [
+          {
+            "id": "te/verbs#past-tense-vellu-to-go",
+            "score": 0.9069,
+            "similarity": 0.8769
+          },
+          {
+            "id": "te/examples#i-am-going-home",
+            "score": 0.8601,
+            "similarity": 0.8451
+          },
+          {
+            "id": "te/verbs#present-continuous-i-am-eating",
+            "score": 0.8523,
+            "similarity": 0.8373
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 5,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "te-idiom",
+      "category": "idiom",
+      "query": "What does andani draaksha pullana mean?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/idioms#andani-draaksha-pullana"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.839,
+        "top3": [
+          {
+            "id": "te/idioms#andani-draaksha-pullana",
+            "score": 0.839,
+            "similarity": 0.839
+          },
+          {
+            "id": "te/phrases#please-and-sorry",
+            "score": 0.8164,
+            "similarity": 0.8164
+          },
+          {
+            "id": "te/culture#showing-respect-and-family-words",
+            "score": 0.8137,
+            "similarity": 0.8137
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "te-postpositions",
+      "category": "grammar",
+      "query": "Explain postpositions in Telugu",
+      "level": "elementary",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/grammar#case-endings-postpositions"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8794,
+        "top3": [
+          {
+            "id": "te/grammar#case-endings-postpositions",
+            "score": 0.9084,
+            "similarity": 0.8784
+          },
+          {
+            "id": "te/verbs#polite-requests-and-commands",
+            "score": 0.9005,
+            "similarity": 0.8705
+          },
+          {
+            "id": "te/grammar#possessives-my-your-our",
+            "score": 0.8944,
+            "similarity": 0.8794
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 2,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hi-thanks",
+      "category": "phrase",
+      "query": "How do I say thank you in Hindi?",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/phrases#thank-you-dhanyavaad",
+        "course/hi/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9334,
+        "top3": [
+          {
+            "id": "hi/phrases#thank-you-dhanyavaad",
+            "score": 0.9334,
+            "similarity": 0.9334
+          },
+          {
+            "id": "hi/phrases#please-and-sorry",
+            "score": 0.893,
+            "similarity": 0.893
+          },
+          {
+            "id": "hi/phrases#how-are-you-aap-kaise-hain",
+            "score": 0.8863,
+            "similarity": 0.8863
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "hi-schwa",
+      "category": "pronunciation",
+      "query": "Why is कमरा pronounced kamraa and not kamaraa?",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/pronunciation#silent-a-schwa-deletion"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8811,
+        "top3": [
+          {
+            "id": "hi/pronunciation#silent-a-schwa-deletion",
+            "score": 0.9211,
+            "similarity": 0.8811
+          },
+          {
+            "id": "hi/grammar#grammatical-gender-masculine-and-feminine-nouns",
+            "score": 0.8775,
+            "similarity": 0.8375
+          },
+          {
+            "id": "hi/grammar#plurals",
+            "score": 0.8711,
+            "similarity": 0.8311
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "hi-ne",
+      "category": "grammar",
+      "query": "When do I use ने in a Hindi sentence?",
+      "level": "intermediate",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/verbs#past-tense-with-ne-the-ergative"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8917,
+        "top3": [
+          {
+            "id": "hi/verbs#past-tense-with-ne-the-ergative",
+            "score": 0.9617,
+            "similarity": 0.8917
+          },
+          {
+            "id": "hi/phrases#shopping-and-directions-yah-kitne-kaa-hai",
+            "score": 0.9073,
+            "similarity": 0.8523
+          },
+          {
+            "id": "hi/grammar#plurals",
+            "score": 0.9053,
+            "similarity": 0.8503
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hi-gender",
+      "category": "grammar",
+      "query": "Is a book masculine or feminine?",
+      "language": "hi",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/grammar#grammatical-gender-masculine-and-feminine-nouns",
+        "hi/beginner-guide#learn-every-noun-with-its-gender",
+        "hi/grammar#verb-agreement-with-gender"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8521,
+        "top3": [
+          {
+            "id": "hi/grammar#grammatical-gender-masculine-and-feminine-nouns",
+            "score": 0.8521,
+            "similarity": 0.8521
+          },
+          {
+            "id": "hi/beginner-guide#learn-every-noun-with-its-gender",
+            "score": 0.838,
+            "similarity": 0.838
+          },
+          {
+            "id": "hi/grammar#plurals",
+            "score": 0.8301,
+            "similarity": 0.8301
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hi-you-forms",
+      "category": "grammar",
+      "query": "What is the difference between aap, tum and tu?",
+      "language": "hi",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/grammar#three-forms-of-you",
+        "hi/beginner-guide#formal-and-informal-you",
+        "hi/culture#showing-respect-and"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8594,
+        "top3": [
+          {
+            "id": "hi/grammar#three-forms-of-you",
+            "score": 0.8594,
+            "similarity": 0.8594
+          },
+          {
+            "id": "hi/beginner-guide#formal-and-informal-you",
+            "score": 0.8423,
+            "similarity": 0.8423
+          },
+          {
+            "id": "hi/phrases#how-are-you-aap-kaise-hain",
+            "score": 0.8197,
+            "similarity": 0.8197
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "hi-no",
+      "category": "phrase",
+      "query": "How do I say no?",
+      "language": "hi",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/phrases#yes-and-no-haan-nahin",
+        "hi/grammar#saying-not-and",
+        "course/hi/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8828,
+        "top3": [
+          {
+            "id": "hi/grammar#saying-not-and",
+            "score": 0.8828,
+            "similarity": 0.8828
+          },
+          {
+            "id": "hi/phrases#yes-and-no-haan-nahin",
+            "score": 0.8686,
+            "similarity": 0.8686
+          },
+          {
+            "id": "hi/phrases#how-are-you-aap-kaise-hain",
+            "score": 0.8681,
+            "similarity": 0.8681
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.6
+      }
+    },
+    {
+      "id": "ta-greet",
+      "category": "phrase",
+      "query": "How do I greet someone in Tamil?",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/phrases#hello-vanakkam",
+        "course/ta/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9029,
+        "top3": [
+          {
+            "id": "ta/phrases#hello-vanakkam",
+            "score": 0.9029,
+            "similarity": 0.9029
+          },
+          {
+            "id": "ta/culture#everyday-etiquette",
+            "score": 0.8951,
+            "similarity": 0.8951
+          },
+          {
+            "id": "ta/phrases#thank-you-nandri",
+            "score": 0.8833,
+            "similarity": 0.8833
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "ta-zha",
+      "category": "pronunciation",
+      "query": "How do I pronounce ழ?",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/pronunciation#the-special-sound-zha",
+        "ta/pronunciation#three-l-sounds"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8849,
+        "top3": [
+          {
+            "id": "ta/pronunciation#the-special-sound-zha",
+            "score": 0.8849,
+            "similarity": 0.8849
+          },
+          {
+            "id": "ta/pronunciation#three-l-sounds",
+            "score": 0.8785,
+            "similarity": 0.8785
+          },
+          {
+            "id": "ta/pronunciation#short-and-long-vowels-change-the-meaning",
+            "score": 0.8347,
+            "similarity": 0.8347
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "ta-word-nandri",
+      "category": "word-meaning",
+      "query": "What does நன்றி mean?",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/phrases#thank-you-nandri",
+        "course/ta/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8533,
+        "top3": [
+          {
+            "id": "ta/phrases#thank-you-nandri",
+            "score": 0.8933,
+            "similarity": 0.8533
+          },
+          {
+            "id": "course/ta/vocabulary#course-vocabulary-greetings",
+            "score": 0.8495,
+            "similarity": 0.8095
+          },
+          {
+            "id": "ta/pronunciation#three-n-sounds-and-two-r-sounds",
+            "score": 0.8182,
+            "similarity": 0.7782
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 3,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "ta-numbers",
+      "category": "vocabulary",
+      "query": "Tamil numbers from one to ten",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/vocabulary#numbers-1-to-10",
+        "course/ta/vocabulary#course-vocabulary-numbers"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9101,
+        "top3": [
+          {
+            "id": "ta/vocabulary#numbers-1-to-10",
+            "score": 0.9101,
+            "similarity": 0.9101
+          },
+          {
+            "id": "course/ta/vocabulary#course-vocabulary-numbers",
+            "score": 0.8659,
+            "similarity": 0.8659
+          },
+          {
+            "id": "ta/alphabet#how-tamil-writing-works",
+            "score": 0.8573,
+            "similarity": 0.8573
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "ta-pongal",
+      "category": "culture",
+      "query": "What is Pongal?",
+      "language": "ta",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/culture#festivals-pongal-and-puthandu"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8565,
+        "top3": [
+          {
+            "id": "ta/culture#festivals-pongal-and-puthandu",
+            "score": 0.8565,
+            "similarity": 0.8565
+          },
+          {
+            "id": "ta/verbs#past-tense-po-to-go",
+            "score": 0.7987,
+            "similarity": 0.7987
+          },
+          {
+            "id": "ta/grammar#plurals",
+            "score": 0.781,
+            "similarity": 0.781
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.6
+      }
+    },
+    {
+      "id": "ta-water-topic",
+      "category": "topic-filter",
+      "query": "What is the word for water?",
+      "language": "ta",
+      "topic": "food",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/vocabulary#food-and-drink",
+        "course/ta/vocabulary#course-vocabulary-food-drink",
+        "ta/examples#i-want-water"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8557,
+        "top3": [
+          {
+            "id": "course/ta/vocabulary#course-vocabulary-food-drink",
+            "score": 0.8844,
+            "similarity": 0.8444
+          },
+          {
+            "id": "ta/vocabulary#food-and-drink",
+            "score": 0.8716,
+            "similarity": 0.8316
+          },
+          {
+            "id": "ta/examples#i-want-water",
+            "score": 0.8557,
+            "similarity": 0.8557
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": null,
+        "languagePrecision": 0
+      }
+    },
+    {
+      "id": "ml-chillu",
+      "category": "alphabet",
+      "query": "What are chillu letters in Malayalam?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/alphabet#chillu-letters-chillaksharangal"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9173,
+        "top3": [
+          {
+            "id": "ml/alphabet#chillu-letters-chillaksharangal",
+            "score": 0.9173,
+            "similarity": 0.9173
+          },
+          {
+            "id": "ml/alphabet#how-malayalam-writing-works",
+            "score": 0.875,
+            "similarity": 0.875
+          },
+          {
+            "id": "ml/alphabet#the-chandrakkala-and-the-half-u",
+            "score": 0.8686,
+            "similarity": 0.8686
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "ml-verb-person",
+      "category": "grammar",
+      "query": "Do Malayalam verbs change for I, you and he?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
+        "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone",
+        "ml/verbs#simple-present-tense-unnu"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8996,
+        "top3": [
+          {
+            "id": "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
+            "score": 0.8996,
+            "similarity": 0.8996
+          },
+          {
+            "id": "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone",
+            "score": 0.8899,
+            "similarity": 0.8899
+          },
+          {
+            "id": "ml/grammar#personal-pronouns",
+            "score": 0.8897,
+            "similarity": 0.8897
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "ml-how-are-you",
+      "category": "phrase",
+      "query": "How do I ask how are you in Malayalam?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/phrases#how-are-you-ningalkku-sukhamaano",
+        "ml/examples#how-are-you-i-am-fine"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9221,
+        "top3": [
+          {
+            "id": "ml/phrases#how-are-you-ningalkku-sukhamaano",
+            "score": 0.9221,
+            "similarity": 0.9221
+          },
+          {
+            "id": "ml/examples#how-are-you-i-am-fine",
+            "score": 0.9071,
+            "similarity": 0.9071
+          },
+          {
+            "id": "ml/grammar#asking-questions",
+            "score": 0.9043,
+            "similarity": 0.9043
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "ml-word-vellam",
+      "category": "word-meaning",
+      "query": "What does വെള്ളം mean?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/vocabulary#food-and-drink",
+        "course/ml/vocabulary#course-vocabulary-food-drink",
+        "ml/examples#i-want-water"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8557,
+        "top3": [
+          {
+            "id": "ml/examples#i-want-water",
+            "score": 0.8957,
+            "similarity": 0.8557
+          },
+          {
+            "id": "ml/phrases#yes-and-no",
+            "score": 0.8809,
+            "similarity": 0.8409
+          },
+          {
+            "id": "course/ml/vocabulary#course-vocabulary-food-drink",
+            "score": 0.8725,
+            "similarity": 0.8325
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 5,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "ml-onam",
+      "category": "culture",
+      "query": "What is Onam?",
+      "language": "ml",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/culture#festivals-onam-and-vishu"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8526,
+        "top3": [
+          {
+            "id": "ml/culture#festivals-onam-and-vishu",
+            "score": 0.8526,
+            "similarity": 0.8526
+          },
+          {
+            "id": "ml/verbs#future-tense-um",
+            "score": 0.7911,
+            "similarity": 0.7911
+          },
+          {
+            "id": "ml/idioms#aana-koduthaalum-aasha-kodukkaruthu",
+            "score": 0.7829,
+            "similarity": 0.7829
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "kn-my-name",
+      "category": "phrase",
+      "query": "How do I say my name is in Kannada?",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/phrases#my-name-is-nanna-hesaru",
+        "kn/examples#my-name-is-asha",
+        "course/kn/vocabulary#course-vocabulary-introductions"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9215,
+        "top3": [
+          {
+            "id": "kn/phrases#my-name-is-nanna-hesaru",
+            "score": 0.9215,
+            "similarity": 0.9215
+          },
+          {
+            "id": "kn/examples#my-name-is-asha",
+            "score": 0.9021,
+            "similarity": 0.9021
+          },
+          {
+            "id": "kn/grammar#possessives-my-your-our",
+            "score": 0.8966,
+            "similarity": 0.8966
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "kn-family",
+      "category": "vocabulary",
+      "query": "Kannada words for mother and father",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/vocabulary#family-words",
+        "course/kn/vocabulary#course-vocabulary-family"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9286,
+        "top3": [
+          {
+            "id": "kn/vocabulary#family-words",
+            "score": 0.9286,
+            "similarity": 0.9286
+          },
+          {
+            "id": "course/kn/vocabulary#course-vocabulary-family",
+            "score": 0.9102,
+            "similarity": 0.9102
+          },
+          {
+            "id": "kn/pronunciation#double-consonants-are-held-longer",
+            "score": 0.9,
+            "similarity": 0.9
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "kn-idiom",
+      "category": "idiom",
+      "query": "What does ಕೈ ಕೆಸರಾದರೆ ಬಾಯಿ ಮೊಸರು mean?",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/idioms#kai-kesaraadare-baayi-mosaru"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8721,
+        "top3": [
+          {
+            "id": "kn/idioms#kai-kesaraadare-baayi-mosaru",
+            "score": 0.9121,
+            "similarity": 0.8721
+          },
+          {
+            "id": "kn/vocabulary#food-and-drink",
+            "score": 0.86,
+            "similarity": 0.82
+          },
+          {
+            "id": "kn/alphabet#vowel-signs-and-the-talekattu-kaagunita",
+            "score": 0.8519,
+            "similarity": 0.8119
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.6
+      }
+    },
+    {
+      "id": "kn-gender",
+      "category": "grammar",
+      "query": "How do Kannada verbs show he, she and it?",
+      "level": "intermediate",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/grammar#gender-in-kannada-verbs",
+        "kn/verbs#past-tense-hogu-to-go"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9066,
+        "top3": [
+          {
+            "id": "kn/grammar#gender-in-kannada-verbs",
+            "score": 0.9366,
+            "similarity": 0.9066
+          },
+          {
+            "id": "kn/verbs#past-tense-hogu-to-go",
+            "score": 0.9083,
+            "similarity": 0.8783
+          },
+          {
+            "id": "kn/verbs#to-be-to-stay-iru",
+            "score": 0.8994,
+            "similarity": 0.8844
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "kn-ottakshara",
+      "category": "alphabet",
+      "query": "What is ottakshara?",
+      "language": "kn",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/alphabet#conjunct-letters-ottakshara"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8176,
+        "top3": [
+          {
+            "id": "kn/alphabet#conjunct-letters-ottakshara",
+            "score": 0.8176,
+            "similarity": 0.8176
+          },
+          {
+            "id": "kn/pronunciation#double-consonants-are-held-longer",
+            "score": 0.7839,
+            "similarity": 0.7839
+          },
+          {
+            "id": "kn/culture#showing-respect-and-family-words",
+            "score": 0.783,
+            "similarity": 0.783
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "kn-goodbye",
+      "category": "phrase",
+      "query": "How do I say goodbye?",
+      "language": "kn",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/phrases#goodbye-hogi-baruttene"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8682,
+        "top3": [
+          {
+            "id": "kn/phrases#goodbye-hogi-baruttene",
+            "score": 0.8682,
+            "similarity": 0.8682
+          },
+          {
+            "id": "kn/phrases#how-are-you-neevu-hegiddeeri",
+            "score": 0.8591,
+            "similarity": 0.8591
+          },
+          {
+            "id": "kn/phrases#please-and-sorry",
+            "score": 0.8416,
+            "similarity": 0.8416
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 5,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "kn-start",
+      "category": "explanation",
+      "query": "How should a complete beginner start learning Kannada?",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/beginner-guide#how-to-start-learning-kannada"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9087,
+        "top3": [
+          {
+            "id": "kn/beginner-guide#how-to-start-learning-kannada",
+            "score": 0.9087,
+            "similarity": 0.9087
+          },
+          {
+            "id": "kn/beginner-guide#formal-and-informal-you",
+            "score": 0.8661,
+            "similarity": 0.8661
+          },
+          {
+            "id": "kn/grammar#asking-questions",
+            "score": 0.8644,
+            "similarity": 0.8644
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "bn-hello",
+      "category": "phrase",
+      "query": "How do I say hello in Bengali?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/phrases#hello-nomoshkar",
+        "course/bn/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9118,
+        "top3": [
+          {
+            "id": "bn/phrases#hello-nomoshkar",
+            "score": 0.9118,
+            "similarity": 0.9118
+          },
+          {
+            "id": "bn/phrases#please-and-sorry",
+            "score": 0.8934,
+            "similarity": 0.8934
+          },
+          {
+            "id": "bn/phrases#thank-you-dhonnobad",
+            "score": 0.8911,
+            "similarity": 0.8911
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "bn-inherent-o",
+      "category": "pronunciation",
+      "query": "Why is অ pronounced like o?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/pronunciation#the-inherent-vowel-is-read-o",
+        "bn/alphabet#vowels-shoroborno",
+        "bn/alphabet#how-bengali-writing-works"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8709,
+        "top3": [
+          {
+            "id": "bn/pronunciation#the-inherent-vowel-is-read-o",
+            "score": 0.8709,
+            "similarity": 0.8709
+          },
+          {
+            "id": "bn/alphabet#vowels-shoroborno",
+            "score": 0.8453,
+            "similarity": 0.8453
+          },
+          {
+            "id": "bn/pronunciation#and-sound-almost-the-same",
+            "score": 0.8414,
+            "similarity": 0.8414
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "bn-you-forms",
+      "category": "grammar",
+      "query": "What is the difference between তুমি and আপনি?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/grammar#three-levels-of-you",
+        "bn/beginner-guide#formal-and-informal-you",
+        "bn/culture#showing-respect-and"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8892,
+        "top3": [
+          {
+            "id": "bn/grammar#three-levels-of-you",
+            "score": 0.9292,
+            "similarity": 0.8892
+          },
+          {
+            "id": "bn/beginner-guide#formal-and-informal-you",
+            "score": 0.9133,
+            "similarity": 0.8733
+          },
+          {
+            "id": "bn/phrases#how-are-you-aapni-kemon-aachhen",
+            "score": 0.9004,
+            "similarity": 0.8604
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.6
+      }
+    },
+    {
+      "id": "bn-no-gender",
+      "category": "grammar",
+      "query": "Do Bengali verbs change for he and she?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/grammar#no-gender-in-bengali-verbs"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.9103,
+        "top3": [
+          {
+            "id": "bn/grammar#no-gender-in-bengali-verbs",
+            "score": 0.9103,
+            "similarity": 0.9103
+          },
+          {
+            "id": "bn/verbs#to-be-aachhi-aachho-aachhen",
+            "score": 0.8753,
+            "similarity": 0.8753
+          },
+          {
+            "id": "bn/grammar#personal-pronouns",
+            "score": 0.8713,
+            "similarity": 0.8713
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "bn-classifier",
+      "category": "grammar",
+      "query": "What does টা mean at the end of a word?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/grammar#classifiers"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8701,
+        "top3": [
+          {
+            "id": "bn/grammar#classifiers",
+            "score": 0.9101,
+            "similarity": 0.8701
+          },
+          {
+            "id": "bn/pronunciation#dental-and-retroflex-sounds",
+            "score": 0.8711,
+            "similarity": 0.8311
+          },
+          {
+            "id": "bn/grammar#plurals",
+            "score": 0.8576,
+            "similarity": 0.8176
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "bn-21-feb",
+      "category": "culture",
+      "query": "Why is 21 February important for Bengali speakers?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/culture#international-mother-language-day-21-february"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8925,
+        "top3": [
+          {
+            "id": "bn/culture#international-mother-language-day-21-february",
+            "score": 0.8925,
+            "similarity": 0.8925
+          },
+          {
+            "id": "bn/verbs#to-be-aachhi-aachho-aachhen",
+            "score": 0.8345,
+            "similarity": 0.8345
+          },
+          {
+            "id": "bn/culture#festivals-durga-puja-and-pohela-boishakh",
+            "score": 0.8339,
+            "similarity": 0.8339
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "bn-future",
+      "category": "verb-form",
+      "query": "How do I form the future tense?",
+      "language": "bn",
+      "level": "elementary",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/verbs#future-tense-jaabo"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8534,
+        "top3": [
+          {
+            "id": "bn/verbs#future-tense-jaabo",
+            "score": 0.8834,
+            "similarity": 0.8534
+          },
+          {
+            "id": "bn/verbs#to-be-aachhi-aachho-aachhen",
+            "score": 0.8522,
+            "similarity": 0.8222
+          },
+          {
+            "id": "bn/vocabulary#time-words",
+            "score": 0.8514,
+            "similarity": 0.8214
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 4,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "hard-te-native-question",
+      "category": "native-language-question",
+      "query": "నమస్కారం అంటే ఏమిటి?",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/phrases#hello-namaskaaram",
+        "course/te/vocabulary#course-vocabulary-greetings"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8462,
+        "top3": [
+          {
+            "id": "te/phrases#hello-namaskaaram",
+            "score": 0.8862,
+            "similarity": 0.8462
+          },
+          {
+            "id": "te/examples#my-name-is-asha",
+            "score": 0.843,
+            "similarity": 0.803
+          },
+          {
+            "id": "te/phrases#i-dont-understand-naaku-artham-kaaledu",
+            "score": 0.8385,
+            "similarity": 0.7985
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "hard-te-grandmother",
+      "category": "paraphrase",
+      "query": "How should I talk politely to my grandmother?",
+      "language": "te",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/beginner-guide#formal-and-informal-you",
+        "te/culture#showing-respect-and-family-words",
+        "te/grammar#personal-pronouns"
+      ],
+      "full": {
+        "rank": null,
+        "hit1": false,
+        "hit3": false,
+        "hit5": false,
+        "reciprocalRank": 0,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8481,
+        "top3": [
+          {
+            "id": "te/phrases#how-are-you-meeru-elaa-unnaaru",
+            "score": 0.8481,
+            "similarity": 0.8481
+          },
+          {
+            "id": "te/culture#everyday-etiquette",
+            "score": 0.8429,
+            "similarity": 0.8429
+          },
+          {
+            "id": "te/phrases#please-and-sorry",
+            "score": 0.8333,
+            "similarity": 0.8333
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": null,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "hard-te-new-year",
+      "category": "paraphrase",
+      "query": "Which festival is the Telugu new year?",
+      "expectLanguage": "te",
+      "relevant": [
+        "te/culture#festivals-ugadi-and-sankranti"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8913,
+        "top3": [
+          {
+            "id": "te/culture#festivals-ugadi-and-sankranti",
+            "score": 0.8913,
+            "similarity": 0.8913
+          },
+          {
+            "id": "te/culture#where-telugu-is-spoken",
+            "score": 0.8312,
+            "similarity": 0.8312
+          },
+          {
+            "id": "te/alphabet#vowel-signs-and-the-talakattu-guninthaalu",
+            "score": 0.8284,
+            "similarity": 0.8284
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.6
+      }
+    },
+    {
+      "id": "hard-hi-want",
+      "category": "paraphrase",
+      "query": "Which word means 'need' or 'want' in Hindi?",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/grammar#i-want-i-like-i-know-the-dative-construction",
+        "hi/examples#i-want-water"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8826,
+        "top3": [
+          {
+            "id": "hi/grammar#i-want-i-like-i-know-the-dative-construction",
+            "score": 0.8826,
+            "similarity": 0.8826
+          },
+          {
+            "id": "hi/examples#i-want-water",
+            "score": 0.8808,
+            "similarity": 0.8808
+          },
+          {
+            "id": "hi/phrases#shopping-and-directions-yah-kitne-kaa-hai",
+            "score": 0.8643,
+            "similarity": 0.8643
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hard-hi-native-question",
+      "category": "native-language-question",
+      "query": "मुझे हिंदी ठीक से नहीं आती का मतलब क्या है?",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/examples#i-dont-know-hindi-well"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8959,
+        "top3": [
+          {
+            "id": "hi/examples#i-dont-know-hindi-well",
+            "score": 0.9359,
+            "similarity": 0.8959
+          },
+          {
+            "id": "hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa",
+            "score": 0.9032,
+            "similarity": 0.8632
+          },
+          {
+            "id": "hi/idioms#daal-mein-kuchh-kaalaa-hai",
+            "score": 0.8816,
+            "similarity": 0.8416
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.8
+      }
+    },
+    {
+      "id": "hard-hi-colours",
+      "category": "level-filter",
+      "query": "colour words",
+      "language": "hi",
+      "level": "beginner",
+      "expectLanguage": "hi",
+      "relevant": [
+        "hi/vocabulary#colours"
+      ],
+      "full": {
+        "rank": 3,
+        "hit1": false,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 0.3333333333333333,
+        "languagePrecision": 1,
+        "harderInTop3": 1,
+        "sufficient": true,
+        "bestSimilarity": 0.8744,
+        "top3": [
+          {
+            "id": "hi/vocabulary#family-words",
+            "score": 0.8516,
+            "similarity": 0.8216
+          },
+          {
+            "id": "course/hi/vocabulary#course-letters-and-sounds",
+            "score": 0.8446,
+            "similarity": 0.8146
+          },
+          {
+            "id": "hi/vocabulary#colours",
+            "score": 0.8444,
+            "similarity": 0.8744
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 2,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "hard-ta-spoken",
+      "category": "paraphrase",
+      "query": "Do people speak Tamil the same way it is written?",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/beginner-guide#spoken-and-written-tamil"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8769,
+        "top3": [
+          {
+            "id": "ta/beginner-guide#spoken-and-written-tamil",
+            "score": 0.8769,
+            "similarity": 0.8769
+          },
+          {
+            "id": "ta/alphabet#how-tamil-writing-works",
+            "score": 0.8765,
+            "similarity": 0.8765
+          },
+          {
+            "id": "ta/culture#where-tamil-is-spoken",
+            "score": 0.8674,
+            "similarity": 0.8674
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hard-ta-sorry",
+      "category": "paraphrase",
+      "query": "how to apologise",
+      "language": "ta",
+      "expectLanguage": "ta",
+      "relevant": [
+        "ta/phrases#please-and-sorry"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8682,
+        "top3": [
+          {
+            "id": "ta/phrases#please-and-sorry",
+            "score": 0.8682,
+            "similarity": 0.8682
+          },
+          {
+            "id": "ta/phrases#how-are-you-neengal-eppadi-irukkireergal",
+            "score": 0.8318,
+            "similarity": 0.8318
+          },
+          {
+            "id": "ta/culture#everyday-etiquette",
+            "score": 0.8256,
+            "similarity": 0.8256
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "hard-ml-count",
+      "category": "paraphrase",
+      "query": "How do I count to five in Malayalam?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/vocabulary#numbers-1-to-10",
+        "course/ml/vocabulary#course-vocabulary-numbers"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8939,
+        "top3": [
+          {
+            "id": "ml/vocabulary#numbers-1-to-10",
+            "score": 0.8939,
+            "similarity": 0.8939
+          },
+          {
+            "id": "ml/beginner-guide#how-to-start-learning-malayalam",
+            "score": 0.8883,
+            "similarity": 0.8883
+          },
+          {
+            "id": "course/ml/vocabulary#course-vocabulary-numbers",
+            "score": 0.8827,
+            "similarity": 0.8827
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hard-ml-half-u",
+      "category": "word-meaning",
+      "query": "Why does രണ്ട് end with a short half u sound?",
+      "expectLanguage": "ml",
+      "relevant": [
+        "ml/alphabet#the-chandrakkala-and-the-half-u",
+        "ml/vocabulary#numbers-1-to-10"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.858,
+        "top3": [
+          {
+            "id": "ml/alphabet#the-chandrakkala-and-the-half-u",
+            "score": 0.898,
+            "similarity": 0.858
+          },
+          {
+            "id": "ml/pronunciation#two-r-sounds-and-and-the-tt-of",
+            "score": 0.871,
+            "similarity": 0.831
+          },
+          {
+            "id": "course/ml/vocabulary#course-vocabulary-numbers",
+            "score": 0.8489,
+            "similarity": 0.8089
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.2
+      }
+    },
+    {
+      "id": "hard-kn-milk",
+      "category": "vocabulary",
+      "query": "What is the Kannada word for milk?",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/vocabulary#food-and-drink",
+        "course/kn/vocabulary#course-vocabulary-food-drink"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8854,
+        "top3": [
+          {
+            "id": "kn/vocabulary#food-and-drink",
+            "score": 0.8854,
+            "similarity": 0.8854
+          },
+          {
+            "id": "course/kn/vocabulary#course-vocabulary-food-drink",
+            "score": 0.8803,
+            "similarity": 0.8803
+          },
+          {
+            "id": "kn/vocabulary#family-words",
+            "score": 0.8779,
+            "similarity": 0.8779
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hard-kn-shop",
+      "category": "paraphrase",
+      "query": "How do I tell a shopkeeper that I need water?",
+      "language": "kn",
+      "expectLanguage": "kn",
+      "relevant": [
+        "kn/examples#i-want-water",
+        "kn/grammar#i-want-i-like-i-know-the-dative-construction",
+        "kn/phrases#shopping-and-directions-idu-eshtu"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8377,
+        "top3": [
+          {
+            "id": "kn/examples#i-want-water",
+            "score": 0.8377,
+            "similarity": 0.8377
+          },
+          {
+            "id": "kn/phrases#shopping-and-directions-idu-eshtu",
+            "score": 0.8313,
+            "similarity": 0.8313
+          },
+          {
+            "id": "kn/culture#everyday-etiquette",
+            "score": 0.8133,
+            "similarity": 0.8133
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": null,
+        "languagePrecision": 0
+      }
+    },
+    {
+      "id": "hard-bn-jol-paani",
+      "category": "paraphrase",
+      "query": "Is water called jol or paani?",
+      "language": "bn",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/vocabulary#food-and-drink",
+        "course/bn/vocabulary#course-vocabulary-food-drink"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8143,
+        "top3": [
+          {
+            "id": "bn/vocabulary#food-and-drink",
+            "score": 0.8143,
+            "similarity": 0.8143
+          },
+          {
+            "id": "bn/examples#i-want-water",
+            "score": 0.8117,
+            "similarity": 0.8117
+          },
+          {
+            "id": "bn/phrases#shopping-and-directions-etaar-daam-koto",
+            "score": 0.7863,
+            "similarity": 0.7863
+          }
+        ],
+        "languageSource": "request"
+      },
+      "vectorOnly": {
+        "rank": 1,
+        "languagePrecision": 0.4
+      }
+    },
+    {
+      "id": "hard-bn-leaving",
+      "category": "paraphrase",
+      "query": "What do Bengali people say when they leave someone's house?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/phrases#goodbye-aashi",
+        "bn/culture#everyday-etiquette"
+      ],
+      "full": {
+        "rank": 2,
+        "hit1": false,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 0.5,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8756,
+        "top3": [
+          {
+            "id": "bn/idioms#naachte-naa-jaanle-uthon-baankaa",
+            "score": 0.8756,
+            "similarity": 0.8756
+          },
+          {
+            "id": "bn/phrases#goodbye-aashi",
+            "score": 0.8728,
+            "similarity": 0.8728
+          },
+          {
+            "id": "bn/examples#i-am-going-home",
+            "score": 0.8681,
+            "similarity": 0.8681
+          }
+        ],
+        "languageSource": "named-in-query"
+      },
+      "vectorOnly": {
+        "rank": 2,
+        "languagePrecision": 1
+      }
+    },
+    {
+      "id": "hard-bn-native-question",
+      "category": "native-language-question",
+      "query": "আপনি কেমন আছেন মানে কী?",
+      "expectLanguage": "bn",
+      "relevant": [
+        "bn/phrases#how-are-you-aapni-kemon-aachhen",
+        "bn/examples#how-are-you-i-am-fine"
+      ],
+      "full": {
+        "rank": 1,
+        "hit1": true,
+        "hit3": true,
+        "hit5": true,
+        "reciprocalRank": 1,
+        "languagePrecision": 1,
+        "harderInTop3": 0,
+        "sufficient": true,
+        "bestSimilarity": 0.8701,
+        "top3": [
+          {
+            "id": "bn/phrases#how-are-you-aapni-kemon-aachhen",
+            "score": 0.9101,
+            "similarity": 0.8701
+          },
+          {
+            "id": "bn/examples#how-are-you-i-am-fine",
+            "score": 0.9101,
+            "similarity": 0.8701
+          },
+          {
+            "id": "bn/grammar#three-levels-of-you",
+            "score": 0.8908,
+            "similarity": 0.8508
+          }
+        ],
+        "languageSource": "script-in-query"
+      },
+      "vectorOnly": {
+        "rank": 3,
+        "languagePrecision": 0.4
+      }
+    }
+  ],
+  "outOfScope": [
+    {
+      "id": "oos-capital",
+      "query": "What is the capital of France?",
+      "sufficient": false,
+      "bestSimilarity": 0.7436,
+      "top": "ta/idioms#every-place-is-home-yaadhum-oore-yaavarum-kelir"
+    },
+    {
+      "id": "oos-bicycle",
+      "query": "How do I fix a flat bicycle tyre?",
+      "sufficient": false,
+      "bestSimilarity": 0.7829,
+      "top": "ta/beginner-guide#spoken-and-written-tamil"
+    },
+    {
+      "id": "oos-python",
+      "query": "Write a Python function that sorts a list",
+      "sufficient": false,
+      "bestSimilarity": 0.7902,
+      "top": "course/ta/vocabulary#course-letters-and-sounds"
+    },
+    {
+      "id": "oos-stocks",
+      "query": "What will the stock market do tomorrow?",
+      "sufficient": false,
+      "bestSimilarity": 0.8035,
+      "top": "bn/vocabulary#time-words"
+    },
+    {
+      "id": "oos-weather",
+      "query": "Will it rain in London next week?",
+      "sufficient": false,
+      "bestSimilarity": 0.8042,
+      "top": "bn/idioms#joto-gorje-toto-borshe-naa"
+    },
+    {
+      "id": "oos-cricket",
+      "query": "Who won the cricket world cup in 2011?",
+      "language": "hi",
+      "sufficient": false,
+      "bestSimilarity": 0.7347,
+      "top": "hi/alphabet#conjunct-letters-and-the-halant"
+    },
+    {
+      "id": "oos-circle",
+      "query": "What is the formula for the area of a circle?",
+      "language": "te",
+      "sufficient": false,
+      "bestSimilarity": 0.7716,
+      "top": "course/te/vocabulary#course-letters-and-sounds"
+    },
+    {
+      "id": "oos-laptop",
+      "query": "Recommend a good laptop for programming",
+      "language": "ta",
+      "sufficient": false,
+      "bestSimilarity": 0.7751,
+      "top": "ta/beginner-guide#how-to-start-learning-tamil"
+    },
+    {
+      "id": "oos-planets",
+      "query": "How many planets are in the solar system?",
+      "language": "kn",
+      "sufficient": false,
+      "bestSimilarity": 0.7806,
+      "top": "course/kn/vocabulary#course-vocabulary-numbers"
+    },
+    {
+      "id": "oos-photosynthesis",
+      "query": "Explain photosynthesis",
+      "language": "ml",
+      "sufficient": false,
+      "bestSimilarity": 0.8005,
+      "top": "ml/phrases#i-dont-understand-enikku-manassilaayilla"
+    },
+    {
+      "id": "oos-recipe",
+      "query": "Give me a recipe for chocolate cake",
+      "language": "bn",
+      "sufficient": false,
+      "bestSimilarity": 0.7963,
+      "top": "bn/verbs#present-perfect-i-have-eaten"
+    },
+    {
+      "id": "oos-interview",
+      "query": "How do I prepare for a job interview?",
+      "sufficient": true,
+      "bestSimilarity": 0.8223,
+      "top": "ta/phrases#how-are-you-neengal-eppadi-irukkireergal"
+    }
+  ]
+}

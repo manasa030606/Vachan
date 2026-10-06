@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "tsx --test --test-reporter=spec \"src/**/*.test.ts\" \"prisma/**/*.test.ts\"",
-    "test:api": "tsx --test --test-reporter=spec \"tests/**/*.test.ts\"",
+    "test:api": "tsx --test --test-reporter=spec \"tests/*.test.ts\"",
+    "test:rag": "tsx --test --test-reporter=spec \"tests/rag/**/*.test.ts\"",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev && prisma generate",
@@ -20,9 +21,13 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force && prisma db seed",
     "db:studio": "prisma studio",
+    "rag:index": "tsx src/rag/cli/index-knowledge.ts",
+    "rag:search": "tsx src/rag/cli/search-knowledge.ts",
+    "rag:eval": "tsx src/rag/cli/evaluate-retrieval.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
     "cookie-parser": "^1.4.7",

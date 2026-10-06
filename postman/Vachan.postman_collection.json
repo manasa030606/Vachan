@@ -3413,7 +3413,407 @@
       ]
     },
     {
-      "name": "12. Logout",
+      "name": "12. RAG knowledge base (Phase 5)",
+      "description": "Retrieval only — no chatbot, no LLM. Needs `npm run rag:index -w backend` first. Requires login (run 1. Auth → Login or Register first). The first search after the server starts loads the embedding model (a few seconds).",
+      "item": [
+        {
+          "name": "Knowledge base stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "stats"]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Six languages indexed\", () => pm.expect(Object.keys(json.knowledgeBase.byLanguage)).to.have.length(6));",
+                  "pm.test(\"Every chunk has an embedding\", () => pm.expect(json.knowledgeBase.chunksWithoutEmbedding).to.eql(0));",
+                  "pm.test(\"384-dimension model\", () => pm.expect(json.knowledgeBase.dimensions).to.eql(384));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — How do I say hello in Telugu? (language inferred)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"How do I say hello in Telugu?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Language inferred from the question\", () => { pm.expect(json.filters.language.code).to.eql(\"te\"); pm.expect(json.filters.language.source).to.eql(\"named-in-query\"); });",
+                  "pm.test(\"Every result is te\", () => json.results.forEach((r) => pm.expect(r.metadata.language).to.eql(\"te\")));",
+                  "pm.test(\"Expected chunk in the top 3\", () => { const top = json.results.slice(0, 3).map((r) => r.id); pm.expect(top.some((id) => [\"te/phrases#hello-namaskaaram\", \"course/te/vocabulary#course-vocabulary-greetings\"].includes(id)), top.join(\", \")).to.be.true; });",
+                  "pm.test(\"Results carry metadata, source and relevance\", () => { const r = json.results[0]; [\"language\",\"level\",\"topic\",\"skill\",\"contentType\",\"source\"].forEach((k) => pm.expect(r.metadata).to.have.property(k)); pm.expect(r.reference).to.be.a(\"string\"); pm.expect(r.relevance.similarity).to.be.within(0, 1); pm.expect(r.relevance.score).to.be.a(\"number\"); });",
+                  "pm.test(\"Enough evidence to answer\", () => pm.expect(json.retrieval.sufficient).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — What is this Telugu word? అమ్మ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What is this Telugu word? అమ్మ\",\n  \"limit\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Every result is te\", () => json.results.forEach((r) => pm.expect(r.metadata.language).to.eql(\"te\")));",
+                  "pm.test(\"Expected chunk in the top 3\", () => { const top = json.results.slice(0, 3).map((r) => r.id); pm.expect(top.some((id) => [\"te/vocabulary#family-words\", \"course/te/vocabulary#course-vocabulary-family\"].includes(id)), top.join(\", \")).to.be.true; });",
+                  "pm.test(\"Exact native word matched\", () => pm.expect(json.results.some((r) => r.relevance.matchedTerms.includes(\"అమ్మ\"))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — beginner grammar concept (Telugu word order)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Explain this beginner grammar concept: why does the verb come at the end of a sentence?\",\n  \"language\": \"te\",\n  \"level\": \"beginner\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Every result is te\", () => json.results.forEach((r) => pm.expect(r.metadata.language).to.eql(\"te\")));",
+                  "pm.test(\"Expected chunk in the top 3\", () => { const top = json.results.slice(0, 3).map((r) => r.id); pm.expect(top.some((id) => [\"te/grammar#word-order-subject-object-verb\"].includes(id)), top.join(\", \")).to.be.true; });",
+                  "pm.test(\"Nothing harder than beginner in the top 3\", () => json.results.slice(0, 3).forEach((r) => pm.expect(r.relevance.levelMatch).to.not.eql(\"harder\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — topic filter (Tamil, food)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What is the word for water?\",\n  \"language\": \"ta\",\n  \"topic\": \"food\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Every result is ta\", () => json.results.forEach((r) => pm.expect(r.metadata.language).to.eql(\"ta\")));",
+                  "pm.test(\"Expected chunk in the top 3\", () => { const top = json.results.slice(0, 3).map((r) => r.id); pm.expect(top.some((id) => [\"ta/vocabulary#food-and-drink\", \"course/ta/vocabulary#course-vocabulary-food-drink\", \"ta/examples#i-want-water\"].includes(id)), top.join(\", \")).to.be.true; });",
+                  "pm.test(\"First result matches the topic\", () => pm.expect(json.results[0].relevance.topicMatch).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — intermediate Hindi grammar (ने)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"When do I use ने in a Hindi sentence?\",\n  \"level\": \"intermediate\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Every result is hi\", () => json.results.forEach((r) => pm.expect(r.metadata.language).to.eql(\"hi\")));",
+                  "pm.test(\"Expected chunk in the top 3\", () => { const top = json.results.slice(0, 3).map((r) => r.id); pm.expect(top.some((id) => [\"hi/verbs#past-tense-with-ne-the-ergative\"].includes(id)), top.join(\", \")).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — out of scope (should be insufficient)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What is the capital of France?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Marked as not enough evidence\", () => pm.expect(json.retrieval.sufficient).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — validation error (empty query)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Validation error\", () => pm.expect(pm.response.json().error.code).to.eql(\"VALIDATION_ERROR\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search — validation error (unsupported language)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rag/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["rag", "search"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"hello\",\n  \"language\": \"fr\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Points at the language field\", () => pm.expect(pm.response.json().error.details[0].field).to.eql(\"language\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "13. Logout",
       "item": [
         {
           "name": "Logout",

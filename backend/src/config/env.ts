@@ -24,6 +24,13 @@ const envSchema = z.object({
     .string()
     .regex(/^\d+[smhd]$/, 'JWT_EXPIRES_IN must look like "7d", "12h" or "30m"')
     .default("7d"),
+  // Phase 5 (RAG) — optional. Folder for the embedding model files (default: backend/.cache/models).
+  RAG_MODEL_DIR: z.string().trim().min(1).optional(),
+  // "false" = never download the model (use only files already in RAG_MODEL_DIR).
+  RAG_ALLOW_DOWNLOAD: z.enum(["true", "false"]).default("true"),
+  // RAG search loads a ~500 MB model in memory. Default: on locally, OFF in production
+  // (Render's free plan has 512 MB). Set RAG_ENABLED=true on a server with ≥ 1 GB RAM.
+  RAG_ENABLED: z.enum(["true", "false"]).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -55,6 +62,10 @@ if (env.JWT_SECRET.startsWith("replace-this")) {
     "⚠️  JWT_SECRET is still the example value. Generate your own: openssl rand -hex 32",
   );
 }
+
+/** Whether POST /api/rag/search may load the embedding model in this process. */
+export const ragEnabled =
+  (env.RAG_ENABLED ?? (env.NODE_ENV === "production" ? "false" : "true")) === "true";
 
 /** CORS_ORIGIN split into a clean array, e.g. ["http://localhost:3000"]. */
 export const allowedOrigins = env.CORS_ORIGIN.split(",")

@@ -1,4 +1,4 @@
-// Prisma schema for Vachan (Phase 4 — placement & gamification).
+// Prisma schema for Vachan (Phase 5 — RAG knowledge base).
 //
 // One set of tables serves ALL languages. Every piece of content belongs to a
 // Language row (Hindi, Telugu, …), so adding a seventh language later means
@@ -14,6 +14,9 @@
 //   User ── UserStats (XP, hearts, streak) · UserDailyActivity (one row per day) · XpEvent (XP log)
 //   User ── UserAchievement ── Achievement
 //   User ── PlacementTest ── PlacementAnswer ── PlacementQuestion ── Exercise
+//
+//   Language ── KnowledgeDocument ── KnowledgeChunk (text + metadata + embedding vector)
+//   (Phase 5: the RAG knowledge base. The `embedding` column uses the pgvector extension.)
 //
 // The connection URL is NOT written here. It is read from DATABASE_URL
 // in backend/prisma.config.ts (Prisma CLI) and backend/src/lib/prisma.ts (the app).
@@ -199,6 +202,8 @@ model Language {
   learners           UserProfile[]
   placementQuestions PlacementQuestion[]
   placementTests     PlacementTest[]
+  knowledgeDocuments KnowledgeDocument[]
+  knowledgeChunks    KnowledgeChunk[]
 }
 
 model Course {
@@ -501,4 +506,98 @@ model PlacementAnswer {
   question PlacementQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([testId, questionId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// RAG knowledge base (Phase 5)
+// ─────────────────────────────────────────────────────────────
+//
+// Content (backend/knowledge-base/*.md + course vocabulary)
+//   → cleaning → chunking → embeddings → KnowledgeChunk rows → vector search.
+// Rows are written ONLY by `npm run rag:index`; never edit them by hand.
+
+/// Who the chunk is written for. Retrieval prefers the learner's level and below.
+enum KnowledgeLevel {
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+}
+
+enum KnowledgeContentType {
+  ALPHABET
+  PRONUNCIATION
+  VOCABULARY
+  GRAMMAR
+  EXAMPLE
+  PHRASE
+  VERB_FORM
+  IDIOM
+  CULTURE
+  EXPLANATION
+}
+
+/// The learner skill a chunk helps with.
+enum KnowledgeSkill {
+  SCRIPT
+  PRONUNCIATION
+  VOCABULARY
+  GRAMMAR
+  CONVERSATION
+  CULTURE
+}
+
+/// One source document, e.g. backend/knowledge-base/te/phrases.md.
+model KnowledgeDocument {
+  /// Stable id, e.g. "te/phrases" or "course/te/vocabulary"
+  id           String   @id
+  languageCode String
+  title        String
+  /// Where the content comes from, e.g. "Vachan curated notes"
+  source       String
+  /// File path (or course reference) of the original content
+  reference    String
+  /// Hash of the cleaned document: unchanged documents are skipped when re-indexing
+  contentHash  String
+  chunkCount   Int
+  indexedAt    DateTime @default(now())
+
+  language Language         @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+  chunks   KnowledgeChunk[]
+
+  @@index([languageCode])
+}
+
+/// One retrievable piece of knowledge (usually one section = one concept).
+model KnowledgeChunk {
+  /// Stable id, e.g. "te/phrases#hello-namaskaram" (or "...#part-2" when a section was split)
+  id             String                      @id
+  documentId     String
+  languageCode   String
+  level          KnowledgeLevel
+  /// Short slug such as "greetings", "pronouns", "vowels"
+  topic          String
+  skill          KnowledgeSkill
+  contentType    KnowledgeContentType
+  source         String
+  /// File + section anchor, e.g. "backend/knowledge-base/te/phrases.md#hello-namaskaram"
+  reference      String
+  /// Section heading, e.g. "Hello — నమస్కారం (namaskaaram)"
+  heading        String
+  /// Clean text shown to learners / given to the tutor in Phase 6
+  content        String
+  charCount      Int
+  contentHash    String
+  /// Name of the model that produced `embedding` (vectors from different models can't be compared)
+  embeddingModel String
+  /// 384-dimension vector from multilingual-e5-small (pgvector type, written with raw SQL)
+  embedding      Unsupported("vector(384)")?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  document KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  language Language          @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+
+  @@index([languageCode, level])
+  @@index([languageCode, topic])
+  @@index([documentId])
 }
