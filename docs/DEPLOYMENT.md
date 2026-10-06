@@ -171,6 +171,11 @@ git add . && git commit -m "…" && git push
 - The next Render build applies the Phase 5 migration on Neon automatically (pgvector is built into Neon).
 - **Knowledge-base search stays off on Render free** (`NODE_ENV=production` → `RAG_ENABLED` defaults to `false`, `POST /api/rag/search` → `503 RAG_DISABLED`): the embedding model needs ≈ 550 MB of RAM and the free plan has 512 MB. The rest of the app is unaffected. Details and how to enable it later: [RAG.md §8](RAG.md#8-deployment).
 
+## 5c. Phase 6 (AI tutor) on the deployed site
+
+- The next Render build applies the `20261008090000_phase6_ai_tutor` migration on Neon.
+- The tutor needs RAG search, which is off on Render free (see 5b), so `/tutor` shows "The tutor isn't available on this server yet" and `POST /api/ai/tutor` answers `503 TUTOR_UNAVAILABLE`. When you enable it on a bigger instance, add `GEMINI_API_KEY` in Render → **vachan-api** → **Environment** (never in Vercel). Details: [AI_TUTOR.md §8](AI_TUTOR.md#8-deployment).
+
 ## 6. Troubleshooting
 
 | Problem                                                                      | Why                                                                                     | Fix                                                                                                                                          |

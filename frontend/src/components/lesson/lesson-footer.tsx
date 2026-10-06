@@ -1,5 +1,5 @@
 // Bottom bar of the lesson: "Check" button, then correct/incorrect feedback + "Continue".
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, MessageCircleQuestion } from "lucide-react";
 import type { AnswerResult } from "@/types/exercise";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -17,6 +17,8 @@ type LessonFooterProps = {
 
   onCheck: () => void;
   onContinue: () => void;
+  /** Phase 6: opens the AI tutor for this exercise (shown after a wrong answer). */
+  onAskTutor?: () => void;
 };
 
 const CORRECT_MESSAGES = ["Great job!", "Excellent!", "You got it!", "Nicely done!"];
@@ -30,6 +32,7 @@ export function LessonFooter({
   explanation,
   onCheck,
   onContinue,
+  onAskTutor,
 }: LessonFooterProps) {
   // Pick an encouraging message based on the answer length (stable, not random).
   const praise = CORRECT_MESSAGES[correctAnswerText.length % CORRECT_MESSAGES.length];
@@ -75,6 +78,16 @@ export function LessonFooter({
                 </p>
                 {explanation && <p className="mt-1 text-sm">{explanation}</p>}
                 <p className="mt-1 text-sm font-bold">You&apos;ll see this one again at the end.</p>
+                {onAskTutor && (
+                  <button
+                    type="button"
+                    onClick={onAskTutor}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-brand-700 ring-2 ring-brand-100 transition hover:bg-brand-50"
+                  >
+                    <MessageCircleQuestion aria-hidden="true" className="size-4" />
+                    Ask the tutor why
+                  </button>
+                )}
               </div>
             </div>
           )}

@@ -31,6 +31,21 @@ const envSchema = z.object({
   // RAG search loads a ~500 MB model in memory. Default: on locally, OFF in production
   // (Render's free plan has 512 MB). Set RAG_ENABLED=true on a server with ≥ 1 GB RAM.
   RAG_ENABLED: z.enum(["true", "false"]).optional(),
+  // Phase 6 (AI tutor). The API keys stay on the server — never in the frontend or in git.
+  //   gemini = Google AI Studio (free tier) · groq = Groq (free tier) · mock = offline test double
+  LLM_PROVIDER: z.enum(["gemini", "groq", "mock"]).default("gemini"),
+  GEMINI_API_KEY: z.string().trim().optional(),
+  GROQ_API_KEY: z.string().trim().optional(),
+  // Optional: a different model than the provider default (see backend/src/config/tutor.ts).
+  LLM_MODEL: z.string().trim().min(1).optional(),
+  // Optional: another model of the same provider, used once when the main one is overloaded.
+  LLM_FALLBACK_MODEL: z.string().trim().min(1).optional(),
+  // Optional: a different API address (proxies, tests). Leave unset normally.
+  LLM_BASE_URL: z.url().optional(),
+  LLM_TIMEOUT_MS: z.coerce.number().int().min(1000).max(120_000).default(40_000),
+  // Per-learner limits for POST /api/ai/tutor (protects the free API quota).
+  TUTOR_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(6),
+  TUTOR_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(100),
 });
 
 export type Env = z.infer<typeof envSchema>;

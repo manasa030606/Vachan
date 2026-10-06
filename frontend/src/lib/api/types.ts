@@ -401,3 +401,77 @@ export type PlacementResultDto = {
   chosenUnit: number | null;
   rules: string[];
 };
+
+// ── AI tutor (Phase 6) ──
+export type TutorLevel = "beginner" | "elementary" | "intermediate";
+
+export type TutorReferenceDto = {
+  n: number;
+  id: string;
+  heading: string;
+  excerpt: string;
+  source: string;
+  reference: string;
+  level: string;
+  contentType: string;
+  similarity: number;
+  /** true = the answer is based on this note */
+  used: boolean;
+};
+
+export type TutorMessageDto = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  status: "answered" | "insufficient" | "refused" | null;
+  references: TutorReferenceDto[];
+  examples: Array<{ native: string; romanization: string; meaning: string }>;
+  context: {
+    level?: TutorLevel;
+    unit?: string | null;
+    lesson?: string | null;
+    sufficient?: boolean;
+    bestSimilarity?: number;
+  } | null;
+  model: string | null;
+  latencyMs: number | null;
+  createdAt: string;
+};
+
+export type TutorConversationDto = {
+  id: string;
+  title: string;
+  language: string;
+  lessonId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  messageCount?: number;
+};
+
+export type TutorContextDto = {
+  context: {
+    language: { code: string; name: string };
+    level: TutorLevel;
+    levelSource: "request" | "self-assessment" | "default";
+    unit: string | null;
+    lesson: { id: string; title: string } | null;
+  };
+  suggestions: string[];
+  status: {
+    available: boolean;
+    reason: string | null;
+    provider: string;
+    providerLabel: string;
+    model: string;
+    isTestDouble: boolean;
+    searchEnabled: boolean;
+  };
+};
+
+export type TutorAskBody = {
+  question: string;
+  conversationId?: string;
+  language?: string;
+  lessonId?: string;
+  exerciseId?: string;
+};

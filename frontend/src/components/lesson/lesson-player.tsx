@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useReducer, useState } from "react";
 import type { ExerciseAnswer, Lesson } from "@/types/exercise";
 import { ExerciseRenderer } from "@/components/exercises/exercise-renderer";
+import { TutorDrawer } from "@/components/tutor/tutor-drawer";
 import { ApiError } from "@/lib/api/client";
 import { startLesson, submitAttempt } from "@/lib/api/endpoints";
 import type { AttemptResultDto, BadgeDto, RewardsDto } from "@/lib/api/types";
@@ -73,6 +74,8 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   const [resumed, setResumed] = useState(false);
   const [runRewards, setRunRewards] = useState<RunRewards>(NO_REWARDS);
   const [nextHeartAt, setNextHeartAt] = useState<string | null>(null);
+  /** Exercise the learner opened the AI tutor for (Phase 6), or null. */
+  const [tutorExerciseId, setTutorExerciseId] = useState<string | null>(null);
 
   const exercise = state.queue[state.position];
   const canCheck = exercise ? isAnswerReady(exercise, state.answer) && !isChecking : false;
@@ -166,6 +169,8 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key !== "Enter") return;
+      // The tutor panel is open (or another box already handled Enter): leave the lesson alone.
+      if (tutorExerciseId || event.defaultPrevented) return;
       // A focused button already reacts to Enter by itself.
       if ((event.target as HTMLElement | null)?.tagName === "BUTTON") return;
       if (state.result) dispatch({ type: "CONTINUE" });
@@ -174,7 +179,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [state.phase, state.result, canCheck, check]);
+  }, [state.phase, state.result, canCheck, check, tutorExerciseId]);
 
   if (state.phase === "intro") {
     return (
@@ -270,8 +275,20 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
           explanation={state.explanation}
           onCheck={() => void check()}
           onContinue={() => dispatch({ type: "CONTINUE" })}
+          onAskTutor={
+            state.result === "incorrect" && !isReview
+              ? () => setTutorExerciseId(exercise.id)
+              : undefined
+          }
         />
       </div>
+      {tutorExerciseId && (
+        <TutorDrawer
+          lessonId={lesson.id}
+          exerciseId={tutorExerciseId}
+          onClose={() => setTutorExerciseId(null)}
+        />
+      )}
     </div>
   );
 }

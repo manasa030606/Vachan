@@ -1,5 +1,6 @@
 // Collects every API route under /api.
 import { Router } from "express";
+import { aiRouter } from "./ai.routes.ts";
 import { authRouter } from "./auth.routes.ts";
 import { coursesRouter } from "./courses.routes.ts";
 import { exercisesRouter } from "./exercises.routes.ts";
@@ -35,3 +36,4 @@ apiRouter.use("/streak", streakRouter);
 apiRouter.use("/achievements", achievementsRouter);
 apiRouter.use("/recommendations", recommendationsRouter);
 apiRouter.use("/rag", ragRouter);
+apiRouter.use("/ai", aiRouter);

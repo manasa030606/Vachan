@@ -14,6 +14,7 @@
     "test": "tsx --test --test-reporter=spec \"src/**/*.test.ts\" \"prisma/**/*.test.ts\"",
     "test:api": "tsx --test --test-reporter=spec \"tests/*.test.ts\"",
     "test:rag": "tsx --test --test-reporter=spec \"tests/rag/**/*.test.ts\"",
+    "test:tutor": "LLM_PROVIDER=mock TUTOR_RATE_LIMIT_PER_MINUTE=30 tsx --test --test-reporter=spec \"tests/tutor/**/*.test.ts\"",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev && prisma generate",
@@ -24,6 +25,8 @@
     "rag:index": "tsx src/rag/cli/index-knowledge.ts",
     "rag:search": "tsx src/rag/cli/search-knowledge.ts",
     "rag:eval": "tsx src/rag/cli/evaluate-retrieval.ts",
+    "ai:check": "tsx src/ai/cli/check-llm.ts",
+    "tutor:eval": "tsx src/ai/cli/evaluate-tutor.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

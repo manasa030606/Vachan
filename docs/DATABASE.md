@@ -281,6 +281,11 @@ After the full Postman run: `totalXp` 70, `currentStreak` 1, 4 badges (first-les
 
 ---
 
+## 9c. Phase 5–6 migrations — what changed
+
+- `20261007090000_phase5_rag_knowledge_base` — pgvector extension, `KnowledgeDocument`, `KnowledgeChunk` (see [RAG.md](RAG.md)).
+- `20261008090000_phase6_ai_tutor` — `AIConversation`, `AIMessage` and the enums `AIMessageRole`, `AIAnswerStatus` (see [AI_TUTOR.md §4](AI_TUTOR.md#4-database-migration-20261008090000_phase6_ai_tutor), including SQL to inspect chats).
+
 ## 10. The schema (19 tables, one set for all languages)
 
 ```

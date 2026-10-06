@@ -1,4 +1,4 @@
-// Prisma schema for Vachan (Phase 5 — RAG knowledge base).
+// Prisma schema for Vachan (Phase 6 — AI tutor).
 //
 // One set of tables serves ALL languages. Every piece of content belongs to a
 // Language row (Hindi, Telugu, …), so adding a seventh language later means
@@ -17,6 +17,8 @@
 //
 //   Language ── KnowledgeDocument ── KnowledgeChunk (text + metadata + embedding vector)
 //   (Phase 5: the RAG knowledge base. The `embedding` column uses the pgvector extension.)
+//
+//   User ── AIConversation ── AIMessage   (Phase 6: AI tutor chats, with the sources of every answer)
 //
 // The connection URL is NOT written here. It is read from DATABASE_URL
 // in backend/prisma.config.ts (Prisma CLI) and backend/src/lib/prisma.ts (the app).
@@ -156,6 +158,7 @@ model User {
   xpEvents         XpEvent[]
   achievements     UserAchievement[]
   placementTests   PlacementTest[]
+  aiConversations  AIConversation[]
 }
 
 model UserProfile {
@@ -204,6 +207,7 @@ model Language {
   placementTests     PlacementTest[]
   knowledgeDocuments KnowledgeDocument[]
   knowledgeChunks    KnowledgeChunk[]
+  aiConversations    AIConversation[]
 }
 
 model Course {
@@ -244,11 +248,12 @@ model Lesson {
   sortOrder   Int
   isPublished Boolean    @default(true)
 
-  unit       Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  exercises  Exercise[]
+  unit            Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  exercises       Exercise[]
   /// Words/letters introduced at the start of the lesson.
-  vocabulary VocabularyItem[]
-  progress   UserLessonProgress[]
+  vocabulary      VocabularyItem[]
+  progress        UserLessonProgress[]
+  aiConversations AIConversation[]
 
   @@unique([unitId, sortOrder])
 }
@@ -600,4 +605,66 @@ model KnowledgeChunk {
   @@index([languageCode, level])
   @@index([languageCode, topic])
   @@index([documentId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// AI tutor (Phase 6)
+// ─────────────────────────────────────────────────────────────
+//
+// question → RAG retrieval (Phase 5) → prompt with the retrieved notes → LLM → answer + references.
+// Every assistant message stores the notes it was based on, so answers can always be traced back.
+
+enum AIMessageRole {
+  USER
+  ASSISTANT
+}
+
+enum AIAnswerStatus {
+  ANSWERED // grounded answer that cites at least one retrieved note
+  INSUFFICIENT // the knowledge base doesn't cover the question → no guessing
+  REFUSED // off-topic or a prompt-injection attempt
+}
+
+/// One tutor chat. Belongs to one learner and one target language.
+model AIConversation {
+  id           String   @id @default(cuid())
+  userId       String
+  languageCode String
+  /// First question, shortened — shown in the conversation list
+  title        String
+  /// Lesson the learner was in when the chat started (optional)
+  lessonId     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language    @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+  lesson   Lesson?     @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  messages AIMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+/// One message in a tutor chat (the learner's question or the tutor's answer).
+model AIMessage {
+  id             String          @id @default(cuid())
+  conversationId String
+  role           AIMessageRole
+  content        String
+  /// Tutor answers only: what happened
+  status         AIAnswerStatus?
+  /// Tutor answers only: the retrieved notes shown as references [{ n, id, heading, source, reference, … }]
+  references     Json?
+  /// Tutor answers only: examples quoted from the notes [{ native, romanization, meaning }]
+  examples       Json?
+  /// Tutor answers only: the context used — level, unit, lesson, retrieval query, best similarity…
+  context        Json?
+  /// Tutor answers only: "gemini/gemini-3.8-flash" (null when no LLM was called)
+  model          String?
+  latencyMs      Int?
+  createdAt      DateTime        @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
 }

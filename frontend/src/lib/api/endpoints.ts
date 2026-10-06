@@ -18,6 +18,10 @@ import type {
   AchievementDto,
   StartLessonDto,
   StatsDto,
+  TutorAskBody,
+  TutorContextDto,
+  TutorConversationDto,
+  TutorMessageDto,
   UserDto,
 } from "./types";
 
@@ -117,3 +121,32 @@ export const decidePlacement = (testId: string, choice: "recommended" | "beginni
     startLessonId: string | null;
     lessonsUnlocked: number;
   }>("/placement/decide", { method: "POST", body: { testId, choice } });
+
+// ── AI tutor (Phase 6) ──
+export const getTutorContext = (params: { language?: string; lessonId?: string }) => {
+  const query = new URLSearchParams(
+    Object.entries(params).filter((entry): entry is [string, string] => Boolean(entry[1])),
+  ).toString();
+  return apiFetch<TutorContextDto>(`/ai/tutor/context${query ? `?${query}` : ""}`);
+};
+
+export const askTutor = (body: TutorAskBody) =>
+  apiFetch<{ conversation: TutorConversationDto; messages: TutorMessageDto[] }>("/ai/tutor", {
+    method: "POST",
+    body,
+  });
+
+export const getTutorConversations = (language?: string) =>
+  apiFetch<{ conversations: TutorConversationDto[] }>(
+    `/ai/conversations${language ? `?language=${encodeURIComponent(language)}` : ""}`,
+  );
+
+export const getTutorConversation = (id: string) =>
+  apiFetch<{ conversation: TutorConversationDto & { messages: TutorMessageDto[] } }>(
+    `/ai/conversations/${encodeURIComponent(id)}`,
+  );
+
+export const deleteTutorConversation = (id: string) =>
+  apiFetch<{ message: string }>(`/ai/conversations/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });

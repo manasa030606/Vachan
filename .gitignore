@@ -30,3 +30,7 @@ Thumbs.db
 
 # Downloaded AI models (Phase 5 embeddings) — large binary files, never commit
 .cache/
+
+# local scratch (not project code)
+.trash-tmp/
+Claude outputs/
