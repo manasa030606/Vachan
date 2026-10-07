@@ -1,7 +1,7 @@
 "use client";
 
 // Small building blocks shared by the admin pages.
-import { AlertTriangle, Check, Loader2 } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, Loader2 } from "lucide-react";
 import { useId, useState, type ComponentProps, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
@@ -54,26 +54,45 @@ export function Input(props: ComponentProps<"input">) {
 export function Textarea(props: ComponentProps<"textarea">) {
   return <textarea {...props} className={cn(inputClass, "font-mono text-sm", props.className)} />;
 }
+/**
+ * Dropdown styled like the other inputs: the browser's own arrow is hidden (it sat against the
+ * edge and looked different in every browser) and replaced by an indigo chevron with room around it.
+ */
 export function Select({
   options,
+  className,
   ...props
 }: ComponentProps<"select"> & {
   options: ReadonlyArray<string | { value: string; label: string }>;
 }) {
   return (
-    <select {...props} className={cn(inputClass, "py-2.5", props.className)}>
-      {options.map((option) =>
-        typeof option === "string" ? (
-          <option key={option} value={option}>
-            {option.toLowerCase().replace(/_/g, " ")}
-          </option>
-        ) : (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ),
-      )}
-    </select>
+    <div className={cn("relative", className)}>
+      <select
+        {...props}
+        className={cn(
+          inputClass,
+          "h-11 cursor-pointer appearance-none py-0 pr-10 pl-3.5 font-semibold",
+          "hover:border-brand-300 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400",
+        )}
+      >
+        {options.map((option) =>
+          typeof option === "string" ? (
+            <option key={option} value={option}>
+              {option.toLowerCase().replace(/_/g, " ")}
+            </option>
+          ) : (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ),
+        )}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-brand-600"
+        strokeWidth={2.5}
+      />
+    </div>
   );
 }
 
