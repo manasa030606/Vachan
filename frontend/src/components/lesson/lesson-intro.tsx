@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BookOpen, RotateCcw, X } from "lucide-react";
 import type { VocabularyWord } from "@/types/learning";
 import { Button } from "@/components/ui/button";
+import { PhraseAudio } from "@/components/speech/phrase-audio";
 
 type LessonIntroProps = {
   title: string;
@@ -12,6 +13,8 @@ type LessonIntroProps = {
   /** Sentence under the title, e.g. "Here are the letters you'll practise…" */
   introText: string;
   showRomanization: boolean;
+  /** Course language, for audio (e.g. "te"). */
+  languageCode: string;
   /** NOT_STARTED / IN_PROGRESS / COMPLETED — changes the start button. */
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
   /** Exercises already done in this run (when resuming). */
@@ -29,6 +32,7 @@ export function LessonIntro({
   words,
   introText,
   showRomanization,
+  languageCode,
   status,
   doneCount,
   totalCount,
@@ -75,7 +79,15 @@ export function LessonIntro({
               </p>
               {showRomanization && <p className="text-slate-500">{word.romanization}</p>}
             </div>
-            <p className="min-w-0 text-right text-lg font-extrabold text-ink">{word.meaning}</p>
+            <div className="flex min-w-0 flex-col items-end gap-1.5">
+              <p className="text-right text-lg font-extrabold text-ink">{word.meaning}</p>
+              {/* Phase 7: hear the word (server audio, or the browser's voice as a fallback). */}
+              <PhraseAudio
+                compact
+                source={{ vocabularyItemId: word.id, text: word.script, language: languageCode }}
+                label={`${word.script} (${word.meaning})`}
+              />
+            </div>
           </li>
         ))}
       </ul>

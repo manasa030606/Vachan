@@ -18,6 +18,7 @@ import { placementRouter } from "./placement.routes.ts";
 import { progressRouter } from "./progress.routes.ts";
 import { ragRouter } from "./rag.routes.ts";
 import { reviewRouter } from "./review.routes.ts";
+import { speechRouter } from "./speech.routes.ts";
 
 export const apiRouter = Router();
 
@@ -37,3 +38,4 @@ apiRouter.use("/achievements", achievementsRouter);
 apiRouter.use("/recommendations", recommendationsRouter);
 apiRouter.use("/rag", ragRouter);
 apiRouter.use("/ai", aiRouter);
+apiRouter.use("/speech", speechRouter);

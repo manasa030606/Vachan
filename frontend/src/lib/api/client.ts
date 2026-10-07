@@ -27,43 +27,70 @@ export class ApiError extends Error {
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
+  /** JSON body, or FormData for file uploads (Phase 7 audio). */
   body?: unknown;
+  /** Give up after this many milliseconds (AI and speech calls). */
+  timeoutMs?: number;
 };
 
-export async function apiFetch<T>(
-  path: string,
-  { method = "GET", body }: RequestOptions = {},
-): Promise<T> {
-  let response: Response;
+const networkError = () =>
+  new ApiError(
+    0,
+    "NETWORK_ERROR",
+    API_URL
+      ? `Can't reach the Vachan server at ${API_URL}. Is the backend running (npm run dev)?`
+      : "Can't reach the Vachan server right now. Please check your internet connection and try again.",
+  );
+
+const timeoutError = () =>
+  new ApiError(0, "TIMEOUT", "The server took too long to answer. Please try again.");
+
+/** Sends the request; network problems and timeouts become ApiErrors. */
+async function send(path: string, { method = "GET", body, timeoutMs }: RequestOptions) {
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   try {
-    response = await fetch(`${API_URL}/api${path}`, {
+    return await fetch(`${API_URL}/api${path}`, {
       method,
       credentials: "include",
       cache: "no-store",
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      // FormData sets its own multipart Content-Type (with the boundary).
+      headers: body === undefined || isForm ? undefined : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
+      signal: timeoutMs ? AbortSignal.timeout(timeoutMs) : undefined,
     });
-  } catch {
-    throw new ApiError(
-      0,
-      "NETWORK_ERROR",
-      API_URL
-        ? `Can't reach the Vachan server at ${API_URL}. Is the backend running (npm run dev)?`
-        : "Can't reach the Vachan server right now. Please try again in a minute.",
-    );
+  } catch (error) {
+    if (
+      error instanceof DOMException &&
+      (error.name === "TimeoutError" || error.name === "AbortError")
+    ) {
+      throw timeoutError();
+    }
+    throw networkError();
   }
+}
 
+async function errorFrom(response: Response): Promise<ApiError> {
   const data: unknown = await response.json().catch(() => null);
-  if (!response.ok) {
-    const error = (
-      data as { error?: { code?: string; message?: string; details?: ApiError["details"] } }
-    )?.error;
-    throw new ApiError(
-      response.status,
-      error?.code ?? "UNKNOWN_ERROR",
-      error?.message ?? `Request failed with HTTP ${response.status}`,
-      error?.details,
-    );
-  }
-  return data as T;
+  const error = (
+    data as { error?: { code?: string; message?: string; details?: ApiError["details"] } }
+  )?.error;
+  return new ApiError(
+    response.status,
+    error?.code ?? "UNKNOWN_ERROR",
+    error?.message ?? `Request failed with HTTP ${response.status}`,
+    error?.details,
+  );
+}
+
+export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const response = await send(path, options);
+  if (!response.ok) throw await errorFrom(response);
+  return (await response.json().catch(() => null)) as T;
+}
+
+/** Downloads a binary response (e.g. WAV audio from /speech/tts). */
+export async function apiBlob(path: string, options: RequestOptions = {}): Promise<Blob> {
+  const response = await send(path, options);
+  if (!response.ok) throw await errorFrom(response);
+  return response.blob();
 }

@@ -51,7 +51,9 @@ export function SidebarNav() {
           </ul>
         </nav>
 
-        <p className="mt-auto hidden px-2 text-xs text-slate-400 lg:block">Phase 6 · AI tutor</p>
+        <p className="mt-auto hidden px-2 text-xs text-slate-400 lg:block">
+          Phase 7 · Speaking &amp; conversation
+        </p>
       </div>
     </aside>
   );

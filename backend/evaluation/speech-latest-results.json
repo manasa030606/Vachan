@@ -1,0 +1,225 @@
+{
+  "generatedAt": "2026-10-07T03:56:26.153Z",
+  "stt": {
+    "provider": "gemini",
+    "model": "gemini-3.5-flash",
+    "configured": true,
+    "keyVariable": "GEMINI_API_KEY",
+    "isTestDouble": false
+  },
+  "tts": {
+    "provider": "gemini",
+    "model": null,
+    "voice": "Kore",
+    "configured": true,
+    "serverAudio": true,
+    "isTestDouble": false
+  },
+  "llm": {
+    "provider": "gemini",
+    "model": "gemini-3.5-flash"
+  },
+  "summary": {
+    "roundTripMatch": 1,
+    "partnerValid": 1,
+    "partnerGrounded": 1,
+    "partnerLevel": 1,
+    "partnerCited": 1
+  },
+  "checks": [
+    {
+      "name": "roundTripMatch",
+      "value": 1,
+      "min": 0.7,
+      "pass": true
+    },
+    {
+      "name": "partnerValid",
+      "value": 1,
+      "min": 0.9,
+      "pass": true
+    },
+    {
+      "name": "partnerGrounded",
+      "value": 1,
+      "min": 0.6,
+      "pass": true
+    },
+    {
+      "name": "partnerLevel",
+      "value": 1,
+      "min": 0.8,
+      "pass": true
+    }
+  ],
+  "trips": [
+    {
+      "language": "te",
+      "id": "te-v30-my-name-is-asha",
+      "expected": "నా పేరు ఆశ",
+      "heard": "నా పేరు ఆశా",
+      "score": 89,
+      "verdict": "close",
+      "ok": true,
+      "audio": "generated"
+    },
+    {
+      "language": "te",
+      "id": "te-v31-what-is-your-name",
+      "expected": "మీ పేరు ఏమిటి?",
+      "heard": "మీ పేరు ఏమిటి?",
+      "score": 100,
+      "verdict": "match",
+      "ok": true,
+      "audio": "generated"
+    },
+    {
+      "language": "hi",
+      "id": "hi-v30-my-name-is-asha",
+      "expected": "मेरा नाम आशा है",
+      "heard": "मेरा नाम आशा है",
+      "score": 100,
+      "verdict": "match",
+      "ok": true,
+      "audio": "generated"
+    },
+    {
+      "language": "hi",
+      "id": "hi-v31-what-is-your-name",
+      "expected": "आपका नाम क्या है?",
+      "heard": "आपका नाम क्या है?",
+      "score": 100,
+      "verdict": "match",
+      "ok": true,
+      "audio": "generated"
+    }
+  ],
+  "lines": [
+    {
+      "scenario": "introductions",
+      "language": "te",
+      "text": "నమస్కారం! మీ పేరు ఏమిటి?",
+      "translation": "Hello! What is your name?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 4,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "introductions",
+      "language": "te",
+      "text": "నమస్కారం! నా పేరు ఆశ. మీ పేరు ఏమిటి?",
+      "translation": "Hello! My name is Asha. What is your name?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 7,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "introductions",
+      "language": "te",
+      "text": "మిమ్మల్ని కలవడం సంతోషం. మీరు ఎక్కడ నుండి వచ్చారు?",
+      "translation": "Nice to meet you. Where are you from?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 7,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "introductions",
+      "language": "te",
+      "summary": true,
+      "valid": true
+    },
+    {
+      "scenario": "restaurant",
+      "language": "te",
+      "text": "నమస్కారం! ఏం కావాలి?",
+      "translation": "Hello! What would you like?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 3,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "restaurant",
+      "language": "te",
+      "text": "సరే, భోజనం ఇవ్వనా?",
+      "translation": "Ok, shall I give food?",
+      "valid": true,
+      "coverage": 0.67,
+      "grounded": true,
+      "words": 3,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "restaurant",
+      "language": "te",
+      "text": "సరే. నీళ్ళు కావాలా?",
+      "translation": "Okay. Do you want water?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 3,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "restaurant",
+      "language": "te",
+      "summary": true,
+      "valid": true
+    },
+    {
+      "scenario": "shopping",
+      "language": "te",
+      "text": "నమస్కారం! ఇది ఎంత?",
+      "translation": "Hello! How much is this?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 3,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "shopping",
+      "language": "te",
+      "text": "వంద రూపాయలు. ఇది ఎంత?",
+      "translation": "One hundred rupees. How much is this?",
+      "valid": true,
+      "coverage": 1,
+      "grounded": true,
+      "words": 4,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "shopping",
+      "language": "te",
+      "text": "సరే, తక్కువ చేస్తాను. ఒకటి కావాలా, రెండు కావాలా?",
+      "translation": "Okay, I will lower it. Do you want one or two?",
+      "valid": true,
+      "coverage": 0.86,
+      "grounded": true,
+      "words": 7,
+      "levelOk": true,
+      "cited": true
+    },
+    {
+      "scenario": "shopping",
+      "language": "te",
+      "summary": true,
+      "valid": true
+    }
+  ]
+}

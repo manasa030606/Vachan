@@ -24,6 +24,10 @@ export class GroqProvider implements LlmProvider {
   ) {}
 
   async generate(request: GenerateRequest): Promise<GenerateResult> {
+    if (request.turns.some((turn) => turn.audio)) {
+      // Groq's chat models can't listen; speech-to-text uses Groq Whisper instead (speech/stt.ts).
+      throw new LlmError("LLM_BAD_REQUEST", "Groq chat models can't listen to audio");
+    }
     const body = {
       model: this.model,
       temperature: request.temperature,

@@ -18,6 +18,7 @@ import type { KnowledgeLevelName } from "../../rag/config.ts";
 import { searchKnowledge } from "../../rag/retrieval.service.ts";
 import type { LanguageCode } from "../../rag/types.ts";
 import { correctAnswerText, describeAnswer } from "../../services/answer-checker.ts";
+import { llmErrorToHttp } from "../llm/http-errors.ts";
 import { getLlmProvider, getLlmStatus } from "../llm/index.ts";
 import { LlmError } from "../llm/types.ts";
 import { decideLevel } from "./level.ts";
@@ -235,29 +236,7 @@ export async function getTutorContext(
 
 // ── Ask ─────────────────────────────────────────────────────────
 
-function toHttpError(error: LlmError): HttpError {
-  const map: Record<LlmError["code"], [number, string]> = {
-    LLM_NOT_CONFIGURED: [503, "Add the API key to backend/.env and restart the backend."],
-    LLM_AUTH_FAILED: [502, "The AI provider rejected the API key. Check it in backend/.env."],
-    LLM_RATE_LIMITED: [429, "The free AI quota is used up for now. Please try again in a minute."],
-    LLM_MODEL_NOT_FOUND: [
-      502,
-      "The configured AI model doesn't exist. Check LLM_MODEL in backend/.env.",
-    ],
-    LLM_TIMEOUT: [504, "The AI took too long to answer. Please try again."],
-    LLM_BLOCKED: [502, "The AI provider refused to answer this question."],
-    LLM_UNAVAILABLE: [503, "The AI service is very busy right now. Please try again in a minute."],
-    LLM_BAD_REQUEST: [502, "The AI service rejected the request. Check LLM_MODEL in backend/.env."],
-    LLM_FAILED: [502, "The AI service had a problem. Please try again."],
-  };
-  const [status, message] = map[error.code];
-  console.warn(`[tutor] ${error.code}: ${error.message}`); // server log only (never contains the key)
-  return new HttpError(
-    status,
-    error.code === "LLM_NOT_CONFIGURED" ? "TUTOR_NOT_CONFIGURED" : error.code,
-    message,
-  );
-}
+const toHttpError = (error: LlmError) => llmErrorToHttp(error, "tutor", "TUTOR_NOT_CONFIGURED");
 
 export async function askTutor(userId: string, input: AskInput) {
   const started = performance.now();

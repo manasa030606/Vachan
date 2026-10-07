@@ -475,3 +475,218 @@ export type TutorAskBody = {
   lessonId?: string;
   exerciseId?: string;
 };
+
+// ── Speech & conversation (Phase 7) ──
+
+export type SpeechStatusDto = {
+  speechToText: { provider: string; model: string; available: boolean; isTestDouble: boolean };
+  textToSpeech: {
+    provider: "gemini" | "browser" | "mock";
+    model: string | null;
+    voice: string | null;
+    available: boolean;
+    serverAudio: boolean;
+    isTestDouble: boolean;
+  };
+  pronunciationNotes: boolean;
+  conversationNotes: boolean;
+  limits: { maxUploadBytes: number; maxDurationMs: number; minDurationMs: number; format: string };
+  locales: Record<string, string>;
+};
+
+export type SpeechPhraseDto = {
+  id: string;
+  kind: "WORD" | "PHRASE";
+  script: string;
+  romanization: string;
+  meaning: string;
+  topic: string;
+  lesson: string | null;
+  bestScore: number | null;
+  attempts: number;
+};
+
+export type AudioWarningDto = { code: string; message: string };
+export type AudioInfoDto = {
+  source: "recorded" | "uploaded";
+  durationMs: number;
+  speechMs: number;
+  bytes: number;
+  sampleRate: number;
+};
+
+export type TranscriptionDto = {
+  transcript: string;
+  language: { code: string; name: string };
+  model: string;
+  audio: AudioInfoDto;
+  warnings: AudioWarningDto[];
+  latencyMs: number;
+};
+
+export type WordResultDto = {
+  expected: string;
+  heard: string | null;
+  status: "correct" | "close" | "wrong" | "missing";
+  similarity: number;
+};
+
+export type PronunciationNotesDto =
+  | {
+      supported: true;
+      notes: Array<{ word: string | null; tip: string }>;
+      overall: string;
+      confident: boolean;
+      model: string;
+      disclaimer: string;
+    }
+  | { supported: false; reason: string };
+
+export type FluencyDto = {
+  rating: "smooth" | "some-pauses" | "hesitant";
+  totalMs: number;
+  speakingMs: number;
+  startDelayMs: number | null;
+  pauses: number;
+  longestPauseMs: number;
+  lettersPerSecond: number | null;
+  notes: string[];
+  method: string;
+};
+
+export type SpeakingEvaluationDto = {
+  attemptId: string;
+  expected: {
+    vocabularyItemId: string | null;
+    script: string;
+    romanization: string;
+    meaning: string;
+  };
+  transcript: string;
+  language: { code: string; name: string };
+  level: TutorLevel;
+  content: {
+    score: number;
+    verdict: "match" | "close" | "partial" | "different" | "nothing-heard";
+    comparedWith: "script" | "romanization";
+    transcriptScript: "native" | "latin" | "mixed" | "empty";
+    words: WordResultDto[];
+    extraWords: string[];
+    method: string;
+  };
+  pronunciation: PronunciationNotesDto;
+  fluency: FluencyDto;
+  warnings: AudioWarningDto[];
+  audio: AudioInfoDto;
+  model: string;
+  latencyMs: number;
+};
+
+export type ListeningQuestionDto = {
+  token: string;
+  type: "meaning" | "script";
+  instruction: string;
+  options: Array<{ id: string; label: string }>;
+};
+
+export type ListeningAnswerDto = {
+  correct: boolean;
+  correctChoiceId: string;
+  answer: { script: string; romanization: string; meaning: string };
+};
+
+export type ScenarioId =
+  "introductions" | "restaurant" | "shopping" | "travel" | "directions" | "everyday";
+
+export type ScenarioDto = {
+  id: ScenarioId;
+  title: string;
+  description: string;
+  partnerRole: string;
+  goal: string;
+  keyWords: Array<{ script: string; romanization: string; meaning: string }>;
+};
+
+export type ConversationAvailabilityDto = {
+  available: boolean;
+  reason: string | null;
+  notesAvailable: boolean;
+  provider: string;
+  model: string;
+  isTestDouble: boolean;
+};
+
+export type ScenarioListDto = {
+  language: { code: string; name: string };
+  level: TutorLevel;
+  levelSource: string;
+  maxLearnerTurns: number;
+  scenarios: ScenarioDto[];
+  status: ConversationAvailabilityDto;
+};
+
+export type PhraseLineDto = { text: string; romanization: string; meaning: string };
+
+export type ConversationFeedbackDto = {
+  understood: boolean;
+  correction: { text: string; romanization: string; explanation: string } | null;
+  note: string;
+};
+
+export type ConversationTurnDto = {
+  id: string;
+  speaker: "partner" | "learner";
+  text: string;
+  romanization: string | null;
+  translation: string | null;
+  inputMode: "text" | "voice" | null;
+  feedback: ConversationFeedbackDto | null;
+  suggestions: PhraseLineDto[];
+  references: Array<{
+    n: number;
+    id: string;
+    heading: string;
+    reference: string;
+    similarity: number;
+  }>;
+  status: "answered" | "refused" | null;
+  createdAt: string;
+};
+
+export type ConversationSummaryDto = {
+  stats: {
+    replies: number;
+    voiceReplies: number;
+    typedReplies: number;
+    understoodReplies: number;
+    corrections: number;
+    vocabularyUsed: Array<{ script: string; romanization: string; meaning: string }>;
+    goalReached: boolean;
+    durationSeconds: number;
+  };
+  review: {
+    strengths: string[];
+    practise: string[];
+    usefulPhrases: PhraseLineDto[];
+    encouragement: string;
+  } | null;
+  reviewNote: string | null;
+};
+
+export type ConversationSessionDto = {
+  id: string;
+  scenario: ScenarioId;
+  scenarioTitle: string;
+  partnerRole: string;
+  goal: string;
+  language: { code: string; name: string };
+  level: TutorLevel;
+  status: "active" | "ended";
+  learnerTurns: number;
+  maxLearnerTurns: number;
+  summary: ConversationSummaryDto | null;
+  startedAt: string;
+  endedAt: string | null;
+};
+
+export type ConversationDto = { session: ConversationSessionDto; turns: ConversationTurnDto[] };

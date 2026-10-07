@@ -1,7 +1,12 @@
 // The small interface every LLM provider implements. The tutor only talks to this interface,
 // so switching Gemini ↔ Groq is one environment variable (LLM_PROVIDER).
 
-export type ChatTurn = { role: "user" | "assistant"; text: string };
+export type ChatTurn = {
+  role: "user" | "assistant";
+  text: string;
+  /** Phase 7: a recording sent with the text (Gemini only — it can listen to audio). */
+  audio?: { mimeType: string; data: Buffer };
+};
 
 export type GenerateRequest = {
   /** Rules for the model (the "system prompt"). */
@@ -12,6 +17,8 @@ export type GenerateRequest = {
   json: boolean;
   temperature: number;
   maxOutputTokens: number;
+  /** What the call is for — used for logs and by the offline test double. */
+  purpose?: "tutor" | "conversation" | "conversation-summary" | "transcription" | "pronunciation";
 };
 
 export type GenerateResult = {
@@ -42,10 +49,48 @@ export class LlmError extends Error {
       | "LLM_BAD_REQUEST"
       | "LLM_FAILED",
     message: string,
+    /** Rate limits only: which free-tier window ran out ("day" = wait until tomorrow). */
+    readonly quotaWindow: "day" | "minute" | null = null,
   ) {
     super(message);
     this.name = "LlmError";
   }
+}
+
+type GoogleErrorDetail = {
+  "@type"?: string;
+  retryDelay?: string;
+  violations?: Array<{
+    quotaId?: string;
+    quotaValue?: string;
+    quotaDimensions?: { model?: string };
+  }>;
+};
+
+/**
+ * Gemini's 429 body says WHICH quota ran out (per minute or per day, which model) and when to
+ * retry — turned into one readable line, e.g.
+ * "20 requests per day for gemini-3.5-flash (free tier) — retry in 43 s".
+ */
+export function describeQuota(
+  data: unknown,
+): { text: string; window: "day" | "minute" | null } | null {
+  const details = (data as { error?: { details?: GoogleErrorDetail[] } } | null)?.error?.details;
+  if (!Array.isArray(details)) return null;
+  const violation = details.find((d) => d.violations?.length)?.violations?.[0];
+  const retry = details.find((d) => d.retryDelay)?.retryDelay;
+  if (!violation) return null;
+  const id = violation.quotaId ?? "";
+  const window = /PerDay/i.test(id) ? "day" : /PerMinute/i.test(id) ? "minute" : null;
+  const what = /Token/i.test(id) ? "tokens" : "requests";
+  const model = violation.quotaDimensions?.model;
+  const text = [
+    `${violation.quotaValue ?? "?"} ${what} per ${window ?? "period"}`,
+    model ? ` for ${model}` : "",
+    /FreeTier/i.test(id) ? " (free tier)" : "",
+    retry ? ` — retry in ${Math.ceil(Number.parseFloat(retry))} s` : "",
+  ].join("");
+  return { text, window };
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -66,9 +111,44 @@ export async function postJson(
   providerLabel: string,
   retryDelaysMs: number[] = [1500, 4000],
 ): Promise<unknown> {
+  return withRetries(
+    () =>
+      postOnce(
+        url,
+        { "Content-Type": "application/json", ...headers },
+        JSON.stringify(body),
+        timeoutMs,
+        providerLabel,
+      ),
+    providerLabel,
+    retryDelaysMs,
+  );
+}
+
+/** POST multipart/form-data (file uploads, e.g. audio for speech-to-text), same error mapping. */
+export async function postFormData(
+  url: string,
+  headers: Record<string, string>,
+  form: FormData,
+  timeoutMs: number,
+  providerLabel: string,
+  retryDelaysMs: number[] = [1500, 4000],
+): Promise<unknown> {
+  return withRetries(
+    () => postOnce(url, headers, form, timeoutMs, providerLabel),
+    providerLabel,
+    retryDelaysMs,
+  );
+}
+
+async function withRetries(
+  call: () => Promise<unknown>,
+  providerLabel: string,
+  retryDelaysMs: number[],
+): Promise<unknown> {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await postOnce(url, headers, body, timeoutMs, providerLabel);
+      return await call();
     } catch (error) {
       const retryable =
         error instanceof LlmError &&
@@ -85,7 +165,7 @@ export async function postJson(
 async function postOnce(
   url: string,
   headers: Record<string, string>,
-  body: unknown,
+  body: string | FormData,
   timeoutMs: number,
   providerLabel: string,
 ): Promise<unknown> {
@@ -93,8 +173,8 @@ async function postOnce(
   try {
     response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify(body),
+      headers,
+      body,
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (error) {
@@ -121,9 +201,13 @@ async function postOnce(
     );
   }
   if (response.status === 429) {
+    const quota = describeQuota(data);
     throw new LlmError(
       "LLM_RATE_LIMITED",
-      `${providerLabel} quota/rate limit reached: ${providerMessage}`,
+      quota
+        ? `${providerLabel} free quota reached: ${quota.text}`
+        : `${providerLabel} quota/rate limit reached: ${providerMessage}`,
+      quota?.window ?? null,
     );
   }
   if (response.status === 404) {

@@ -159,6 +159,8 @@ model User {
   achievements     UserAchievement[]
   placementTests   PlacementTest[]
   aiConversations  AIConversation[]
+  speechAttempts   SpeechAttempt[]
+  conversations    ConversationSession[]
 }
 
 model UserProfile {
@@ -208,6 +210,9 @@ model Language {
   knowledgeDocuments KnowledgeDocument[]
   knowledgeChunks    KnowledgeChunk[]
   aiConversations    AIConversation[]
+  audioClips         AudioClip[]
+  speechAttempts     SpeechAttempt[]
+  conversations      ConversationSession[]
 }
 
 model Course {
@@ -314,8 +319,9 @@ model VocabularyItem {
   meaning      String
   topic        String
 
-  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
-  lessons  Lesson[]
+  language       Language        @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  lessons        Lesson[]
+  speechAttempts SpeechAttempt[]
 
   @@unique([languageId, script])
 }
@@ -667,4 +673,160 @@ model AIMessage {
   conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Speaking & conversation (Phase 7)
+// ─────────────────────────────────────────────────────────────
+//
+// Listening:  phrase → text-to-speech (cached in AudioClip) → play / replay / slow.
+// Speaking:   expected phrase → recording → speech-to-text → transcript → comparison → feedback.
+// Role-play:  scenario + level + vocabulary + RAG notes → AI partner → learner replies → summary.
+//
+// Learner recordings are NOT stored — only facts about them (length, size, format, timing).
+
+/// Where a recording came from.
+enum AudioInputSource {
+  RECORDED // the microphone in the app
+  UPLOADED // an audio file the learner chose
+}
+
+enum ConversationScenario {
+  INTRODUCTIONS
+  RESTAURANT
+  SHOPPING
+  TRAVEL
+  DIRECTIONS
+  EVERYDAY
+}
+
+enum ConversationStatus {
+  ACTIVE
+  ENDED
+}
+
+/// How the learner gave a conversation reply.
+enum ConversationInputMode {
+  TEXT
+  VOICE
+}
+
+/// Text-to-speech cache: each phrase is generated once (free-tier quota) and served from here.
+model AudioClip {
+  id           String   @id @default(cuid())
+  /// sha256(provider/model/voice + language + text) — the same text never generates twice
+  cacheKey     String   @unique
+  languageCode String
+  text         String
+  /// "gemini/<model>/<voice>"
+  provider     String
+  mimeType     String
+  sampleRate   Int
+  durationMs   Int
+  byteSize     Int
+  /// The audio file itself (WAV, usually 50–200 KB)
+  data         Bytes
+  hits         Int      @default(0)
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime @default(now())
+
+  language Language @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+
+  @@index([languageCode])
+}
+
+/// One speaking-exercise attempt: what was expected, what speech-to-text heard, and the feedback.
+model SpeechAttempt {
+  id                   String           @id @default(cuid())
+  userId               String
+  languageCode         String
+  /// The course word/phrase practised (null when a custom text was given)
+  vocabularyItemId     String?
+  expectedText         String
+  expectedRomanization String
+  transcript           String
+  /// Content match: 0–100 character similarity and its verdict (match, close, partial, different, nothing-heard)
+  contentScore         Int
+  contentVerdict       String
+  /// Word-by-word comparison [{ expected, heard, status, similarity }] + extra words
+  contentMatch         Json
+  /// Timing-based fluency { rating, pauses, longestPauseMs, lettersPerSecond, notes }
+  fluency              Json
+  /// AI pronunciation notes { supported, notes, overall, confident } (experimental)
+  pronunciation        Json?
+  /// Warnings about the recording (too quiet, noisy, distorted)
+  audioIssues          Json?
+  // ── audio metadata (the recording itself is not stored) ──
+  audioSource          AudioInputSource
+  audioMimeType        String
+  audioBytes           Int
+  audioDurationMs      Int
+  audioSampleRate      Int
+  /// Time with sound in the recording
+  speechMs             Int
+  /// "gemini/gemini-3.5-flash", "groq/whisper-large-v3" …
+  sttModel             String
+  latencyMs            Int
+  createdAt            DateTime         @default(now())
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language       Language        @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+  vocabularyItem VocabularyItem? @relation(fields: [vocabularyItemId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+/// One role-play conversation (e.g. ordering at a restaurant in Telugu).
+model ConversationSession {
+  id           String               @id @default(cuid())
+  userId       String
+  languageCode String
+  scenario     ConversationScenario
+  level        KnowledgeLevel
+  status       ConversationStatus   @default(ACTIVE)
+  /// Number of learner replies so far
+  learnerTurns Int                  @default(0)
+  /// End-of-session summary { stats, strengths, practise, usefulPhrases } (set when ended)
+  summary      Json?
+  startedAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  endedAt      DateTime?
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language           @relation(fields: [languageCode], references: [code], onDelete: Cascade)
+  turns    ConversationTurn[]
+
+  @@index([userId, startedAt])
+}
+
+/// One line in a role-play: the AI partner's line or the learner's reply.
+model ConversationTurn {
+  id           String                 @id @default(cuid())
+  sessionId    String
+  role         AIMessageRole
+  /// The line in the target language (native script)
+  text         String
+  romanization String?
+  translation  String?
+  /// Learner turns: typed or spoken (then text = the transcript the learner sent)
+  inputMode    ConversationInputMode?
+  /// Learner turns: voice metadata { durationMs, bytes, sttModel } (no audio stored)
+  audio        Json?
+  /// Learner turns: the partner's feedback { understood, correction, note }
+  feedback     Json?
+  /// AI turns: reply ideas for the learner [{ text, romanization, meaning }]
+  suggestions  Json?
+  /// AI turns: the knowledge-base notes used [{ id, heading, reference }]
+  references   Json?
+  /// AI turns: ANSWERED, or REFUSED when the learner's reply was a prompt-injection attempt
+  status       AIAnswerStatus?
+  /// AI turns: what the reply was based on — retrieval query, best similarity, level, word coverage
+  context      Json?
+  model        String?
+  latencyMs    Int?
+  createdAt    DateTime               @default(now())
+
+  session ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
 }

@@ -63,7 +63,20 @@ export class GeminiProvider implements LlmProvider {
       systemInstruction: { parts: [{ text: request.system }] },
       contents: request.turns.map((turn) => ({
         role: turn.role === "assistant" ? "model" : "user",
-        parts: [{ text: turn.text }],
+        parts: [
+          // Phase 7: Gemini can listen — a recording goes in as inline data next to the text.
+          ...(turn.audio
+            ? [
+                {
+                  inlineData: {
+                    mimeType: turn.audio.mimeType,
+                    data: turn.audio.data.toString("base64"),
+                  },
+                },
+              ]
+            : []),
+          { text: turn.text },
+        ],
       })),
       generationConfig: {
         temperature: request.temperature,

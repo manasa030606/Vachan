@@ -40,7 +40,7 @@ export class RateLimiter {
 }
 
 /** Express middleware (after requireAuth): limits by user id. */
-export function rateLimitByUser(limiter: RateLimiter) {
+export function rateLimitByUser(limiter: RateLimiter, feature = "tutor") {
   return (req: Request, res: Response, next: NextFunction) => {
     const blocked = limiter.hit(req.auth?.userId ?? req.ip ?? "anonymous");
     if (blocked) {
@@ -50,7 +50,7 @@ export function rateLimitByUser(limiter: RateLimiter) {
         "RATE_LIMITED",
         blocked.rule === "minute"
           ? `You're asking quickly! Please wait ${blocked.retryAfterSeconds} seconds.`
-          : "You've reached today's tutor limit. Please come back tomorrow.",
+          : `You've reached today's ${feature} limit. Please come back tomorrow.`,
         { retryAfterSeconds: blocked.retryAfterSeconds, limit: blocked.rule },
       );
     }

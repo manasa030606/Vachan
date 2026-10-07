@@ -15,6 +15,7 @@
     "test:api": "tsx --test --test-reporter=spec \"tests/*.test.ts\"",
     "test:rag": "tsx --test --test-reporter=spec \"tests/rag/**/*.test.ts\"",
     "test:tutor": "LLM_PROVIDER=mock TUTOR_RATE_LIMIT_PER_MINUTE=30 tsx --test --test-reporter=spec \"tests/tutor/**/*.test.ts\"",
+    "test:speech": "LLM_PROVIDER=mock STT_PROVIDER=mock TTS_PROVIDER=mock SPEECH_RATE_LIMIT_PER_MINUTE=100 CONVERSATION_RATE_LIMIT_PER_MINUTE=100 tsx --test --test-reporter=spec \"tests/speech/**/*.test.ts\"",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev && prisma generate",
@@ -27,6 +28,9 @@
     "rag:eval": "tsx src/rag/cli/evaluate-retrieval.ts",
     "ai:check": "tsx src/ai/cli/check-llm.ts",
     "tutor:eval": "tsx src/ai/cli/evaluate-tutor.ts",
+    "speech:check": "tsx src/speech/cli/check-speech.ts",
+    "speech:eval": "tsx src/speech/cli/evaluate-speech.ts",
+    "speech:prefetch": "tsx src/speech/cli/prefetch-audio.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -38,6 +42,7 @@
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -46,6 +51,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
     "@types/node": "^22.20.4",
     "eslint": "^9.39.5",
     "globals": "^16.5.0",

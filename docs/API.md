@@ -1,4 +1,4 @@
-# Vachan — API reference & Postman testing guide (Phase 4)
+# Vachan — API reference & Postman testing guide (Phases 2–7)
 
 Base URL: **`http://localhost:4000/api`** locally · **`https://vachan-api.onrender.com/api`** deployed (see [DEPLOYMENT.md](DEPLOYMENT.md)) · All bodies are JSON · All errors look like:
 
@@ -10,40 +10,55 @@ Base URL: **`http://localhost:4000/api`** locally · **`https://vachan-api.onren
 
 ## 1. Endpoint list
 
-| #   | Method | URL                          | Auth         | Purpose                                                                                                                                       |
-| --- | ------ | ---------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0   | GET    | `/api/health`                | none         | API + database status                                                                                                                         |
-| 1   | POST   | `/api/auth/register`         | none         | Create an account (logs you in)                                                                                                               |
-| 2   | POST   | `/api/auth/login`            | none         | Log in, get a token                                                                                                                           |
-| 27  | POST   | `/api/auth/logout`           | **required** | Log out (old tokens stop working)                                                                                                             |
-| 4   | GET    | `/api/me`                    | **required** | Current user + profile                                                                                                                        |
-| 5   | PATCH  | `/api/me`                    | **required** | Update profile (onboarding, settings, language)                                                                                               |
-| 6   | GET    | `/api/languages`             | none         | The six languages                                                                                                                             |
-| 7   | GET    | `/api/courses`               | none         | All courses (`?languageCode=te` to filter)                                                                                                    |
-| 8   | GET    | `/api/courses/:id`           | optional     | Course → units → lessons with status                                                                                                          |
-| 9   | GET    | `/api/lessons/:id`           | **required** | Lesson + exercises (no answers) + my progress                                                                                                 |
-| 10  | POST   | `/api/lessons/:id/start`     | **required** | start or resume a lesson                                                                                                                      |
-| 11  | POST   | `/api/exercises/:id/attempt` | **required** | Submit an answer (lesson or review); server checks it, returns feedback + rewards (§18)                                                       |
-| 12  | GET    | `/api/progress`              | **required** | My overall progress + resume point                                                                                                            |
-| 13  | GET    | `/api/progress/:lessonId`    | **required** | My progress in one lesson (per exercise)                                                                                                      |
-| 14  | GET    | `/api/review`                | **required** | open mistakes + words learned                                                                                                                 |
-| 15  | GET    | `/api/review/attempts`       | **required** | every incorrect answer                                                                                                                        |
-| 16  | GET    | `/api/review/session`        | **required** | Open mistakes as exercises to practise                                                                                                        |
-| 19  | GET    | `/api/stats`                 | **required** | **Phase 4** · XP, level, streak, hearts, daily goal, recent badges                                                                            |
-| 20  | GET    | `/api/streak`                | **required** | **Phase 4** · current/longest streak + last 7 days                                                                                            |
-| 21  | GET    | `/api/achievements`          | **required** | **Phase 4** · all badges with progress                                                                                                        |
-| 22  | GET    | `/api/recommendations`       | **required** | **Phase 4** · practice recommendations (transparent rules)                                                                                    |
-| 23  | POST   | `/api/placement/start`       | **required** | **Phase 4** · start a placement test                                                                                                          |
-| 24  | POST   | `/api/placement/answer`      | **required** | **Phase 4** · answer one placement question                                                                                                   |
-| 25  | GET    | `/api/placement/result`      | **required** | **Phase 4** · score per unit + recommended unit                                                                                               |
-| 26  | POST   | `/api/placement/decide`      | **required** | **Phase 4** · start at the recommended unit or Unit 1                                                                                         |
-| 28  | POST   | `/api/rag/search`            | **required** | **Phase 5** · knowledge-base retrieval: chunks + metadata + relevance ([RAG.md §7](RAG.md#7-retrieval))                                       |
-| 29  | GET    | `/api/rag/stats`             | **required** | **Phase 5** · what is indexed (per language / type / level, topics)                                                                           |
-| 30  | POST   | `/api/ai/tutor`              | **required** | **Phase 6** · AI tutor: grounded answer + sources ([AI_TUTOR.md §5](AI_TUTOR.md#5-api-all-require-login--bearer-token-or-the-website-cookie)) |
-| 31  | GET    | `/api/ai/tutor/context`      | **required** | **Phase 6** · learner context, suggested questions, availability                                                                              |
-| 32  | GET    | `/api/ai/conversations`      | **required** | **Phase 6** · my tutor chats                                                                                                                  |
-| 33  | GET    | `/api/ai/conversations/:id`  | **required** | **Phase 6** · one chat with messages                                                                                                          |
-| 34  | DELETE | `/api/ai/conversations/:id`  | **required** | **Phase 6** · delete a chat                                                                                                                   |
+| #   | Method | URL                              | Auth         | Purpose                                                                                                                                       |
+| --- | ------ | -------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0   | GET    | `/api/health`                    | none         | API + database status                                                                                                                         |
+| 1   | POST   | `/api/auth/register`             | none         | Create an account (logs you in)                                                                                                               |
+| 2   | POST   | `/api/auth/login`                | none         | Log in, get a token                                                                                                                           |
+| 27  | POST   | `/api/auth/logout`               | **required** | Log out (old tokens stop working)                                                                                                             |
+| 4   | GET    | `/api/me`                        | **required** | Current user + profile                                                                                                                        |
+| 5   | PATCH  | `/api/me`                        | **required** | Update profile (onboarding, settings, language)                                                                                               |
+| 6   | GET    | `/api/languages`                 | none         | The six languages                                                                                                                             |
+| 7   | GET    | `/api/courses`                   | none         | All courses (`?languageCode=te` to filter)                                                                                                    |
+| 8   | GET    | `/api/courses/:id`               | optional     | Course → units → lessons with status                                                                                                          |
+| 9   | GET    | `/api/lessons/:id`               | **required** | Lesson + exercises (no answers) + my progress                                                                                                 |
+| 10  | POST   | `/api/lessons/:id/start`         | **required** | start or resume a lesson                                                                                                                      |
+| 11  | POST   | `/api/exercises/:id/attempt`     | **required** | Submit an answer (lesson or review); server checks it, returns feedback + rewards (§18)                                                       |
+| 12  | GET    | `/api/progress`                  | **required** | My overall progress + resume point                                                                                                            |
+| 13  | GET    | `/api/progress/:lessonId`        | **required** | My progress in one lesson (per exercise)                                                                                                      |
+| 14  | GET    | `/api/review`                    | **required** | open mistakes + words learned                                                                                                                 |
+| 15  | GET    | `/api/review/attempts`           | **required** | every incorrect answer                                                                                                                        |
+| 16  | GET    | `/api/review/session`            | **required** | Open mistakes as exercises to practise                                                                                                        |
+| 19  | GET    | `/api/stats`                     | **required** | **Phase 4** · XP, level, streak, hearts, daily goal, recent badges                                                                            |
+| 20  | GET    | `/api/streak`                    | **required** | **Phase 4** · current/longest streak + last 7 days                                                                                            |
+| 21  | GET    | `/api/achievements`              | **required** | **Phase 4** · all badges with progress                                                                                                        |
+| 22  | GET    | `/api/recommendations`           | **required** | **Phase 4** · practice recommendations (transparent rules)                                                                                    |
+| 23  | POST   | `/api/placement/start`           | **required** | **Phase 4** · start a placement test                                                                                                          |
+| 24  | POST   | `/api/placement/answer`          | **required** | **Phase 4** · answer one placement question                                                                                                   |
+| 25  | GET    | `/api/placement/result`          | **required** | **Phase 4** · score per unit + recommended unit                                                                                               |
+| 26  | POST   | `/api/placement/decide`          | **required** | **Phase 4** · start at the recommended unit or Unit 1                                                                                         |
+| 28  | POST   | `/api/rag/search`                | **required** | **Phase 5** · knowledge-base retrieval: chunks + metadata + relevance ([RAG.md §7](RAG.md#7-retrieval))                                       |
+| 29  | GET    | `/api/rag/stats`                 | **required** | **Phase 5** · what is indexed (per language / type / level, topics)                                                                           |
+| 30  | POST   | `/api/ai/tutor`                  | **required** | **Phase 6** · AI tutor: grounded answer + sources ([AI_TUTOR.md §5](AI_TUTOR.md#5-api-all-require-login--bearer-token-or-the-website-cookie)) |
+| 31  | GET    | `/api/ai/tutor/context`          | **required** | **Phase 6** · learner context, suggested questions, availability                                                                              |
+| 32  | GET    | `/api/ai/conversations`          | **required** | **Phase 6** · my tutor chats                                                                                                                  |
+| 33  | GET    | `/api/ai/conversations/:id`      | **required** | **Phase 6** · one chat with messages                                                                                                          |
+| 34  | DELETE | `/api/ai/conversations/:id`      | **required** | **Phase 6** · delete a chat                                                                                                                   |
+| 35  | GET    | `/api/speech/status`             | **required** | **Phase 7** · speech providers, limits ([SPEECH.md §10](SPEECH.md#10-api))                                                                    |
+| 36  | GET    | `/api/speech/tts`                | **required** | **Phase 7** · WAV audio of a phrase (cached text-to-speech)                                                                                   |
+| 37  | POST   | `/api/speech/transcribe`         | **required** | **Phase 7** · multipart `audio` (WAV) → transcript                                                                                            |
+| 38  | POST   | `/api/speech/evaluate`           | **required** | **Phase 7** · speaking exercise: content match + pronunciation notes + fluency                                                                |
+| 39  | GET    | `/api/speech/phrases`            | **required** | **Phase 7** · words/phrases to practise + best score                                                                                          |
+| 40  | GET    | `/api/speech/attempts`           | **required** | **Phase 7** · my speaking attempts                                                                                                            |
+| 41  | GET    | `/api/speech/listening`          | **required** | **Phase 7** · listening-comprehension round                                                                                                   |
+| 42  | POST   | `/api/speech/listening/answer`   | **required** | **Phase 7** · check a listening answer                                                                                                        |
+| 43  | GET    | `/api/ai/conversation/scenarios` | **required** | **Phase 7** · the 6 role-play scenarios                                                                                                       |
+| 44  | POST   | `/api/ai/conversation`           | **required** | **Phase 7** · start a role-play                                                                                                               |
+| 45  | GET    | `/api/ai/conversation`           | **required** | **Phase 7** · my role-plays                                                                                                                   |
+| 46  | GET    | `/api/ai/conversation/:id`       | **required** | **Phase 7** · one role-play                                                                                                                   |
+| 47  | POST   | `/api/ai/conversation/:id/reply` | **required** | **Phase 7** · my reply → partner's answer + feedback                                                                                          |
+| 48  | POST   | `/api/ai/conversation/:id/end`   | **required** | **Phase 7** · end → summary                                                                                                                   |
+| 49  | DELETE | `/api/ai/conversation/:id`       | **required** | **Phase 7** · delete a role-play                                                                                                              |
 
 `PATCH /api/me` is from the spec's API table (section 11) and is needed so onboarding and settings are saved.
 
@@ -1299,6 +1314,27 @@ Prerequisites: `npm run rag:index -w backend`, a key in `backend/.env` (`npm run
 | `DELETE /ai/conversations/{{conversationId}}`, then `GET` it         | —                                                                                                   | `200`, then `404`                                                                                                                             |
 
 Full request/response examples and every error code: [AI_TUTOR.md §5](AI_TUTOR.md#5-api-all-require-login--bearer-token-or-the-website-cookie).
+
+## 5d. Speech & conversation (Phase 7) — folders 14 and 15
+
+Prerequisites: `npm install`, `npm run db:migrate -w backend`, `npm run rag:index -w backend`, `GEMINI_API_KEY` (`npm run speech:check -w backend` must say ✅), logged in (folder 1).
+
+**Audio requests are `multipart/form-data`**: Body → form-data → key `audio`, type **File** (a `.wav` from `postman/audio/`) + text keys. Set Postman's _Settings → General → Working directory_ to the repo's `postman/` folder so the saved file paths work, or reselect the file. Postman can't record — the sample WAV is a voice-like test signal, not real speech; for a real test save the TTS audio with **Send and Download** and upload it.
+
+| Request                                                                       | Body / query                                                                                | Expected                                                                                     |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GET /speech/status`                                                          | —                                                                                           | `200`, providers + limits, no keys                                                           |
+| `GET /speech/tts?vocabularyItemId=te-v16-hello`                               | —                                                                                           | `200 audio/wav`, `X-Audio-Source: generated` then `cache`                                    |
+| `POST /speech/transcribe`                                                     | form-data: `audio`=speech-sample.wav, `language`=te                                         | `200`, `transcript`, `audio.durationMs`                                                      |
+| `POST /speech/transcribe`                                                     | `silence.wav` · `too-short.wav` · `not-audio.txt` · no file                                 | `422 AUDIO_SILENT` · `422 AUDIO_TOO_SHORT` · `415 UNSUPPORTED_AUDIO_FORMAT` · `400 NO_AUDIO` |
+| `POST /speech/evaluate`                                                       | `audio`, `language`=te, `vocabularyItemId`=te-v16-hello                                     | `200`, separate `content`, `pronunciation`, `fluency`                                        |
+| `GET /speech/listening?language=te&count=4` → `POST /speech/listening/answer` | `{"token": "{{listeningToken}}", "choiceId": "a"}`                                          | questions without answers; `correct`, `correctChoiceId`                                      |
+| `POST /ai/conversation`                                                       | `{"scenario": "restaurant", "language": "te"}`                                              | `201`, partner line in Telugu script + references                                            |
+| `POST /ai/conversation/{{roleplayId}}/reply`                                  | `{"text": "నాకు భోజనం కావాలి"}` · voice: `+ "inputMode": "voice", "audio": {…}` · injection | `200` learner + partner turns; refused for the injection                                     |
+| `POST /ai/conversation/{{roleplayId}}/end`                                    | —                                                                                           | `200`, `summary.stats` + `summary.review`                                                    |
+| reply after end                                                               | `{"text": "హలో"}`                                                                           | `409 CONVERSATION_ENDED`                                                                     |
+
+Full formats, examples, error codes and limitations: [SPEECH.md](SPEECH.md).
 
 ## 6. Automated version of this guide
 

@@ -189,6 +189,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
         words={lesson.newWords}
         introText={lesson.introText}
         showRomanization={showRomanization}
+        languageCode={lesson.languageCode}
         status={lesson.progress.status}
         doneCount={state.completedIds.length}
         totalCount={state.totalExercises}

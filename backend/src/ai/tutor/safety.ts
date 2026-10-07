@@ -23,7 +23,7 @@ export function sanitizeQuestion(input: string): string {
 }
 
 const PROMPT_TAGS =
-  /<\/?\s*(context|question|learner|exercise|conversation|system|instructions?|rules)\b[^>]*>/gi;
+  /<\/?\s*(context|question|learner|exercise|conversation|system|instructions?|rules|scenario|vocabulary|notes|reply)\b[^>]*>/gi;
 
 export function neutralizeTags(text: string): string {
   return text.replace(PROMPT_TAGS, "");

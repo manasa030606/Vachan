@@ -1,5 +1,5 @@
 // One function per backend endpoint. Components call these instead of fetch().
-import { apiFetch } from "./client";
+import { apiBlob, apiFetch } from "./client";
 import type {
   AttemptAnswerDto,
   AttemptMode,
@@ -23,6 +23,17 @@ import type {
   TutorConversationDto,
   TutorMessageDto,
   UserDto,
+  ConversationDto,
+  ConversationSessionDto,
+  ListeningAnswerDto,
+  ListeningQuestionDto,
+  ScenarioId,
+  ScenarioListDto,
+  SpeakingEvaluationDto,
+  SpeechPhraseDto,
+  SpeechStatusDto,
+  TranscriptionDto,
+  TutorLevel,
 } from "./types";
 
 type AuthResponse = { user: UserDto; token: string };
@@ -150,3 +161,106 @@ export const deleteTutorConversation = (id: string) =>
   apiFetch<{ message: string }>(`/ai/conversations/${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
+
+// ── Speech & conversation (Phase 7) ──
+const SPEECH_TIMEOUT_MS = 70_000; // speech-to-text + AI notes (with retries on a busy free tier)
+const AI_TIMEOUT_MS = 90_000;
+
+const query = (params: Record<string, string | number | undefined>) => {
+  const text = new URLSearchParams(
+    Object.entries(params)
+      .filter(
+        (entry): entry is [string, string | number] => entry[1] !== undefined && entry[1] !== "",
+      )
+      .map(([key, value]) => [key, String(value)]),
+  ).toString();
+  return text ? `?${text}` : "";
+};
+
+export const getSpeechStatus = () => apiFetch<{ status: SpeechStatusDto }>("/speech/status");
+
+/** WAV audio of a course phrase, a listening question, or a short text. */
+export const getSpeechAudio = (
+  source: { vocabularyItemId: string } | { question: string } | { text: string; language: string },
+) => apiBlob(`/speech/tts${query(source)}`, { timeoutMs: SPEECH_TIMEOUT_MS });
+
+export const getSpeakingPhrases = (language?: string) =>
+  apiFetch<{
+    language: { code: string; name: string };
+    level: TutorLevel;
+    phrases: SpeechPhraseDto[];
+  }>(`/speech/phrases${query({ language })}`);
+
+/** The recording goes in the multipart field "audio" (WAV). */
+function audioForm(audio: Blob, fields: Record<string, string | undefined>) {
+  const form = new FormData();
+  form.append("audio", audio, "recording.wav");
+  for (const [key, value] of Object.entries(fields)) if (value) form.append(key, value);
+  return form;
+}
+
+export const transcribeAudio = (
+  audio: Blob,
+  fields: { language?: string; source: "recorded" | "uploaded" },
+) =>
+  apiFetch<TranscriptionDto>("/speech/transcribe", {
+    method: "POST",
+    body: audioForm(audio, fields),
+    timeoutMs: SPEECH_TIMEOUT_MS,
+  });
+
+export const evaluateSpeaking = (
+  audio: Blob,
+  fields: { language?: string; vocabularyItemId: string; source: "recorded" | "uploaded" },
+) =>
+  apiFetch<SpeakingEvaluationDto>("/speech/evaluate", {
+    method: "POST",
+    body: audioForm(audio, fields),
+    timeoutMs: SPEECH_TIMEOUT_MS,
+  });
+
+export const getListeningRound = (language?: string, count?: number) =>
+  apiFetch<{ language: { code: string; name: string }; questions: ListeningQuestionDto[] }>(
+    `/speech/listening${query({ language, count })}`,
+  );
+
+export const checkListeningAnswer = (token: string, choiceId: string) =>
+  apiFetch<ListeningAnswerDto>("/speech/listening/answer", {
+    method: "POST",
+    body: { token, choiceId },
+  });
+
+export const getScenarios = (language?: string) =>
+  apiFetch<ScenarioListDto>(`/ai/conversation/scenarios${query({ language })}`);
+
+export const startConversation = (body: { scenario: ScenarioId; language?: string }) =>
+  apiFetch<ConversationDto>("/ai/conversation", { method: "POST", body, timeoutMs: AI_TIMEOUT_MS });
+
+export const getConversationSessions = (language?: string) =>
+  apiFetch<{ sessions: ConversationSessionDto[] }>(`/ai/conversation${query({ language })}`);
+
+export const getConversationSession = (id: string) =>
+  apiFetch<ConversationDto>(`/ai/conversation/${encodeURIComponent(id)}`);
+
+export const replyToConversation = (
+  id: string,
+  body: {
+    text: string;
+    inputMode: "text" | "voice";
+    audio?: { durationMs?: number; bytes?: number; sttModel?: string };
+  },
+) =>
+  apiFetch<ConversationDto>(`/ai/conversation/${encodeURIComponent(id)}/reply`, {
+    method: "POST",
+    body,
+    timeoutMs: AI_TIMEOUT_MS,
+  });
+
+export const endConversation = (id: string) =>
+  apiFetch<ConversationDto>(`/ai/conversation/${encodeURIComponent(id)}/end`, {
+    method: "POST",
+    timeoutMs: AI_TIMEOUT_MS,
+  });
+
+export const deleteConversationSession = (id: string) =>
+  apiFetch<{ message: string }>(`/ai/conversation/${encodeURIComponent(id)}`, { method: "DELETE" });

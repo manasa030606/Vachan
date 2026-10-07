@@ -32,11 +32,15 @@ export function getLlmStatus() {
   };
 }
 
+/** Busy, slow, or out of free quota → the fallback model (each model has its own free quota). */
+export const FALLBACK_CODES: string[] = ["LLM_UNAVAILABLE", "LLM_TIMEOUT", "LLM_RATE_LIMITED"];
+
 /**
  * Optional LLM_FALLBACK_MODEL: if the main model is still busy after the retries (free-tier
- * "high demand" 503s), the same question is sent once to this other model of the same provider.
+ * "high demand" 503s), too slow, or out of its free quota (429), the same request is sent once to
+ * this other model of the same provider. Also used by speech-to-text and pronunciation notes.
  */
-class WithFallback implements LlmProvider {
+export class WithFallback implements LlmProvider {
   readonly name: string;
   readonly model: string;
   constructor(
@@ -50,10 +54,9 @@ class WithFallback implements LlmProvider {
     try {
       return await this.primary.generate(request);
     } catch (error) {
-      if (!(error instanceof LlmError) || !["LLM_UNAVAILABLE", "LLM_TIMEOUT"].includes(error.code))
-        throw error;
+      if (!(error instanceof LlmError) || !FALLBACK_CODES.includes(error.code)) throw error;
       console.warn(
-        `[llm] ${this.primary.model} unavailable — trying fallback ${this.fallback.model}`,
+        `[llm] ${this.primary.model} ${error.code} — trying fallback ${this.fallback.model}`,
       );
       return this.fallback.generate(request);
     }

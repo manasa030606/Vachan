@@ -46,6 +46,26 @@ const envSchema = z.object({
   // Per-learner limits for POST /api/ai/tutor (protects the free API quota).
   TUTOR_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(6),
   TUTOR_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(100),
+  // Phase 7 (speech). Same API keys as the tutor; nothing new is needed for the defaults.
+  // Speech-to-text: gemini (listens with the LLM model) · groq (Whisper) · mock (test double).
+  // Default: the same provider as LLM_PROVIDER.
+  STT_PROVIDER: z.enum(["gemini", "groq", "mock"]).optional(),
+  STT_MODEL: z.string().trim().min(1).optional(),
+  // Text-to-speech: gemini (Gemini TTS, cached in the database) · browser (no server audio —
+  // the learner's browser voice is used) · mock (test double). Default: gemini when the
+  // tutor uses Gemini, mock when it uses mock, otherwise browser.
+  TTS_PROVIDER: z.enum(["gemini", "browser", "mock"]).optional(),
+  // Optional: a specific Gemini TTS model (default: the newest "flash … tts" model of the key).
+  TTS_MODEL: z.string().trim().min(1).optional(),
+  TTS_VOICE: z.string().trim().min(1).default("Kore"),
+  SPEECH_TIMEOUT_MS: z.coerce.number().int().min(1000).max(120_000).default(30_000),
+  // AI pronunciation notes (Gemini listens to the recording again). "false" = timing + text only.
+  PRONUNCIATION_NOTES: z.enum(["true", "false"]).default("true"),
+  // Per-learner limits: transcribe/evaluate requests, and conversation replies.
+  SPEECH_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(10),
+  SPEECH_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(150),
+  CONVERSATION_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(8),
+  CONVERSATION_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(150),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -13,3 +13,5 @@ backend/evaluation/latest-results.json
 docs/RAG_EVALUATION.md
 backend/evaluation/tutor-latest-results.json
 docs/AI_TUTOR_EVALUATION.md
+backend/evaluation/speech-latest-results.json
+docs/SPEECH_EVALUATION.md

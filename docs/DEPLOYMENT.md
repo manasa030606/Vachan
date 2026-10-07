@@ -176,6 +176,14 @@ git add . && git commit -m "…" && git push
 - The next Render build applies the `20261008090000_phase6_ai_tutor` migration on Neon.
 - The tutor needs RAG search, which is off on Render free (see 5b), so `/tutor` shows "The tutor isn't available on this server yet" and `POST /api/ai/tutor` answers `503 TUTOR_UNAVAILABLE`. When you enable it on a bigger instance, add `GEMINI_API_KEY` in Render → **vachan-api** → **Environment** (never in Vercel). Details: [AI_TUTOR.md §8](AI_TUTOR.md#8-deployment).
 
+## 5d. Phase 7 (speech & conversation) on the deployed site
+
+- The next Render build applies `20261009090000_phase7_speech_conversation` on Neon (run `npm run db:deploy -w backend` from your Mac if your build doesn't migrate).
+- Re-index the knowledge base on Neon for the new `conversation.md` notes: `DATABASE_URL=<neon url> npm run rag:index -w backend` (from your Mac).
+- Add `GEMINI_API_KEY` in Render → **vachan-api** → **Environment** (never in Vercel). Speech-to-text, text-to-speech and the role-play work on the free plan; with RAG off the role-play partner uses only the course vocabulary (the UI says so).
+- Optional: pre-generate the demo audio into Neon: `DATABASE_URL=<neon url> npm run speech:prefetch -w backend -- --language te`.
+- The microphone needs https — Vercel is https, so it works. Details: [SPEECH.md §15](SPEECH.md#15-deployment-notes).
+
 ## 6. Troubleshooting
 
 | Problem                                                                      | Why                                                                                     | Fix                                                                                                                                          |

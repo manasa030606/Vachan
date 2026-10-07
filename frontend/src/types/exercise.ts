@@ -103,6 +103,8 @@ export type Lesson = {
   mode: LessonMode;
   title: string;
   unitTitle: string;
+  /** Course language code, e.g. "te" (used for audio). Empty for review sessions. */
+  languageCode: string;
   /** Words introduced before the exercises start ("Short introduction + examples"). */
   newWords: VocabularyWord[];
   /** Sentence shown on the intro screen. */

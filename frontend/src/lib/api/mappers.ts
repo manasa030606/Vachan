@@ -56,6 +56,7 @@ export function toLesson(dto: LessonDto): Lesson {
     title: dto.title,
     unitTitle: dto.unit.title,
     introText: dto.introText,
+    languageCode: dto.course.language.code,
     newWords: dto.vocabulary,
     exercises: dto.exercises.map(toExercise),
     progress: {
@@ -73,6 +74,7 @@ export function toReviewLesson(dto: ReviewSessionDto): Lesson {
     title: dto.title,
     unitTitle: "Practice",
     introText: dto.introText,
+    languageCode: "",
     newWords: [],
     exercises: dto.exercises.map((exercise) => toExercise(exercise)),
     progress: { status: "NOT_STARTED", completedExerciseIds: [] },

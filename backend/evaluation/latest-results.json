@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-10-06T05:50:11.055Z",
+  "generatedAt": "2026-10-06T13:55:05.215Z",
   "model": "Xenova/multilingual-e5-small",
   "k": 5,
-  "chunksIndexed": 394,
+  "chunksIndexed": 430,
   "summary": {
     "full": {
       "hitAt1": 0.945,
       "hitAt3": 0.982,
       "hitAt5": 0.982,
-      "mrr": 0.961,
+      "mrr": 0.964,
       "languagePrecision": 1,
       "inScopeSufficient": 1
     },
     "vectorOnly": {
       "hitAt1": 0.745,
-      "hitAt3": 0.836,
-      "hitAt5": 0.927,
-      "mrr": 0.805,
-      "languagePrecision": 0.618,
+      "hitAt3": 0.855,
+      "hitAt5": 0.945,
+      "mrr": 0.81,
+      "languagePrecision": 0.633,
       "inScopeSufficient": 1
     },
     "outOfScopeRejected": 0.9166666666666666,
@@ -32,7 +32,7 @@
     },
     {
       "name": "MRR@5",
-      "value": 0.961,
+      "value": 0.964,
       "min": 0.7,
       "passed": true
     },
@@ -74,22 +74,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9152,
+        "bestSimilarity": 0.9162,
         "top3": [
           {
             "id": "te/phrases#hello-namaskaaram",
-            "score": 0.9152,
-            "similarity": 0.9152
+            "score": 0.9162,
+            "similarity": 0.9162
           },
           {
             "id": "te/phrases#thank-you-dhanyavaadaalu",
-            "score": 0.899,
-            "similarity": 0.899
+            "score": 0.9022,
+            "similarity": 0.9022
           },
           {
-            "id": "te/phrases#how-are-you-meeru-elaa-unnaaru",
-            "score": 0.8956,
-            "similarity": 0.8956
+            "id": "te/phrases#please-and-sorry",
+            "score": 0.8992,
+            "similarity": 0.8992
           }
         ],
         "languageSource": "named-in-query"
@@ -117,22 +117,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9193,
+        "bestSimilarity": 0.9182,
         "top3": [
           {
             "id": "te/vocabulary#family-words",
-            "score": 0.9593,
-            "similarity": 0.9193
+            "score": 0.9582,
+            "similarity": 0.9182
           },
           {
             "id": "course/te/vocabulary#course-vocabulary-family",
-            "score": 0.945,
-            "similarity": 0.905
+            "score": 0.9396,
+            "similarity": 0.8996
           },
           {
             "id": "te/pronunciation#double-consonants-are-held-longer",
-            "score": 0.9235,
-            "similarity": 0.8835
+            "score": 0.9249,
+            "similarity": 0.8849
           }
         ],
         "languageSource": "named-in-query"
@@ -160,28 +160,28 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8848,
+        "bestSimilarity": 0.8883,
         "top3": [
           {
             "id": "te/grammar#word-order-subject-object-verb",
-            "score": 0.9148,
-            "similarity": 0.8848
+            "score": 0.9183,
+            "similarity": 0.8883
           },
           {
             "id": "te/pronunciation#words-end-in-vowels",
-            "score": 0.909,
-            "similarity": 0.879
+            "score": 0.9104,
+            "similarity": 0.8804
           },
           {
-            "id": "te/grammar#possessives-my-your-our",
-            "score": 0.9029,
-            "similarity": 0.8729
+            "id": "te/alphabet#how-telugu-writing-works",
+            "score": 0.901,
+            "similarity": 0.871
           }
         ],
         "languageSource": "named-in-query"
       },
       "vectorOnly": {
-        "rank": 4,
+        "rank": 3,
         "languagePrecision": 1
       }
     },
@@ -203,22 +203,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8444,
+        "bestSimilarity": 0.845,
         "top3": [
           {
             "id": "te/grammar#personal-pronouns",
-            "score": 0.8844,
-            "similarity": 0.8444
+            "score": 0.885,
+            "similarity": 0.845
           },
           {
             "id": "te/verbs#to-be-to-stay-undu",
-            "score": 0.8489,
-            "similarity": 0.8089
+            "score": 0.8479,
+            "similarity": 0.8079
           },
           {
-            "id": "te/verbs#habitual-and-future-tense-tinu-to-eat",
-            "score": 0.8419,
-            "similarity": 0.8019
+            "id": "te/verbs#past-tense-vellu-to-go",
+            "score": 0.8414,
+            "similarity": 0.8014
           }
         ],
         "languageSource": "script-in-query"
@@ -248,29 +248,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8898,
+        "bestSimilarity": 0.8927,
         "top3": [
           {
             "id": "te/examples#i-want-water",
-            "score": 0.8898,
-            "similarity": 0.8898
+            "score": 0.8927,
+            "similarity": 0.8927
+          },
+          {
+            "id": "course/te/vocabulary#course-vocabulary-phrases",
+            "score": 0.8629,
+            "similarity": 0.8629
           },
           {
             "id": "te/grammar#i-want-i-like-i-know-the-dative-construction",
-            "score": 0.8573,
-            "similarity": 0.8573
-          },
-          {
-            "id": "te/phrases#shopping-and-directions-idi-enta",
-            "score": 0.8568,
-            "similarity": 0.8568
+            "score": 0.8574,
+            "similarity": 0.8574
           }
         ],
         "languageSource": "request"
       },
       "vectorOnly": {
-        "rank": null,
-        "languagePrecision": 0
+        "rank": 5,
+        "languagePrecision": 0.2
       }
     },
     {
@@ -291,29 +291,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8406,
+        "bestSimilarity": 0.8365,
         "top3": [
           {
             "id": "te/alphabet#vowel-signs-and-the-talakattu-guninthaalu",
-            "score": 0.8406,
-            "similarity": 0.8406
-          },
-          {
-            "id": "te/phrases#yes-and-no",
-            "score": 0.8017,
-            "similarity": 0.8017
+            "score": 0.8365,
+            "similarity": 0.8365
           },
           {
             "id": "te/culture#festivals-ugadi-and-sankranti",
-            "score": 0.7988,
-            "similarity": 0.7988
+            "score": 0.7967,
+            "similarity": 0.7967
+          },
+          {
+            "id": "te/phrases#yes-and-no",
+            "score": 0.7954,
+            "similarity": 0.7954
           }
         ],
         "languageSource": "request"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.4
+        "languagePrecision": 0.2
       }
     },
     {
@@ -335,22 +335,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8769,
+        "bestSimilarity": 0.8748,
         "top3": [
           {
             "id": "te/verbs#past-tense-vellu-to-go",
-            "score": 0.9069,
-            "similarity": 0.8769
+            "score": 0.9048,
+            "similarity": 0.8748
           },
           {
             "id": "te/examples#i-am-going-home",
-            "score": 0.8601,
-            "similarity": 0.8451
+            "score": 0.861,
+            "similarity": 0.846
           },
           {
             "id": "te/verbs#present-continuous-i-am-eating",
-            "score": 0.8523,
-            "similarity": 0.8373
+            "score": 0.8552,
+            "similarity": 0.8402
           }
         ],
         "languageSource": "request"
@@ -378,29 +378,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.839,
+        "bestSimilarity": 0.8385,
         "top3": [
           {
             "id": "te/idioms#andani-draaksha-pullana",
-            "score": 0.839,
-            "similarity": 0.839
-          },
-          {
-            "id": "te/phrases#please-and-sorry",
-            "score": 0.8164,
-            "similarity": 0.8164
+            "score": 0.8385,
+            "similarity": 0.8385
           },
           {
             "id": "te/culture#showing-respect-and-family-words",
-            "score": 0.8137,
-            "similarity": 0.8137
+            "score": 0.8157,
+            "similarity": 0.8157
+          },
+          {
+            "id": "te/phrases#please-and-sorry",
+            "score": 0.8149,
+            "similarity": 0.8149
           }
         ],
         "languageSource": "request"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.4
+        "languagePrecision": 0.6
       }
     },
     {
@@ -421,28 +421,28 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8794,
+        "bestSimilarity": 0.8784,
         "top3": [
           {
             "id": "te/grammar#case-endings-postpositions",
-            "score": 0.9084,
-            "similarity": 0.8784
+            "score": 0.9067,
+            "similarity": 0.8767
           },
           {
             "id": "te/verbs#polite-requests-and-commands",
-            "score": 0.9005,
-            "similarity": 0.8705
+            "score": 0.9015,
+            "similarity": 0.8715
           },
           {
-            "id": "te/grammar#possessives-my-your-our",
-            "score": 0.8944,
-            "similarity": 0.8794
+            "id": "te/conversation#asking-for-directions-ekkada-undi",
+            "score": 0.8953,
+            "similarity": 0.8653
           }
         ],
         "languageSource": "named-in-query"
       },
       "vectorOnly": {
-        "rank": 2,
+        "rank": 3,
         "languagePrecision": 1
       }
     },
@@ -464,22 +464,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9334,
+        "bestSimilarity": 0.9336,
         "top3": [
           {
             "id": "hi/phrases#thank-you-dhanyavaad",
-            "score": 0.9334,
-            "similarity": 0.9334
+            "score": 0.9336,
+            "similarity": 0.9336
           },
           {
             "id": "hi/phrases#please-and-sorry",
-            "score": 0.893,
-            "similarity": 0.893
+            "score": 0.8926,
+            "similarity": 0.8926
           },
           {
-            "id": "hi/phrases#how-are-you-aap-kaise-hain",
-            "score": 0.8863,
-            "similarity": 0.8863
+            "id": "hi/phrases#my-name-is-meraa-naam-hai",
+            "score": 0.8895,
+            "similarity": 0.8895
           }
         ],
         "languageSource": "named-in-query"
@@ -506,29 +506,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8811,
+        "bestSimilarity": 0.8782,
         "top3": [
           {
             "id": "hi/pronunciation#silent-a-schwa-deletion",
-            "score": 0.9211,
-            "similarity": 0.8811
+            "score": 0.9182,
+            "similarity": 0.8782
           },
           {
             "id": "hi/grammar#grammatical-gender-masculine-and-feminine-nouns",
-            "score": 0.8775,
-            "similarity": 0.8375
+            "score": 0.879,
+            "similarity": 0.839
           },
           {
             "id": "hi/grammar#plurals",
-            "score": 0.8711,
-            "similarity": 0.8311
+            "score": 0.8757,
+            "similarity": 0.8357
           }
         ],
         "languageSource": "script-in-query"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.8
+        "languagePrecision": 1
       }
     },
     {
@@ -549,22 +549,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8917,
+        "bestSimilarity": 0.8924,
         "top3": [
           {
             "id": "hi/verbs#past-tense-with-ne-the-ergative",
-            "score": 0.9617,
-            "similarity": 0.8917
-          },
-          {
-            "id": "hi/phrases#shopping-and-directions-yah-kitne-kaa-hai",
-            "score": 0.9073,
-            "similarity": 0.8523
+            "score": 0.9624,
+            "similarity": 0.8924
           },
           {
             "id": "hi/grammar#plurals",
-            "score": 0.9053,
-            "similarity": 0.8503
+            "score": 0.9089,
+            "similarity": 0.8539
+          },
+          {
+            "id": "hi/phrases#shopping-and-directions-yah-kitne-kaa-hai",
+            "score": 0.9055,
+            "similarity": 0.8505
           }
         ],
         "languageSource": "named-in-query"
@@ -594,22 +594,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8521,
+        "bestSimilarity": 0.8487,
         "top3": [
           {
             "id": "hi/grammar#grammatical-gender-masculine-and-feminine-nouns",
-            "score": 0.8521,
-            "similarity": 0.8521
+            "score": 0.8487,
+            "similarity": 0.8487
           },
           {
             "id": "hi/beginner-guide#learn-every-noun-with-its-gender",
-            "score": 0.838,
-            "similarity": 0.838
+            "score": 0.8388,
+            "similarity": 0.8388
           },
           {
             "id": "hi/grammar#plurals",
-            "score": 0.8301,
-            "similarity": 0.8301
+            "score": 0.8322,
+            "similarity": 0.8322
           }
         ],
         "languageSource": "request"
@@ -639,22 +639,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8594,
+        "bestSimilarity": 0.8638,
         "top3": [
           {
             "id": "hi/grammar#three-forms-of-you",
-            "score": 0.8594,
-            "similarity": 0.8594
+            "score": 0.8638,
+            "similarity": 0.8638
           },
           {
             "id": "hi/beginner-guide#formal-and-informal-you",
-            "score": 0.8423,
-            "similarity": 0.8423
+            "score": 0.8443,
+            "similarity": 0.8443
           },
           {
             "id": "hi/phrases#how-are-you-aap-kaise-hain",
-            "score": 0.8197,
-            "similarity": 0.8197
+            "score": 0.8184,
+            "similarity": 0.8184
           }
         ],
         "languageSource": "request"
@@ -684,22 +684,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8828,
+        "bestSimilarity": 0.8822,
         "top3": [
           {
             "id": "hi/grammar#saying-not-and",
-            "score": 0.8828,
-            "similarity": 0.8828
-          },
-          {
-            "id": "hi/phrases#yes-and-no-haan-nahin",
-            "score": 0.8686,
-            "similarity": 0.8686
+            "score": 0.8822,
+            "similarity": 0.8822
           },
           {
             "id": "hi/phrases#how-are-you-aap-kaise-hain",
-            "score": 0.8681,
-            "similarity": 0.8681
+            "score": 0.8704,
+            "similarity": 0.8704
+          },
+          {
+            "id": "hi/phrases#yes-and-no-haan-nahin",
+            "score": 0.869,
+            "similarity": 0.869
           }
         ],
         "languageSource": "request"
@@ -727,22 +727,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9029,
+        "bestSimilarity": 0.9017,
         "top3": [
           {
             "id": "ta/phrases#hello-vanakkam",
-            "score": 0.9029,
-            "similarity": 0.9029
+            "score": 0.9017,
+            "similarity": 0.9017
           },
           {
             "id": "ta/culture#everyday-etiquette",
-            "score": 0.8951,
-            "similarity": 0.8951
+            "score": 0.8926,
+            "similarity": 0.8926
           },
           {
-            "id": "ta/phrases#thank-you-nandri",
-            "score": 0.8833,
-            "similarity": 0.8833
+            "id": "ta/conversation#introductions-ungalaich-chandhiththadhil-magizhchi",
+            "score": 0.8895,
+            "similarity": 0.8895
           }
         ],
         "languageSource": "named-in-query"
@@ -770,22 +770,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8849,
+        "bestSimilarity": 0.883,
         "top3": [
           {
             "id": "ta/pronunciation#the-special-sound-zha",
-            "score": 0.8849,
-            "similarity": 0.8849
+            "score": 0.883,
+            "similarity": 0.883
           },
           {
             "id": "ta/pronunciation#three-l-sounds",
-            "score": 0.8785,
-            "similarity": 0.8785
+            "score": 0.8752,
+            "similarity": 0.8752
           },
           {
             "id": "ta/pronunciation#short-and-long-vowels-change-the-meaning",
-            "score": 0.8347,
-            "similarity": 0.8347
+            "score": 0.8374,
+            "similarity": 0.8374
           }
         ],
         "languageSource": "script-in-query"
@@ -813,28 +813,28 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8533,
+        "bestSimilarity": 0.8485,
         "top3": [
           {
             "id": "ta/phrases#thank-you-nandri",
-            "score": 0.8933,
-            "similarity": 0.8533
+            "score": 0.8885,
+            "similarity": 0.8485
           },
           {
             "id": "course/ta/vocabulary#course-vocabulary-greetings",
-            "score": 0.8495,
-            "similarity": 0.8095
+            "score": 0.8429,
+            "similarity": 0.8029
           },
           {
-            "id": "ta/pronunciation#three-n-sounds-and-two-r-sounds",
-            "score": 0.8182,
-            "similarity": 0.7782
+            "id": "ta/conversation#at-a-restaurant-enakku-saappaadu-vendum",
+            "score": 0.8331,
+            "similarity": 0.7931
           }
         ],
         "languageSource": "script-in-query"
       },
       "vectorOnly": {
-        "rank": 3,
+        "rank": 2,
         "languagePrecision": 0.2
       }
     },
@@ -856,29 +856,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9101,
+        "bestSimilarity": 0.9109,
         "top3": [
           {
             "id": "ta/vocabulary#numbers-1-to-10",
-            "score": 0.9101,
-            "similarity": 0.9101
+            "score": 0.9109,
+            "similarity": 0.9109
           },
           {
             "id": "course/ta/vocabulary#course-vocabulary-numbers",
-            "score": 0.8659,
-            "similarity": 0.8659
+            "score": 0.869,
+            "similarity": 0.869
           },
           {
             "id": "ta/alphabet#how-tamil-writing-works",
-            "score": 0.8573,
-            "similarity": 0.8573
+            "score": 0.8587,
+            "similarity": 0.8587
           }
         ],
         "languageSource": "named-in-query"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.2
+        "languagePrecision": 0.4
       }
     },
     {
@@ -899,22 +899,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8565,
+        "bestSimilarity": 0.8575,
         "top3": [
           {
             "id": "ta/culture#festivals-pongal-and-puthandu",
-            "score": 0.8565,
-            "similarity": 0.8565
+            "score": 0.8575,
+            "similarity": 0.8575
           },
           {
             "id": "ta/verbs#past-tense-po-to-go",
-            "score": 0.7987,
-            "similarity": 0.7987
+            "score": 0.803,
+            "similarity": 0.803
           },
           {
             "id": "ta/grammar#plurals",
-            "score": 0.781,
-            "similarity": 0.781
+            "score": 0.7798,
+            "similarity": 0.7798
           }
         ],
         "languageSource": "request"
@@ -945,7 +945,7 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8557,
+        "bestSimilarity": 0.8577,
         "top3": [
           {
             "id": "course/ta/vocabulary#course-vocabulary-food-drink",
@@ -954,20 +954,20 @@
           },
           {
             "id": "ta/vocabulary#food-and-drink",
-            "score": 0.8716,
-            "similarity": 0.8316
+            "score": 0.8713,
+            "similarity": 0.8313
           },
           {
             "id": "ta/examples#i-want-water",
-            "score": 0.8557,
-            "similarity": 0.8557
+            "score": 0.8577,
+            "similarity": 0.8577
           }
         ],
         "languageSource": "request"
       },
       "vectorOnly": {
-        "rank": null,
-        "languagePrecision": 0
+        "rank": 5,
+        "languagePrecision": 0.2
       }
     },
     {
@@ -987,22 +987,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9173,
+        "bestSimilarity": 0.9192,
         "top3": [
           {
             "id": "ml/alphabet#chillu-letters-chillaksharangal",
-            "score": 0.9173,
-            "similarity": 0.9173
+            "score": 0.9192,
+            "similarity": 0.9192
           },
           {
             "id": "ml/alphabet#how-malayalam-writing-works",
-            "score": 0.875,
-            "similarity": 0.875
+            "score": 0.8726,
+            "similarity": 0.8726
           },
           {
             "id": "ml/alphabet#the-chandrakkala-and-the-half-u",
-            "score": 0.8686,
-            "similarity": 0.8686
+            "score": 0.8689,
+            "similarity": 0.8689
           }
         ],
         "languageSource": "named-in-query"
@@ -1031,22 +1031,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8996,
+        "bestSimilarity": 0.8991,
         "top3": [
           {
             "id": "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
-            "score": 0.8996,
-            "similarity": 0.8996
+            "score": 0.8991,
+            "similarity": 0.8991
           },
           {
             "id": "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone",
-            "score": 0.8899,
-            "similarity": 0.8899
+            "score": 0.8924,
+            "similarity": 0.8924
           },
           {
             "id": "ml/grammar#personal-pronouns",
-            "score": 0.8897,
-            "similarity": 0.8897
+            "score": 0.8887,
+            "similarity": 0.8887
           }
         ],
         "languageSource": "named-in-query"
@@ -1074,22 +1074,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9221,
+        "bestSimilarity": 0.9242,
         "top3": [
           {
             "id": "ml/phrases#how-are-you-ningalkku-sukhamaano",
-            "score": 0.9221,
-            "similarity": 0.9221
-          },
-          {
-            "id": "ml/examples#how-are-you-i-am-fine",
-            "score": 0.9071,
-            "similarity": 0.9071
+            "score": 0.9242,
+            "similarity": 0.9242
           },
           {
             "id": "ml/grammar#asking-questions",
-            "score": 0.9043,
-            "similarity": 0.9043
+            "score": 0.9072,
+            "similarity": 0.9072
+          },
+          {
+            "id": "ml/examples#how-are-you-i-am-fine",
+            "score": 0.9049,
+            "similarity": 0.9049
           }
         ],
         "languageSource": "named-in-query"
@@ -1118,22 +1118,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8557,
+        "bestSimilarity": 0.8527,
         "top3": [
           {
             "id": "ml/examples#i-want-water",
-            "score": 0.8957,
-            "similarity": 0.8557
+            "score": 0.8927,
+            "similarity": 0.8527
           },
           {
             "id": "ml/phrases#yes-and-no",
-            "score": 0.8809,
-            "similarity": 0.8409
+            "score": 0.8801,
+            "similarity": 0.8401
           },
           {
-            "id": "course/ml/vocabulary#course-vocabulary-food-drink",
-            "score": 0.8725,
-            "similarity": 0.8325
+            "id": "course/ml/vocabulary#course-vocabulary-phrases",
+            "score": 0.8755,
+            "similarity": 0.8355
           }
         ],
         "languageSource": "script-in-query"
@@ -1161,22 +1161,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8526,
+        "bestSimilarity": 0.8523,
         "top3": [
           {
             "id": "ml/culture#festivals-onam-and-vishu",
-            "score": 0.8526,
-            "similarity": 0.8526
+            "score": 0.8523,
+            "similarity": 0.8523
           },
           {
             "id": "ml/verbs#future-tense-um",
-            "score": 0.7911,
-            "similarity": 0.7911
+            "score": 0.791,
+            "similarity": 0.791
           },
           {
             "id": "ml/idioms#aana-koduthaalum-aasha-kodukkaruthu",
-            "score": 0.7829,
-            "similarity": 0.7829
+            "score": 0.7864,
+            "similarity": 0.7864
           }
         ],
         "languageSource": "request"
@@ -1205,22 +1205,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9215,
+        "bestSimilarity": 0.9198,
         "top3": [
           {
             "id": "kn/phrases#my-name-is-nanna-hesaru",
-            "score": 0.9215,
-            "similarity": 0.9215
+            "score": 0.9198,
+            "similarity": 0.9198
           },
           {
             "id": "kn/examples#my-name-is-asha",
-            "score": 0.9021,
-            "similarity": 0.9021
+            "score": 0.8988,
+            "similarity": 0.8988
           },
           {
-            "id": "kn/grammar#possessives-my-your-our",
-            "score": 0.8966,
-            "similarity": 0.8966
+            "id": "kn/conversation#introductions-nimmannu-bhetiyaagi-santoshavaayitu",
+            "score": 0.8979,
+            "similarity": 0.8979
           }
         ],
         "languageSource": "named-in-query"
@@ -1248,22 +1248,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9286,
+        "bestSimilarity": 0.9284,
         "top3": [
           {
             "id": "kn/vocabulary#family-words",
-            "score": 0.9286,
-            "similarity": 0.9286
+            "score": 0.9284,
+            "similarity": 0.9284
           },
           {
             "id": "course/kn/vocabulary#course-vocabulary-family",
-            "score": 0.9102,
-            "similarity": 0.9102
+            "score": 0.909,
+            "similarity": 0.909
           },
           {
             "id": "kn/pronunciation#double-consonants-are-held-longer",
-            "score": 0.9,
-            "similarity": 0.9
+            "score": 0.8994,
+            "similarity": 0.8994
           }
         ],
         "languageSource": "named-in-query"
@@ -1290,29 +1290,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8721,
+        "bestSimilarity": 0.8808,
         "top3": [
           {
             "id": "kn/idioms#kai-kesaraadare-baayi-mosaru",
-            "score": 0.9121,
-            "similarity": 0.8721
+            "score": 0.9208,
+            "similarity": 0.8808
           },
           {
             "id": "kn/vocabulary#food-and-drink",
-            "score": 0.86,
-            "similarity": 0.82
+            "score": 0.8627,
+            "similarity": 0.8227
           },
           {
             "id": "kn/alphabet#vowel-signs-and-the-talekattu-kaagunita",
-            "score": 0.8519,
-            "similarity": 0.8119
+            "score": 0.8525,
+            "similarity": 0.8125
           }
         ],
         "languageSource": "script-in-query"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.6
+        "languagePrecision": 1
       }
     },
     {
@@ -1334,22 +1334,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9066,
+        "bestSimilarity": 0.9077,
         "top3": [
           {
             "id": "kn/grammar#gender-in-kannada-verbs",
-            "score": 0.9366,
-            "similarity": 0.9066
+            "score": 0.9377,
+            "similarity": 0.9077
           },
           {
             "id": "kn/verbs#past-tense-hogu-to-go",
-            "score": 0.9083,
-            "similarity": 0.8783
+            "score": 0.9067,
+            "similarity": 0.8767
           },
           {
             "id": "kn/verbs#to-be-to-stay-iru",
-            "score": 0.8994,
-            "similarity": 0.8844
+            "score": 0.899,
+            "similarity": 0.884
           }
         ],
         "languageSource": "named-in-query"
@@ -1377,17 +1377,17 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8176,
+        "bestSimilarity": 0.8153,
         "top3": [
           {
             "id": "kn/alphabet#conjunct-letters-ottakshara",
-            "score": 0.8176,
-            "similarity": 0.8176
+            "score": 0.8153,
+            "similarity": 0.8153
           },
           {
             "id": "kn/pronunciation#double-consonants-are-held-longer",
-            "score": 0.7839,
-            "similarity": 0.7839
+            "score": 0.7832,
+            "similarity": 0.7832
           },
           {
             "id": "kn/culture#showing-respect-and-family-words",
@@ -1420,29 +1420,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8682,
+        "bestSimilarity": 0.8664,
         "top3": [
           {
             "id": "kn/phrases#goodbye-hogi-baruttene",
-            "score": 0.8682,
-            "similarity": 0.8682
+            "score": 0.8664,
+            "similarity": 0.8664
           },
           {
             "id": "kn/phrases#how-are-you-neevu-hegiddeeri",
-            "score": 0.8591,
-            "similarity": 0.8591
+            "score": 0.8607,
+            "similarity": 0.8607
           },
           {
-            "id": "kn/phrases#please-and-sorry",
-            "score": 0.8416,
-            "similarity": 0.8416
+            "id": "kn/conversation#everyday-conversation-oota-aaytaa",
+            "score": 0.8518,
+            "similarity": 0.8518
           }
         ],
         "languageSource": "request"
       },
       "vectorOnly": {
-        "rank": 5,
-        "languagePrecision": 0.2
+        "rank": null,
+        "languagePrecision": 0
       }
     },
     {
@@ -1462,22 +1462,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9087,
+        "bestSimilarity": 0.91,
         "top3": [
           {
             "id": "kn/beginner-guide#how-to-start-learning-kannada",
-            "score": 0.9087,
-            "similarity": 0.9087
+            "score": 0.91,
+            "similarity": 0.91
           },
           {
             "id": "kn/beginner-guide#formal-and-informal-you",
-            "score": 0.8661,
-            "similarity": 0.8661
+            "score": 0.8686,
+            "similarity": 0.8686
           },
           {
             "id": "kn/grammar#asking-questions",
-            "score": 0.8644,
-            "similarity": 0.8644
+            "score": 0.8639,
+            "similarity": 0.8639
           }
         ],
         "languageSource": "named-in-query"
@@ -1505,22 +1505,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9118,
+        "bestSimilarity": 0.9117,
         "top3": [
           {
             "id": "bn/phrases#hello-nomoshkar",
-            "score": 0.9118,
-            "similarity": 0.9118
-          },
-          {
-            "id": "bn/phrases#please-and-sorry",
-            "score": 0.8934,
-            "similarity": 0.8934
+            "score": 0.9117,
+            "similarity": 0.9117
           },
           {
             "id": "bn/phrases#thank-you-dhonnobad",
-            "score": 0.8911,
-            "similarity": 0.8911
+            "score": 0.8922,
+            "similarity": 0.8922
+          },
+          {
+            "id": "bn/phrases#please-and-sorry",
+            "score": 0.8906,
+            "similarity": 0.8906
           }
         ],
         "languageSource": "named-in-query"
@@ -1549,22 +1549,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8709,
+        "bestSimilarity": 0.8721,
         "top3": [
           {
             "id": "bn/pronunciation#the-inherent-vowel-is-read-o",
-            "score": 0.8709,
-            "similarity": 0.8709
+            "score": 0.8721,
+            "similarity": 0.8721
           },
           {
             "id": "bn/alphabet#vowels-shoroborno",
-            "score": 0.8453,
-            "similarity": 0.8453
+            "score": 0.843,
+            "similarity": 0.843
           },
           {
-            "id": "bn/pronunciation#and-sound-almost-the-same",
-            "score": 0.8414,
-            "similarity": 0.8414
+            "id": "bn/beginner-guide#reading-the-romanization",
+            "score": 0.8428,
+            "similarity": 0.8428
           }
         ],
         "languageSource": "script-in-query"
@@ -1593,22 +1593,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8892,
+        "bestSimilarity": 0.8879,
         "top3": [
           {
             "id": "bn/grammar#three-levels-of-you",
-            "score": 0.9292,
-            "similarity": 0.8892
+            "score": 0.9279,
+            "similarity": 0.8879
           },
           {
             "id": "bn/beginner-guide#formal-and-informal-you",
-            "score": 0.9133,
-            "similarity": 0.8733
+            "score": 0.9107,
+            "similarity": 0.8707
           },
           {
             "id": "bn/phrases#how-are-you-aapni-kemon-aachhen",
-            "score": 0.9004,
-            "similarity": 0.8604
+            "score": 0.9023,
+            "similarity": 0.8623
           }
         ],
         "languageSource": "script-in-query"
@@ -1635,22 +1635,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.9103,
+        "bestSimilarity": 0.9094,
         "top3": [
           {
             "id": "bn/grammar#no-gender-in-bengali-verbs",
-            "score": 0.9103,
-            "similarity": 0.9103
+            "score": 0.9094,
+            "similarity": 0.9094
           },
           {
             "id": "bn/verbs#to-be-aachhi-aachho-aachhen",
-            "score": 0.8753,
-            "similarity": 0.8753
+            "score": 0.8739,
+            "similarity": 0.8739
           },
           {
             "id": "bn/grammar#personal-pronouns",
-            "score": 0.8713,
-            "similarity": 0.8713
+            "score": 0.8679,
+            "similarity": 0.8679
           }
         ],
         "languageSource": "named-in-query"
@@ -1677,29 +1677,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8701,
+        "bestSimilarity": 0.8736,
         "top3": [
           {
             "id": "bn/grammar#classifiers",
-            "score": 0.9101,
-            "similarity": 0.8701
+            "score": 0.9136,
+            "similarity": 0.8736
           },
           {
             "id": "bn/pronunciation#dental-and-retroflex-sounds",
-            "score": 0.8711,
-            "similarity": 0.8311
+            "score": 0.8734,
+            "similarity": 0.8334
           },
           {
             "id": "bn/grammar#plurals",
-            "score": 0.8576,
-            "similarity": 0.8176
+            "score": 0.8554,
+            "similarity": 0.8154
           }
         ],
         "languageSource": "script-in-query"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.4
+        "languagePrecision": 0.6
       }
     },
     {
@@ -1719,22 +1719,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8925,
+        "bestSimilarity": 0.8933,
         "top3": [
           {
             "id": "bn/culture#international-mother-language-day-21-february",
-            "score": 0.8925,
-            "similarity": 0.8925
-          },
-          {
-            "id": "bn/verbs#to-be-aachhi-aachho-aachhen",
-            "score": 0.8345,
-            "similarity": 0.8345
+            "score": 0.8933,
+            "similarity": 0.8933
           },
           {
             "id": "bn/culture#festivals-durga-puja-and-pohela-boishakh",
-            "score": 0.8339,
-            "similarity": 0.8339
+            "score": 0.8381,
+            "similarity": 0.8381
+          },
+          {
+            "id": "bn/phrases#yes-and-no-hyaan-naa",
+            "score": 0.8324,
+            "similarity": 0.8324
           }
         ],
         "languageSource": "named-in-query"
@@ -1763,22 +1763,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8534,
+        "bestSimilarity": 0.8547,
         "top3": [
           {
             "id": "bn/verbs#future-tense-jaabo",
-            "score": 0.8834,
-            "similarity": 0.8534
+            "score": 0.8847,
+            "similarity": 0.8547
           },
           {
             "id": "bn/verbs#to-be-aachhi-aachho-aachhen",
-            "score": 0.8522,
-            "similarity": 0.8222
+            "score": 0.852,
+            "similarity": 0.822
           },
           {
             "id": "bn/vocabulary#time-words",
-            "score": 0.8514,
-            "similarity": 0.8214
+            "score": 0.8508,
+            "similarity": 0.8208
           }
         ],
         "languageSource": "request"
@@ -1806,29 +1806,29 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8462,
+        "bestSimilarity": 0.8463,
         "top3": [
           {
             "id": "te/phrases#hello-namaskaaram",
-            "score": 0.8862,
-            "similarity": 0.8462
+            "score": 0.8863,
+            "similarity": 0.8463
+          },
+          {
+            "id": "te/conversation#introductions-mimmalni-kalavadam-santosham",
+            "score": 0.8662,
+            "similarity": 0.8262
           },
           {
             "id": "te/examples#my-name-is-asha",
-            "score": 0.843,
-            "similarity": 0.803
-          },
-          {
-            "id": "te/phrases#i-dont-understand-naaku-artham-kaaledu",
-            "score": 0.8385,
-            "similarity": 0.7985
+            "score": 0.8414,
+            "similarity": 0.8014
           }
         ],
         "languageSource": "script-in-query"
       },
       "vectorOnly": {
         "rank": 1,
-        "languagePrecision": 0.8
+        "languagePrecision": 0.4
       }
     },
     {
@@ -1851,22 +1851,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8481,
+        "bestSimilarity": 0.8491,
         "top3": [
           {
             "id": "te/phrases#how-are-you-meeru-elaa-unnaaru",
-            "score": 0.8481,
-            "similarity": 0.8481
+            "score": 0.8491,
+            "similarity": 0.8491
           },
           {
             "id": "te/culture#everyday-etiquette",
-            "score": 0.8429,
-            "similarity": 0.8429
+            "score": 0.8418,
+            "similarity": 0.8418
           },
           {
             "id": "te/phrases#please-and-sorry",
-            "score": 0.8333,
-            "similarity": 0.8333
+            "score": 0.8322,
+            "similarity": 0.8322
           }
         ],
         "languageSource": "request"
@@ -1893,22 +1893,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8913,
+        "bestSimilarity": 0.8895,
         "top3": [
           {
             "id": "te/culture#festivals-ugadi-and-sankranti",
-            "score": 0.8913,
-            "similarity": 0.8913
+            "score": 0.8895,
+            "similarity": 0.8895
           },
           {
             "id": "te/culture#where-telugu-is-spoken",
-            "score": 0.8312,
-            "similarity": 0.8312
+            "score": 0.8303,
+            "similarity": 0.8303
           },
           {
             "id": "te/alphabet#vowel-signs-and-the-talakattu-guninthaalu",
-            "score": 0.8284,
-            "similarity": 0.8284
+            "score": 0.8294,
+            "similarity": 0.8294
           }
         ],
         "languageSource": "named-in-query"
@@ -1936,22 +1936,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8826,
+        "bestSimilarity": 0.8838,
         "top3": [
           {
             "id": "hi/grammar#i-want-i-like-i-know-the-dative-construction",
-            "score": 0.8826,
-            "similarity": 0.8826
+            "score": 0.8838,
+            "similarity": 0.8838
           },
           {
             "id": "hi/examples#i-want-water",
-            "score": 0.8808,
-            "similarity": 0.8808
+            "score": 0.8799,
+            "similarity": 0.8799
           },
           {
-            "id": "hi/phrases#shopping-and-directions-yah-kitne-kaa-hai",
-            "score": 0.8643,
-            "similarity": 0.8643
+            "id": "hi/conversation#at-a-restaurant-mujhe-khaanaa-chaahiye",
+            "score": 0.8663,
+            "similarity": 0.8663
           }
         ],
         "languageSource": "named-in-query"
@@ -1978,22 +1978,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8959,
+        "bestSimilarity": 0.8951,
         "top3": [
           {
             "id": "hi/examples#i-dont-know-hindi-well",
-            "score": 0.9359,
-            "similarity": 0.8959
+            "score": 0.9351,
+            "similarity": 0.8951
           },
           {
             "id": "hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa",
-            "score": 0.9032,
-            "similarity": 0.8632
+            "score": 0.903,
+            "similarity": 0.863
           },
           {
-            "id": "hi/idioms#daal-mein-kuchh-kaalaa-hai",
-            "score": 0.8816,
-            "similarity": 0.8416
+            "id": "hi/examples#how-are-you-i-am-fine",
+            "score": 0.8812,
+            "similarity": 0.8412
           }
         ],
         "languageSource": "script-in-query"
@@ -2014,36 +2014,36 @@
         "hi/vocabulary#colours"
       ],
       "full": {
-        "rank": 3,
+        "rank": 2,
         "hit1": false,
         "hit3": true,
         "hit5": true,
-        "reciprocalRank": 0.3333333333333333,
+        "reciprocalRank": 0.5,
         "languagePrecision": 1,
         "harderInTop3": 1,
         "sufficient": true,
-        "bestSimilarity": 0.8744,
+        "bestSimilarity": 0.8768,
         "top3": [
           {
             "id": "hi/vocabulary#family-words",
-            "score": 0.8516,
-            "similarity": 0.8216
-          },
-          {
-            "id": "course/hi/vocabulary#course-letters-and-sounds",
-            "score": 0.8446,
-            "similarity": 0.8146
+            "score": 0.8521,
+            "similarity": 0.8221
           },
           {
             "id": "hi/vocabulary#colours",
-            "score": 0.8444,
-            "similarity": 0.8744
+            "score": 0.8468,
+            "similarity": 0.8768
+          },
+          {
+            "id": "course/hi/vocabulary#course-letters-and-sounds",
+            "score": 0.8467,
+            "similarity": 0.8167
           }
         ],
         "languageSource": "request"
       },
       "vectorOnly": {
-        "rank": 2,
+        "rank": 1,
         "languagePrecision": 0.2
       }
     },
@@ -2056,36 +2056,36 @@
         "ta/beginner-guide#spoken-and-written-tamil"
       ],
       "full": {
-        "rank": 1,
-        "hit1": true,
+        "rank": 2,
+        "hit1": false,
         "hit3": true,
         "hit5": true,
-        "reciprocalRank": 1,
+        "reciprocalRank": 0.5,
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8769,
+        "bestSimilarity": 0.8786,
         "top3": [
           {
-            "id": "ta/beginner-guide#spoken-and-written-tamil",
-            "score": 0.8769,
-            "similarity": 0.8769
+            "id": "ta/alphabet#how-tamil-writing-works",
+            "score": 0.8786,
+            "similarity": 0.8786
           },
           {
-            "id": "ta/alphabet#how-tamil-writing-works",
-            "score": 0.8765,
-            "similarity": 0.8765
+            "id": "ta/beginner-guide#spoken-and-written-tamil",
+            "score": 0.8742,
+            "similarity": 0.8742
           },
           {
             "id": "ta/culture#where-tamil-is-spoken",
-            "score": 0.8674,
-            "similarity": 0.8674
+            "score": 0.868,
+            "similarity": 0.868
           }
         ],
         "languageSource": "named-in-query"
       },
       "vectorOnly": {
-        "rank": 1,
+        "rank": 2,
         "languagePrecision": 1
       }
     },
@@ -2107,22 +2107,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8682,
+        "bestSimilarity": 0.8662,
         "top3": [
           {
             "id": "ta/phrases#please-and-sorry",
-            "score": 0.8682,
-            "similarity": 0.8682
+            "score": 0.8662,
+            "similarity": 0.8662
           },
           {
             "id": "ta/phrases#how-are-you-neengal-eppadi-irukkireergal",
-            "score": 0.8318,
-            "similarity": 0.8318
+            "score": 0.8333,
+            "similarity": 0.8333
           },
           {
-            "id": "ta/culture#everyday-etiquette",
-            "score": 0.8256,
-            "similarity": 0.8256
+            "id": "ta/beginner-guide#formal-and-informal-you",
+            "score": 0.8267,
+            "similarity": 0.8267
           }
         ],
         "languageSource": "request"
@@ -2150,22 +2150,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8939,
+        "bestSimilarity": 0.8945,
         "top3": [
           {
             "id": "ml/vocabulary#numbers-1-to-10",
-            "score": 0.8939,
-            "similarity": 0.8939
+            "score": 0.8945,
+            "similarity": 0.8945
           },
           {
             "id": "ml/beginner-guide#how-to-start-learning-malayalam",
-            "score": 0.8883,
-            "similarity": 0.8883
+            "score": 0.8898,
+            "similarity": 0.8898
           },
           {
             "id": "course/ml/vocabulary#course-vocabulary-numbers",
-            "score": 0.8827,
-            "similarity": 0.8827
+            "score": 0.8808,
+            "similarity": 0.8808
           }
         ],
         "languageSource": "named-in-query"
@@ -2193,28 +2193,28 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.858,
+        "bestSimilarity": 0.8592,
         "top3": [
           {
             "id": "ml/alphabet#the-chandrakkala-and-the-half-u",
-            "score": 0.898,
-            "similarity": 0.858
+            "score": 0.8992,
+            "similarity": 0.8592
           },
           {
             "id": "ml/pronunciation#two-r-sounds-and-and-the-tt-of",
-            "score": 0.871,
-            "similarity": 0.831
+            "score": 0.869,
+            "similarity": 0.829
           },
           {
-            "id": "course/ml/vocabulary#course-vocabulary-numbers",
-            "score": 0.8489,
-            "similarity": 0.8089
+            "id": "ml/vocabulary#numbers-1-to-10",
+            "score": 0.8512,
+            "similarity": 0.8112
           }
         ],
         "languageSource": "script-in-query"
       },
       "vectorOnly": {
-        "rank": 1,
+        "rank": 2,
         "languagePrecision": 0.2
       }
     },
@@ -2236,22 +2236,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8854,
+        "bestSimilarity": 0.8863,
         "top3": [
           {
             "id": "kn/vocabulary#food-and-drink",
-            "score": 0.8854,
-            "similarity": 0.8854
+            "score": 0.8863,
+            "similarity": 0.8863
           },
           {
             "id": "course/kn/vocabulary#course-vocabulary-food-drink",
-            "score": 0.8803,
-            "similarity": 0.8803
+            "score": 0.8826,
+            "similarity": 0.8826
           },
           {
             "id": "kn/vocabulary#family-words",
-            "score": 0.8779,
-            "similarity": 0.8779
+            "score": 0.88,
+            "similarity": 0.88
           }
         ],
         "languageSource": "named-in-query"
@@ -2281,22 +2281,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8377,
+        "bestSimilarity": 0.8392,
         "top3": [
           {
             "id": "kn/examples#i-want-water",
-            "score": 0.8377,
-            "similarity": 0.8377
+            "score": 0.8392,
+            "similarity": 0.8392
+          },
+          {
+            "id": "kn/conversation#at-a-restaurant-nanage-oota-beku",
+            "score": 0.8305,
+            "similarity": 0.8305
           },
           {
             "id": "kn/phrases#shopping-and-directions-idu-eshtu",
-            "score": 0.8313,
-            "similarity": 0.8313
-          },
-          {
-            "id": "kn/culture#everyday-etiquette",
-            "score": 0.8133,
-            "similarity": 0.8133
+            "score": 0.83,
+            "similarity": 0.83
           }
         ],
         "languageSource": "request"
@@ -2325,22 +2325,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8143,
+        "bestSimilarity": 0.8129,
         "top3": [
           {
             "id": "bn/vocabulary#food-and-drink",
-            "score": 0.8143,
-            "similarity": 0.8143
+            "score": 0.8129,
+            "similarity": 0.8129
           },
           {
             "id": "bn/examples#i-want-water",
-            "score": 0.8117,
-            "similarity": 0.8117
+            "score": 0.812,
+            "similarity": 0.812
           },
           {
             "id": "bn/phrases#shopping-and-directions-etaar-daam-koto",
-            "score": 0.7863,
-            "similarity": 0.7863
+            "score": 0.7889,
+            "similarity": 0.7889
           }
         ],
         "languageSource": "request"
@@ -2360,36 +2360,36 @@
         "bn/culture#everyday-etiquette"
       ],
       "full": {
-        "rank": 2,
-        "hit1": false,
+        "rank": 1,
+        "hit1": true,
         "hit3": true,
         "hit5": true,
-        "reciprocalRank": 0.5,
+        "reciprocalRank": 1,
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8756,
+        "bestSimilarity": 0.8761,
         "top3": [
           {
-            "id": "bn/idioms#naachte-naa-jaanle-uthon-baankaa",
-            "score": 0.8756,
-            "similarity": 0.8756
-          },
-          {
             "id": "bn/phrases#goodbye-aashi",
-            "score": 0.8728,
-            "similarity": 0.8728
+            "score": 0.8761,
+            "similarity": 0.8761
           },
           {
-            "id": "bn/examples#i-am-going-home",
-            "score": 0.8681,
-            "similarity": 0.8681
+            "id": "bn/conversation#everyday-conversation-khaaoaa-hoyechhe",
+            "score": 0.8718,
+            "similarity": 0.8718
+          },
+          {
+            "id": "bn/idioms#naachte-naa-jaanle-uthon-baankaa",
+            "score": 0.8717,
+            "similarity": 0.8717
           }
         ],
         "languageSource": "named-in-query"
       },
       "vectorOnly": {
-        "rank": 2,
+        "rank": 1,
         "languagePrecision": 1
       }
     },
@@ -2411,22 +2411,22 @@
         "languagePrecision": 1,
         "harderInTop3": 0,
         "sufficient": true,
-        "bestSimilarity": 0.8701,
+        "bestSimilarity": 0.8717,
         "top3": [
           {
             "id": "bn/phrases#how-are-you-aapni-kemon-aachhen",
-            "score": 0.9101,
-            "similarity": 0.8701
+            "score": 0.9117,
+            "similarity": 0.8717
           },
           {
             "id": "bn/examples#how-are-you-i-am-fine",
-            "score": 0.9101,
-            "similarity": 0.8701
+            "score": 0.9111,
+            "similarity": 0.8711
           },
           {
             "id": "bn/grammar#three-levels-of-you",
-            "score": 0.8908,
-            "similarity": 0.8508
+            "score": 0.8868,
+            "similarity": 0.8468
           }
         ],
         "languageSource": "script-in-query"
@@ -2442,21 +2442,21 @@
       "id": "oos-capital",
       "query": "What is the capital of France?",
       "sufficient": false,
-      "bestSimilarity": 0.7436,
+      "bestSimilarity": 0.7471,
       "top": "ta/idioms#every-place-is-home-yaadhum-oore-yaavarum-kelir"
     },
     {
       "id": "oos-bicycle",
       "query": "How do I fix a flat bicycle tyre?",
       "sufficient": false,
-      "bestSimilarity": 0.7829,
-      "top": "ta/beginner-guide#spoken-and-written-tamil"
+      "bestSimilarity": 0.7813,
+      "top": "bn/conversation#travel-ektaa-tikit-din"
     },
     {
       "id": "oos-python",
       "query": "Write a Python function that sorts a list",
       "sufficient": false,
-      "bestSimilarity": 0.7902,
+      "bestSimilarity": 0.7912,
       "top": "course/ta/vocabulary#course-letters-and-sounds"
     },
     {
@@ -2464,13 +2464,13 @@
       "query": "What will the stock market do tomorrow?",
       "sufficient": false,
       "bestSimilarity": 0.8035,
-      "top": "bn/vocabulary#time-words"
+      "top": "ta/verbs#future-tense-i-will-eat"
     },
     {
       "id": "oos-weather",
       "query": "Will it rain in London next week?",
       "sufficient": false,
-      "bestSimilarity": 0.8042,
+      "bestSimilarity": 0.8045,
       "top": "bn/idioms#joto-gorje-toto-borshe-naa"
     },
     {
@@ -2478,23 +2478,23 @@
       "query": "Who won the cricket world cup in 2011?",
       "language": "hi",
       "sufficient": false,
-      "bestSimilarity": 0.7347,
-      "top": "hi/alphabet#conjunct-letters-and-the-halant"
+      "bestSimilarity": 0.7361,
+      "top": "hi/idioms#naach-na-jaane-aangan-tedhaa"
     },
     {
       "id": "oos-circle",
       "query": "What is the formula for the area of a circle?",
       "language": "te",
       "sufficient": false,
-      "bestSimilarity": 0.7716,
-      "top": "course/te/vocabulary#course-letters-and-sounds"
+      "bestSimilarity": 0.769,
+      "top": "te/idioms#koti-vidyalu-kooti-korake"
     },
     {
       "id": "oos-laptop",
       "query": "Recommend a good laptop for programming",
       "language": "ta",
       "sufficient": false,
-      "bestSimilarity": 0.7751,
+      "bestSimilarity": 0.7743,
       "top": "ta/beginner-guide#how-to-start-learning-tamil"
     },
     {
@@ -2502,7 +2502,7 @@
       "query": "How many planets are in the solar system?",
       "language": "kn",
       "sufficient": false,
-      "bestSimilarity": 0.7806,
+      "bestSimilarity": 0.7787,
       "top": "course/kn/vocabulary#course-vocabulary-numbers"
     },
     {
@@ -2510,22 +2510,22 @@
       "query": "Explain photosynthesis",
       "language": "ml",
       "sufficient": false,
-      "bestSimilarity": 0.8005,
-      "top": "ml/phrases#i-dont-understand-enikku-manassilaayilla"
+      "bestSimilarity": 0.8023,
+      "top": "ml/examples#i-want-water"
     },
     {
       "id": "oos-recipe",
       "query": "Give me a recipe for chocolate cake",
       "language": "bn",
       "sufficient": false,
-      "bestSimilarity": 0.7963,
+      "bestSimilarity": 0.7946,
       "top": "bn/verbs#present-perfect-i-have-eaten"
     },
     {
       "id": "oos-interview",
       "query": "How do I prepare for a job interview?",
       "sufficient": true,
-      "bestSimilarity": 0.8223,
+      "bestSimilarity": 0.8264,
       "top": "ta/phrases#how-are-you-neengal-eppadi-irukkireergal"
     }
   ]

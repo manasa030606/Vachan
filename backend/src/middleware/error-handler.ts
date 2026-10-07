@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import multer from "multer";
 import { ZodError } from "zod";
 import { env } from "../config/env.ts";
 import { Prisma } from "../generated/prisma/client.ts";
@@ -37,6 +38,27 @@ export function errorHandler(
           message: issue.message,
         })),
       },
+    });
+    return;
+  }
+
+  // 2b. Upload problems (multer): file too large, wrong field name …
+  if (error instanceof multer.MulterError) {
+    const tooLarge = error.code === "LIMIT_FILE_SIZE";
+    res.status(tooLarge ? 413 : 400).json({
+      error: tooLarge
+        ? {
+            code: "AUDIO_TOO_LARGE",
+            message:
+              "The recording is too large (max 2 MB ≈ 60 seconds of WAV). Record a shorter phrase.",
+          }
+        : {
+            code: "BAD_UPLOAD",
+            message:
+              error.code === "LIMIT_UNEXPECTED_FILE"
+                ? 'Send exactly one file, in the form field named "audio".'
+                : `Upload problem: ${error.message}`,
+          },
     });
     return;
   }
