@@ -4,7 +4,6 @@ Vachan is a web app for learning Indian languages — Hindi, Telugu, Tamil, Mala
 Bengali — from English. Learners follow short lessons, earn XP and streaks, practise speaking, and
 can ask an AI tutor that answers only from Vachan's own notes (retrieval-augmented generation).
 
-Built as a final-year BTech CS-AI capstone project.
 
 **Live demo:** https://vachan-eta.vercel.app
 
@@ -92,4 +91,4 @@ Full steps, including the AI key and troubleshooting: [docs/SETUP.md](docs/SETUP
 
 ## Author
 
-Manasa — BTech CS-AI, Rishihood University.
+Manasa.
