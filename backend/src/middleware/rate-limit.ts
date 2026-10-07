@@ -41,16 +41,27 @@ export class RateLimiter {
 
 /** Express middleware (after requireAuth): limits by user id. */
 export function rateLimitByUser(limiter: RateLimiter, feature = "tutor") {
+  return rateLimitBy(limiter, (req) => req.auth?.userId ?? req.ip ?? "anonymous", feature);
+}
+
+/**
+ * Phase 8: limits by any key — e.g. client IP + email for login (slows down password guessing
+ * without locking a real user out from a different network). Behind Render/Vercel the client IP
+ * comes from X-Forwarded-For, which Express only trusts when `trust proxy` is set (app.ts).
+ */
+export function rateLimitBy(limiter: RateLimiter, key: (req: Request) => string, feature: string) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const blocked = limiter.hit(req.auth?.userId ?? req.ip ?? "anonymous");
+    const blocked = limiter.hit(key(req));
     if (blocked) {
       res.setHeader("Retry-After", String(blocked.retryAfterSeconds));
       throw new HttpError(
         429,
         "RATE_LIMITED",
         blocked.rule === "minute"
-          ? `You're asking quickly! Please wait ${blocked.retryAfterSeconds} seconds.`
-          : `You've reached today's ${feature} limit. Please come back tomorrow.`,
+          ? `Too many requests. Please wait ${blocked.retryAfterSeconds} seconds.`
+          : blocked.rule === "day"
+            ? `You've reached today's ${feature} limit. Please come back tomorrow.`
+            : `Too many ${feature} attempts. Please try again in ${Math.ceil(blocked.retryAfterSeconds / 60)} minutes.`,
         { retryAfterSeconds: blocked.retryAfterSeconds, limit: blocked.rule },
       );
     }

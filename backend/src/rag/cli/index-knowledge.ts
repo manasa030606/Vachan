@@ -15,7 +15,7 @@ try {
   const report = await indexKnowledgeBase(prisma, { force, log: (line) => console.log(line) });
   console.log(
     `\n✅ Done in ${report.seconds}s — ${report.documents} documents, ${report.chunks} chunks ` +
-      `(${report.embedded.length} documents embedded, ${report.skipped.length} unchanged, ${report.removed.length} removed).`,
+      `(${report.embedded.length} documents embedded, ${report.skipped.length} unchanged, ${report.drafts.length} drafts not indexed, ${report.removed.length} removed).`,
   );
   if (report.removed.length > 0) console.log(`   Removed: ${report.removed.join(", ")}`);
   console.log("   Next: npm run rag:eval -w backend\n");

@@ -161,6 +161,7 @@ model User {
   aiConversations  AIConversation[]
   speechAttempts   SpeechAttempt[]
   conversations    ConversationSession[]
+  adminActions     AdminAuditLog[]
 }
 
 model UserProfile {
@@ -236,6 +237,8 @@ model Unit {
   description String
   stage       LearningStage
   sortOrder   Int
+  /// Phase 8: hidden from learners while false (admin dashboard → unpublish)
+  isPublished Boolean       @default(true)
 
   course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons Lesson[]
@@ -378,6 +381,8 @@ model UserExerciseAttempt {
 
   @@index([userId, lessonId])
   @@index([userId, exerciseId])
+  /// Phase 8 analytics: attempts in a date range ("last 30 days")
+  @@index([createdAt])
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -419,6 +424,8 @@ model UserDailyActivity {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
+  /// Phase 8 analytics: active learners per day
+  @@index([date])
 }
 
 /// Every XP award, so totals can always be explained.
@@ -558,19 +565,47 @@ enum KnowledgeSkill {
 }
 
 /// One source document, e.g. backend/knowledge-base/te/phrases.md.
+enum KnowledgeOrigin {
+  FILE
+  COURSE
+  ADMIN
+}
+
+enum KnowledgeStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model KnowledgeDocument {
   /// Stable id, e.g. "te/phrases" or "course/te/vocabulary"
-  id           String   @id
-  languageCode String
-  title        String
+  id             String                @id
+  languageCode   String
+  title          String
   /// Where the content comes from, e.g. "Vachan curated notes"
-  source       String
+  source         String
   /// File path (or course reference) of the original content
-  reference    String
+  reference      String
   /// Hash of the cleaned document: unchanged documents are skipped when re-indexing
-  contentHash  String
-  chunkCount   Int
-  indexedAt    DateTime @default(now())
+  contentHash    String
+  chunkCount     Int
+  indexedAt      DateTime              @default(now())
+  // ── Phase 8: content management ──
+  /// FILE = backend/knowledge-base/*.md (text edited in git) · COURSE = course vocabulary ·
+  /// ADMIN = written in the admin dashboard (text stored in `body`)
+  origin         KnowledgeOrigin       @default(FILE)
+  /// DRAFT documents have no chunks, so search and the AI never see them
+  status         KnowledgeStatus       @default(PUBLISHED)
+  /// ADMIN documents: the markdown sections ("## Heading" + text)
+  body           String?
+  /// ADMIN documents: metadata defaults for every section
+  level          KnowledgeLevel?
+  topic          String?
+  contentType    KnowledgeContentType?
+  skill          KnowledgeSkill?
+  /// The text changed after the last indexing — re-index to update search
+  needsReindex   Boolean               @default(false)
+  lastIndexError String?
+  updatedAt      DateTime              @default(now()) @updatedAt
 
   language Language         @relation(fields: [languageCode], references: [code], onDelete: Cascade)
   chunks   KnowledgeChunk[]
@@ -829,4 +864,27 @@ model ConversationTurn {
   session ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Admin (Phase 8)
+// ─────────────────────────────────────────────────────────────
+
+/// Every change made in the admin dashboard: who, what, when (no learner data).
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  /// The admin who made the change (null if that account was deleted later)
+  userId     String?
+  /// e.g. "lesson.update", "lesson.publish", "knowledge.reindex"
+  action     String
+  entityType String
+  entityId   String
+  /// Short human-readable description, e.g. "Greetings (te-u3-l1)"
+  summary    String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
 }

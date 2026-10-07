@@ -1,6 +1,6 @@
-# Vachan — Deployment guide (Phase 4.5)
+# Vachan — Deployment guide (Phases 4.5–8)
 
-How the Phase 4 app runs on the internet, step by step. No previous deployment experience needed. Every service below has a free plan and lets you sign in with GitHub.
+How Vachan runs on the internet, step by step. No previous deployment experience needed. Every service below has a free plan and lets you sign in with GitHub.
 
 ## 1. Architecture
 
@@ -27,11 +27,11 @@ How the Phase 4 app runs on the internet, step by step. No previous deployment e
 
 **Three databases, three purposes**
 
-| Database                                  | Where                       | Used for                                                             |
-| ----------------------------------------- | --------------------------- | -------------------------------------------------------------------- |
-| Local                                     | PostgreSQL on your Mac      | Development, `npm run dev`, tests                                    |
-| Staging / initial deployment (this phase) | Neon free project           | The public demo — real accounts, real data, but not mission-critical |
-| Future final production                   | Paid/managed plan (Phase 8) | Backups, no sleeping, monitoring, migrations via CI                  |
+| Database                                  | Where                  | Used for                                                             |
+| ----------------------------------------- | ---------------------- | -------------------------------------------------------------------- |
+| Local                                     | PostgreSQL on your Mac | Development, `npm run dev`, tests                                    |
+| Staging / initial deployment (this phase) | Neon free project      | The public demo — real accounts, real data, but not mission-critical |
+| Final production (when real users arrive) | Paid/managed plan      | Backups, no sleeping, monitoring — see §7 for the checklist          |
 
 Never point the deployed backend at your local database, and never run tests against the deployed one.
 
@@ -184,6 +184,23 @@ git add . && git commit -m "…" && git push
 - Optional: pre-generate the demo audio into Neon: `DATABASE_URL=<neon url> npm run speech:prefetch -w backend -- --language te`.
 - The microphone needs https — Vercel is https, so it works. Details: [SPEECH.md §15](SPEECH.md#15-deployment-notes).
 
+## 5e. Phase 8 (admin dashboard, analytics, security) on the deployed site
+
+1. Push. The Render build applies `20261010090000_phase8_admin_analytics` on Neon (`prisma migrate deploy`).
+   `render.yaml` now also sets `TRUST_PROXY=2` (Vercel proxy + Render proxy) so login/register rate limits
+   see the learner's real IP. If you created the service by hand, add `TRUST_PROXY` = `2` in Render → Environment.
+2. Make yourself admin on the deployed database (from your Mac; the account must be registered on the site first):
+   ```bash
+   DATABASE_URL='<neon url>' npm run admin:grant -w backend -- you@example.com
+   ```
+3. Open `https://<your-app>.vercel.app/admin`. Content, vocabulary, analytics and the audit log work on
+   Render free. Knowledge-base **publishing** works too, but embedding is off there (`RAG_ENABLED=false`),
+   so after publishing or editing notes run, from your Mac:
+   ```bash
+   DATABASE_URL='<neon url>' npm run rag:index -w backend
+   ```
+4. Seeding is now safe to repeat — it never overwrites content you edited in the dashboard.
+
 ## 6. Troubleshooting
 
 | Problem                                                                      | Why                                                                                     | Fix                                                                                                                                          |
@@ -203,3 +220,42 @@ git add . && git commit -m "…" && git push
 | CORS error in the console                                                    | Browser calling Render directly with an origin not in `CORS_ORIGIN`                     | Use the `/api` proxy; set `CORS_ORIGIN` to the exact Vercel URL                                                                              |
 | Node version errors                                                          | Old Node                                                                                | Render `NODE_VERSION=22`; Vercel → Settings → Node.js Version 22.x                                                                           |
 | Works locally, fails on Linux with "Module not found"                        | File name case differs (`Button.tsx` vs `button.tsx`)                                   | Match the import exactly (Linux is case-sensitive)                                                                                           |
+| `/admin` says "Admins only"                                                  | The account isn't an admin on **that** database                                         | `DATABASE_URL='<neon url>' npm run admin:grant -w backend -- you@example.com`, then reload                                                   |
+| Registering fails with `429` for everyone                                    | `TRUST_PROXY` too low behind the Vercel proxy, all learners share one IP                | Render → Environment → `TRUST_PROXY=2` → Save                                                                                                |
+
+## 7. Option B — everything on one server with Docker
+
+For a VPS or a college server (≥ 2 GB RAM so the AI Tutor's embedding model fits), Docker Compose runs
+PostgreSQL + pgvector, the API and the web app together:
+
+```bash
+git clone <your repo> vachan && cd vachan
+cp .env.production.example .env.production      # fill in POSTGRES_PASSWORD, JWT_SECRET, GEMINI_API_KEY, PUBLIC_URL
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml --env-file .env.production exec backend npm run db:seed -w backend
+docker compose -f docker-compose.prod.yml --env-file .env.production exec backend npm run rag:index -w backend
+docker compose -f docker-compose.prod.yml --env-file .env.production exec backend npm run admin:grant -w backend -- you@example.com
+```
+
+- Migrations run automatically each time the backend container starts (`prisma migrate deploy`).
+- Only port 3000 (the web app) is published; the API and database are reachable only inside the
+  Docker network. The browser reaches the API through the same `/api` proxy as on Vercel.
+- For a public domain put a TLS proxy in front (e.g. Caddy: `vachan.example.com { reverse_proxy localhost:3000 }`),
+  set `PUBLIC_URL=https://vachan.example.com` and restart.
+- Update: `git pull && docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build`.
+- Backups: DATABASE.md §11b.
+
+Files: `backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.prod.yml`, `.env.production.example`, `.dockerignore`.
+
+## 8. Production checklist
+
+| Item                                                           | Free demo (Vercel + Render + Neon) | Real users                                      |
+| -------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------- |
+| Secrets only in dashboards / `.env.production`                 | ✅                                 | ✅                                              |
+| `NODE_ENV=production`, fresh `JWT_SECRET`, exact `CORS_ORIGIN` | ✅                                 | ✅                                              |
+| Migrations with `db:deploy` only                               | ✅ (Render build)                  | ✅ (CI or container start)                      |
+| Backups                                                        | Neon history / branches            | daily `pg_dump` off-site or managed PITR        |
+| No cold starts                                                 | ❌ Render free sleeps              | paid instance                                   |
+| AI Tutor search (RAG) on the server                            | ❌ 512 MB RAM                      | ≥ 1 GB RAM, `RAG_ENABLED=true`                  |
+| Monitoring / alerts                                            | `/api/health` by hand              | uptime monitor on `/api/health`, error tracking |
+| Admin accounts reviewed                                        | `npm run admin:list -w backend`    | same, regularly                                 |

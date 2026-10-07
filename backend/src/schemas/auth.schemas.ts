@@ -23,7 +23,10 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   email,
-  password: z.string({ error: "Password is required" }).min(1, "Password is required"),
+  password: z
+    .string({ error: "Password is required" })
+    .min(1, "Password is required")
+    .max(128, "Password must be at most 128 characters"),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

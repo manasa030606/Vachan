@@ -5,12 +5,20 @@
 //   lg (desktop): full sidebar with labels
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { useSession } from "@/components/session/session-provider";
 import { cn } from "@/lib/cn";
 import { NAV_ITEMS } from "./nav-items";
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const { user } = useSession();
+  // The admin entry is only a shortcut; the server checks the ADMIN role on every request.
+  const items =
+    user?.role === "ADMIN"
+      ? [...NAV_ITEMS, { href: "/admin", label: "Admin", icon: ShieldCheck }]
+      : NAV_ITEMS;
 
   return (
     <aside className="hidden shrink-0 border-r-2 border-slate-200/70 bg-white md:block md:w-24 lg:w-64">
@@ -26,7 +34,7 @@ export function SidebarNav() {
 
         <nav aria-label="Main">
           <ul className="space-y-2">
-            {NAV_ITEMS.map((item) => {
+            {items.map((item) => {
               const isActive = pathname.startsWith(item.href);
               const Icon = item.icon;
               return (
@@ -51,9 +59,7 @@ export function SidebarNav() {
           </ul>
         </nav>
 
-        <p className="mt-auto hidden px-2 text-xs text-slate-400 lg:block">
-          Phase 7 · Speaking &amp; conversation
-        </p>
+        <p className="mt-auto hidden px-2 text-xs text-slate-400 lg:block">Vachan v1.0</p>
       </div>
     </aside>
   );

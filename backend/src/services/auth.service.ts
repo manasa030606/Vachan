@@ -8,6 +8,9 @@ import { getUserById, type UserDto } from "./user.service.ts";
 
 export type AuthResult = { user: UserDto; token: string };
 
+let dummy: Promise<string> | null = null;
+const dummyHash = () => (dummy ??= hashPassword("not-a-real-password-0"));
+
 export async function registerUser(input: RegisterInput): Promise<AuthResult> {
   const existing = await prisma.user.findUnique({ where: { email: input.email } });
   if (existing) {
@@ -34,7 +37,12 @@ export async function loginUser(input: LoginInput): Promise<AuthResult> {
 
   // Same message whether the email or the password is wrong, so attackers
   // can't use the login form to discover which emails are registered.
-  const passwordOk = user ? await verifyPassword(input.password, user.passwordHash) : false;
+  // Phase 8: an unknown email still runs a full scrypt check, so the response time doesn't
+  // reveal whether the account exists (timing-based user enumeration).
+  const passwordOk = await verifyPassword(
+    input.password,
+    user?.passwordHash ?? (await dummyHash()),
+  );
   if (!user || !passwordOk) {
     throw new HttpError(401, "INVALID_CREDENTIALS", "Email or password is incorrect");
   }

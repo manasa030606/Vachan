@@ -1,0 +1,13 @@
+{
+  "name": "vachan-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser end-to-end test of a learner's full journey (localhost only)",
+  "scripts": {
+    "test": "node full-journey.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.16.3",
+    "playwright": "^1.63.0"
+  }
+}

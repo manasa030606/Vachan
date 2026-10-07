@@ -168,6 +168,7 @@ async function courseUnits(languageId: string) {
     orderBy: { sortOrder: "asc" },
     include: {
       units: {
+        where: { isPublished: true },
         orderBy: { sortOrder: "asc" },
         include: {
           lessons: {

@@ -66,6 +66,12 @@ const envSchema = z.object({
   SPEECH_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(150),
   CONVERSATION_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(8),
   CONVERSATION_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(150),
+  // Phase 8 security: brute-force limits (login per IP + email, sign-ups per IP).
+  LOGIN_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(10_000).default(10),
+  REGISTER_RATE_LIMIT_PER_HOUR: z.coerce.number().int().min(1).max(100_000).default(20),
+  // Phase 8: behind a proxy (Render, Docker + nginx) the client IP is in X-Forwarded-For.
+  // Number of proxies to trust; default 1 in production, 0 locally.
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

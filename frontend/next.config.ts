@@ -6,8 +6,30 @@ import type { NextConfig } from "next";
 // first-party and no cross-site cookie/CORS problems appear. See docs/DEPLOYMENT.md.
 const backendUrl = process.env.BACKEND_URL?.trim().replace(/\/+$/, "");
 
+// Phase 8: security headers for every page.
+//   frame-ancestors / X-Frame-Options  no clickjacking (the app can't be framed)
+//   nosniff                            no content-type guessing
+//   Permissions-Policy                 the microphone only for Vachan itself (speaking practice);
+//                                      camera and location are never needed
+// A full Content-Security-Policy is not set: Next.js needs inline scripts unless every page uses
+// nonces — see docs/SECURITY.md (remaining risks).
+const securityHeaders = [
+  { key: "X-Frame-Options", value: "DENY" },
+  {
+    key: "Content-Security-Policy",
+    value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
+  },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "microphone=(self), camera=(), geolocation=(), payment=()" },
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
   // Don't auto-generate AGENTS.md / CLAUDE.md files in this folder.
   agentRules: false,
   async rewrites() {

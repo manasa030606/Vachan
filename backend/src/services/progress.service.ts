@@ -43,13 +43,24 @@ export async function submitAttempt(
         select: {
           id: true,
           isPublished: true,
-          unit: { select: { courseId: true } },
+          unit: {
+            select: {
+              courseId: true,
+              isPublished: true,
+              course: { select: { isPublished: true } },
+            },
+          },
           _count: { select: { exercises: true } },
         },
       },
     },
   });
-  if (!exercise || !exercise.lesson.isPublished) {
+  if (
+    !exercise ||
+    !exercise.lesson.isPublished ||
+    !exercise.lesson.unit.isPublished ||
+    !exercise.lesson.unit.course.isPublished
+  ) {
     throw notFound("EXERCISE_NOT_FOUND", "Exercise not found");
   }
   const lessonId = exercise.lesson.id;
@@ -214,7 +225,10 @@ export async function getProgressSummary(userId: string) {
         id: true,
         title: true,
         language: { select: { code: true, name: true } },
-        units: { select: { lessons: { where: { isPublished: true }, select: { id: true } } } },
+        units: {
+          where: { isPublished: true },
+          select: { lessons: { where: { isPublished: true }, select: { id: true } } },
+        },
       },
     }),
   ]);

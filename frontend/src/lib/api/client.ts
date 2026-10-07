@@ -26,7 +26,7 @@ export class ApiError extends Error {
 }
 
 type RequestOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   /** JSON body, or FormData for file uploads (Phase 7 audio). */
   body?: unknown;
   /** Give up after this many milliseconds (AI and speech calls). */

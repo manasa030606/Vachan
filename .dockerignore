@@ -1,0 +1,17 @@
+# Keep images small and secrets out of them.
+**/node_modules
+**/.next
+**/dist
+**/.cache
+**/*.tsbuildinfo
+backend/src/generated
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+.git
+.trash-tmp
+e2e
+docs
+postman
+*.log

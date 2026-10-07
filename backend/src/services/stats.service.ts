@@ -82,7 +82,7 @@ async function achievementMetrics(
       select: { lessonId: true },
     }),
     db.unit.findMany({
-      where: { course: { isPublished: true } },
+      where: { isPublished: true, course: { isPublished: true } },
       select: { lessons: { where: { isPublished: true }, select: { id: true } } },
     }),
   ]);

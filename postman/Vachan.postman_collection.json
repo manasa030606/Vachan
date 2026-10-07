@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Vachan API",
-    "description": "Phase 4 API (placement & gamification). Run the requests from top to bottom (folders 0 → 12) — each folder builds on the one before.\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
+    "description": "Phases 2–8 API (placement & gamification). Run the requests from top to bottom (folders 0 → 12) — each folder builds on the one before.\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -61,6 +61,26 @@
     },
     {
       "key": "roleplayId",
+      "value": ""
+    },
+    {
+      "key": "adminEmail",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "adminLessonId",
+      "value": ""
+    },
+    {
+      "key": "adminDocId",
       "value": ""
     }
   ],
@@ -5532,12 +5552,74 @@
       ]
     },
     {
-      "name": "16. Logout",
+      "name": "16. Admin dashboard & analytics (Phase 8)",
+      "description": "Needs an ADMIN account: run `npm run admin:grant -w backend -- you@example.com`, then set the collection variables adminEmail and adminPassword. Without them every request here is skipped (the rest of the collection still passes).",
       "item": [
         {
-          "name": "Logout",
+          "name": "Login as admin (needs adminEmail + adminPassword)",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Logs in with an ADMIN account. Admins are created only from a terminal: `npm run admin:grant -w backend -- you@example.com`. Set the collection variables adminEmail / adminPassword first (never commit them). Without them, this whole folder is skipped.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminEmail')) {",
+                  "  console.log('Skipped: adminEmail is empty.');",
+                  "  pm.collectionVariables.set('adminToken', '');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Account has the ADMIN role\", () => pm.expect(json.user.role).to.eql(\"ADMIN\"));",
+                  "pm.collectionVariables.set('adminToken', json.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner token is refused (403 ADMIN_ONLY)",
+          "request": {
+            "method": "GET",
             "header": [
               {
                 "key": "Accept",
@@ -5545,13 +5627,147 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/auth/logout",
+              "raw": "{{baseUrl}}/admin/analytics",
               "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
+              "path": ["admin", "analytics"]
             },
-            "description": ""
+            "description": "The ordinary learner token from folder 1 cannot use admin endpoints. The role is read from the database on every request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
           },
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"ADMIN_ONLY\", () => pm.expect(pm.response.json().error.code).to.eql(\"ADMIN_ONLY\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Analytics (last 30 days)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/analytics?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "analytics"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            },
+            "description": "Aggregates only: active learners, completion and drop-off, accuracy, common mistakes, language usage, streaks, AI Tutor and speaking usage. Optional: &language=te",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Has the main sections\", () => pm.expect(json).to.include.keys(\"activeLearners\",\"lessons\",\"accuracy\",\"commonMistakes\",\"languages\",\"streaks\",\"tutor\",\"speaking\"));",
+                  "pm.test(\"No personal data (no e-mails)\", () => pm.expect(pm.response.text()).to.not.match(/@[a-z0-9-]+\\./i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Languages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/languages",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "languages"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
@@ -5562,7 +5778,7 @@
           ]
         },
         {
-          "name": "Get me after logout (401 — old token no longer works)",
+          "name": "Content tree (Telugu)",
           "request": {
             "method": "GET",
             "header": [
@@ -5572,18 +5788,1027 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/me",
+              "raw": "{{baseUrl}}/admin/content?language=te",
               "host": ["{{baseUrl}}"],
-              "path": ["me"]
+              "path": ["admin", "content"],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "te"
+                }
+              ]
             },
-            "description": ""
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
           },
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": ["pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"]
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Has courses\", () => pm.expect(pm.response.json().courses.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create lesson (starts unpublished)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/lessons",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "lessons"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"unitId\": \"te-u3\",\n  \"title\": \"At the market (Postman)\",\n  \"introText\": \"Words for shopping.\",\n  \"kind\": \"VOCABULARY\",\n  \"vocabularyIds\": [\n    \"te-v23-water\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const lesson = pm.response.json().lesson;",
+                  "pm.test(\"Unpublished\", () => pm.expect(lesson.isPublished).to.eql(false));",
+                  "pm.collectionVariables.set('adminLessonId', lesson.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publish while empty → 409 LESSON_EMPTY",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/lessons/{{adminLessonId}}/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "lessons", "{{adminLessonId}}", "publish"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"published\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 409\", () => pm.response.to.have.status(409));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid exercise → 400 INVALID_EXERCISE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/exercises",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "exercises"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lessonId\": \"{{adminLessonId}}\",\n  \"type\": \"MULTIPLE_CHOICE\",\n  \"instruction\": \"Select the meaning\",\n  \"prompt\": \"నీళ్ళు\",\n  \"options\": [\n    {\n      \"text\": \"Water\",\n      \"isCorrect\": true\n    },\n    {\n      \"text\": \"Milk\",\n      \"isCorrect\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Explains the problem\", () => pm.expect(pm.response.json().error.message).to.match(/exactly one/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add exercise",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/exercises",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "exercises"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lessonId\": \"{{adminLessonId}}\",\n  \"type\": \"MULTIPLE_CHOICE\",\n  \"instruction\": \"Select the meaning\",\n  \"prompt\": \"నీళ్ళు\",\n  \"explanation\": \"నీళ్ళు (neellu) means water.\",\n  \"options\": [\n    {\n      \"text\": \"Water\",\n      \"isCorrect\": true\n    },\n    {\n      \"text\": \"Milk\"\n    },\n    {\n      \"text\": \"Food\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 201\", () => pm.response.to.have.status(201));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publish lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/lessons/{{adminLessonId}}/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "lessons", "{{adminLessonId}}", "publish"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"published\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learners now see it in the course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/te-course",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", "te-course"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Lesson is listed\", () => pm.expect(pm.response.text()).to.include(pm.variables.get(\"adminLessonId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unpublish lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/lessons/{{adminLessonId}}/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "lessons", "{{adminLessonId}}", "publish"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"published\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hidden from learners again",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/te-course",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", "te-course"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Lesson is not listed\", () => pm.expect(pm.response.text()).to.not.include(pm.variables.get(\"adminLessonId\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Learner cannot open it directly (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/{{adminLessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lessons", "{{adminLessonId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete lesson",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/lessons/{{adminLessonId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "lessons", "{{adminLessonId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vocabulary search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/vocabulary?language=te&search=water",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "vocabulary"],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "te"
+                },
+                {
+                  "key": "search",
+                  "value": "water"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Knowledge documents (Telugu)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/knowledge?language=te",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "knowledge"],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "te"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Says whether search is on\", () => pm.expect(pm.response.json()).to.have.property(\"searchEnabled\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create knowledge note (draft)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/knowledge",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "knowledge"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"languageCode\": \"te\",\n  \"title\": \"Asking for directions (Postman)\",\n  \"source\": \"Vachan admin notes\",\n  \"level\": \"beginner\",\n  \"topic\": \"directions\",\n  \"contentType\": \"phrase\",\n  \"skill\": \"conversation\",\n  \"body\": \"## Asking the way\\n\\nఎక్కడ (ekkaḍa) means where. స్టేషన్ ఎక్కడ? — Where is the station?\\n\\n## Left and right\\n\\nఎడమ (eḍama) is left, కుడి (kuḍi) is right.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const doc = pm.response.json().document;",
+                  "pm.test(\"Draft with 2 chunks previewed\", () => { pm.expect(doc.status).to.eql('DRAFT'); pm.expect(doc.preview.length).to.eql(2); });",
+                  "pm.collectionVariables.set('adminDocId', encodeURIComponent(doc.id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preview chunks (dry run)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/knowledge/{{adminDocId}}/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "knowledge", "{{adminDocId}}", "preview"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publish note (indexes it, or explains how when search is off)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/knowledge/{{adminDocId}}/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "knowledge", "{{adminDocId}}", "publish"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"published\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete note",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/knowledge/{{adminDocId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "knowledge", "{{adminDocId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Audit log",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/audit-log",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "audit-log"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.variables.get('adminToken')) {",
+                  "  console.log('Skipped: set adminEmail/adminPassword (an account with the ADMIN role) to run the admin folder.');",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Records the deletion\", () => pm.expect(pm.response.json().entries[0].action).to.eql(\"knowledge.delete\"));"
+                ]
               }
             }
           ]

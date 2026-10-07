@@ -5,9 +5,13 @@
 //   · 12 placement questions
 // plus the badge definitions (src/config/achievements.ts) and one demo account.
 //
-// Safe to run again: languages are updated in place; courses and vocabulary are
-// deleted and re-created. ⚠️ That also clears learners' lesson progress and answers
-// (fine for development). User accounts are kept.
+// Safe to run again (Phase 8): languages, badges and the demo account are updated in place, and
+// a language's course content is only created when that language has NO course yet — so
+// content edited in the admin dashboard and learners' progress are never overwritten.
+//
+//   npm run db:seed:reset-content -w backend   ⚠️ deletes and re-creates ALL course content and
+//                                        vocabulary (and therefore learners' lesson progress
+//                                        and answers). Development only.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
@@ -25,19 +29,20 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
+const resetContent = process.argv.includes("--reset-content");
+
 async function seedLanguage(index: number) {
   const data = SEED_LANGUAGES[index];
   const course = buildCourse(data);
 
   const language = await prisma.language.upsert({
     where: { code: data.code },
+    // Names only — never isActive/sortOrder, which admins may have changed in the dashboard.
     update: {
       name: data.name,
       nativeName: data.nativeName,
       scriptName: data.scriptName,
       description: data.description,
-      sortOrder: index + 1,
-      isActive: true,
     },
     create: {
       id: `lang-${data.code}`,
@@ -49,6 +54,14 @@ async function seedLanguage(index: number) {
       sortOrder: index + 1,
     },
   });
+
+  const existing = await prisma.course.count({ where: { languageId: language.id } });
+  if (existing > 0 && !resetContent) {
+    console.log(
+      `  – ${data.name.padEnd(10)} has content already — kept (re-create: npm run db:seed:reset-content -w backend)`,
+    );
+    return;
+  }
 
   // Start this language's content from a clean slate (cascades to units, lessons, exercises, progress).
   await prisma.course.deleteMany({ where: { languageId: language.id } });

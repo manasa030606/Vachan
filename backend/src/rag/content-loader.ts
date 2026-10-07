@@ -1,6 +1,7 @@
-// Step 1 of the pipeline: COLLECT CONTENT from two approved sources.
+// Step 1 of the pipeline: COLLECT CONTENT from three approved sources.
 //   1. Curated notes:   backend/knowledge-base/<language>/*.md
 //   2. Course content:  vocabulary and letters already taught in the lessons (VocabularyItem table)
+//   3. Admin notes:     written in the admin dashboard (Phase 8, KnowledgeDocument.body)
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { PrismaClient } from "../generated/prisma/client.ts";
@@ -102,4 +103,51 @@ export async function loadCourseDocuments(prisma: PrismaClient): Promise<SourceD
     });
   }
   return documents;
+}
+
+/** Phase 8: a document written in the admin dashboard, in the same format as the files. */
+export type AdminDocumentRow = {
+  id: string;
+  languageCode: string;
+  title: string;
+  source: string;
+  level: string | null;
+  topic: string | null;
+  contentType: string | null;
+  skill: string | null;
+  body: string | null;
+};
+
+const fromEnum = (value: string | null, fallback: string) =>
+  (value ?? fallback).toLowerCase().replace(/_/g, "-");
+
+/**
+ * Turns an admin document into a SourceDocument by giving it the same front matter a file has,
+ * so it goes through exactly the same parsing, validation and chunking.
+ * Throws KnowledgeFormatError with a readable message when the text has no "## " sections etc.
+ */
+export function adminDocumentSource(row: AdminDocumentRow): SourceDocument {
+  const frontMatter = [
+    "---",
+    `language: ${row.languageCode}`,
+    `title: ${row.title.replace(/\n/g, " ")}`,
+    `type: ${fromEnum(row.contentType, "explanation")}`,
+    `level: ${fromEnum(row.level, "beginner")}`,
+    `skill: ${fromEnum(row.skill, "vocabulary")}`,
+    `topic: ${row.topic ?? "general"}`,
+    `source: ${row.source.replace(/\n/g, " ")}`,
+    "---",
+    "",
+  ].join("\n");
+  const parsed = parseKnowledgeFile(`${row.id}.md`, frontMatter + (row.body ?? ""));
+  return { ...parsed, id: row.id, reference: `admin-dashboard:${row.id}` };
+}
+
+/** Published admin documents (drafts are never indexed). */
+export async function loadAdminDocuments(prisma: PrismaClient): Promise<SourceDocument[]> {
+  const rows = await prisma.knowledgeDocument.findMany({
+    where: { origin: "ADMIN", status: "PUBLISHED" },
+    orderBy: { id: "asc" },
+  });
+  return rows.map(adminDocumentSource);
 }

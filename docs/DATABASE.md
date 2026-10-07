@@ -176,7 +176,7 @@ IDs are readable so you can type them in Postman: language `lang-te`, course `te
 
 Plus one **demo account** for quick testing: `demo@vachan.dev` / `Vachan2026!` (Hindi, onboarding done). Development only.
 
-Running the seed again **updates** languages, **re-creates** courses/vocabulary and **keeps** user accounts. ⚠️ Re-creating the courses also **clears every learner's lesson progress and answers** (they belong to lessons) — fine in development, but don't re-seed if you want to keep your test progress.
+Running the seed again is **safe** (Phase 8): it updates the badge definitions and the demo account, and creates a language's course only if that language has **no course yet**. Content edited in the admin dashboard and learners' progress are never overwritten. To throw the course content away and re-create it from code (development only — this also deletes learners' lesson progress and answers): `npm run db:seed:reset-content -w backend`.
 
 ---
 
@@ -200,7 +200,7 @@ Deletes **everything** (all users and progress), re-applies the migrations and r
 npm run db:reset
 ```
 
-Only content (keep users): `npm run db:seed`.
+Only content (keep user accounts, lose lesson progress): `npm run db:seed:reset-content -w backend`.
 
 Docker full wipe: `docker compose down -v && npm run db:up && npm run db:migrate && npm run db:seed`.
 
@@ -287,7 +287,18 @@ After the full Postman run: `totalXp` 70, `currentStreak` 1, 4 badges (first-les
 - `20261008090000_phase6_ai_tutor` — `AIConversation`, `AIMessage` and the enums `AIMessageRole`, `AIAnswerStatus` (see [AI_TUTOR.md §4](AI_TUTOR.md#4-database-migration-20261008090000_phase6_ai_tutor), including SQL to inspect chats).
 - `20261009090000_phase7_speech_conversation` — `AudioClip` (text-to-speech cache), `SpeechAttempt` (speaking attempts with transcript, scores and **audio metadata** — recordings are not stored), `ConversationSession` + `ConversationTurn` (role-plays), enums `AudioInputSource`, `ConversationScenario`, `ConversationStatus`, `ConversationInputMode` (see [SPEECH.md §12](SPEECH.md#12-database), including SQL).
 
-## 10. The schema (19 tables, one set for all languages)
+## 9d. Phase 8 migration — what changed
+
+`20261010090000_phase8_admin_analytics`:
+
+- `Unit.isPublished` (default `true`) — units can be hidden like courses and lessons.
+- `KnowledgeDocument`: `origin` (FILE / COURSE / ADMIN), `status` (DRAFT / PUBLISHED), `body` (text of dashboard notes), `level`, `topic`, `contentType`, `skill`, `needsReindex`, `lastIndexError`, `updatedAt`. Existing course-vocabulary documents are marked `COURSE` by the migration.
+- New table `AdminAuditLog` (`userId` → User, `action`, `entityType`, `entityId`, `summary`, `createdAt`).
+- Indexes for analytics: `UserExerciseAttempt(createdAt)`, `UserDailyActivity(date)`.
+
+Nothing is deleted or renamed, so it applies to a database with real learners without data loss.
+
+## 10. The schema (28 tables, one set for all languages)
 
 ```
 Language ─┬─ Course ── Unit ── Lesson ─┬─ Exercise ── ExerciseOption
@@ -375,6 +386,67 @@ WHERE u.email = 'you@example.com' AND a."isCorrect" = false ORDER BY a."createdA
 
 ---
 
+## 11b. Development vs production database (Phase 8)
+
+### Migrations
+
+| Situation                                     | Command                                   | What it does                                                                                                                                                                                            |
+| --------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Development** — you changed `schema.prisma` | `npm run db:migrate -w backend`           | `prisma migrate dev`: creates a **new migration file** from your change, applies it, regenerates the client. Uses a temporary "shadow" database. Commit the new folder in `backend/prisma/migrations/`. |
+| **Development** — pulled new code             | `npm run db:migrate -w backend`           | applies the migrations you don't have yet                                                                                                                                                               |
+| **Production / staging**                      | `npm run db:deploy -w backend`            | `prisma migrate deploy`: applies pending migrations **only**; never creates migrations, never resets, never asks questions. Run by the Render build and by the Docker backend container on start.       |
+| Check what's pending                          | `npx prisma migrate status` (in backend/) | lists applied / pending migrations                                                                                                                                                                      |
+
+Rules: never edit tables by hand, never edit a migration that has already been applied anywhere, never
+run `db:reset` or `migrate dev` against production. A failed production migration: fix the cause, then
+`npx prisma migrate resolve --rolled-back <name>` and deploy again (see the Prisma docs for `migrate resolve`).
+
+### Seed
+
+| Database    | Seed?                                                                                                                                                                            |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Development | `npm run db:seed` — safe to repeat; demo account included                                                                                                                        |
+| Production  | once, after the first `db:deploy`: `NODE_ENV=production npm run db:seed -w backend` (no demo account). After that, change content in the **admin dashboard**, not with the seed. |
+
+### Prisma Studio
+
+`npm run db:studio` opens a local data browser (Section 7). Against production only for reading:
+`DATABASE_URL='<production url>' npm run db:studio -w backend` — edits there bypass validation and the
+audit log, so make content changes in the admin dashboard instead.
+
+### Backups
+
+- **Neon (staging)**: the free plan keeps a short history (point-in-time restore for a limited window)
+  and branches. Before a risky change, create a branch in the Neon console as a snapshot.
+- **Any PostgreSQL** (including Docker Compose):
+  ```bash
+  pg_dump --format=custom --no-owner "$DATABASE_URL" > vachan-$(date +%F).dump        # backup
+  pg_restore --clean --no-owner --dbname "$DATABASE_URL" vachan-2026-10-10.dump        # restore
+  # Docker Compose:
+  docker compose -f docker-compose.prod.yml exec postgres pg_dump -U vachan -Fc vachan > vachan.dump
+  ```
+- Schedule the dump daily (cron / a CI job) and keep copies **outside** the server. Test a restore once.
+- The knowledge-base chunks can always be rebuilt with `npm run rag:index`; user accounts, progress
+  and admin-written content can't — those are what backups protect.
+
+### Important tables
+
+| Table                                                                                       | Why it matters                                                |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `User`, `UserProfile`                                                                       | accounts (scrypt hashes, roles), learner settings             |
+| `Language` → `Course` → `Unit` → `Lesson` → `Exercise` → `ExerciseOption`, `VocabularyItem` | course content (edited in the admin dashboard)                |
+| `UserLessonProgress`, `UserExerciseAttempt`                                                 | progress and every answer (review, analytics)                 |
+| `UserStats`, `XpEvent`, `UserDailyActivity`, `UserAchievement`                              | XP, streaks, hearts, daily goals, badges                      |
+| `PlacementQuestion`, `PlacementTest`, `PlacementAnswer`                                     | placement test                                                |
+| `KnowledgeDocument`, `KnowledgeChunk`                                                       | RAG knowledge base (chunks have 384-d pgvector embeddings)    |
+| `AIConversation`, `AIMessage`                                                               | AI Tutor chats with their sources                             |
+| `SpeechAttempt`, `AudioClip`                                                                | speaking results (no recordings), cached text-to-speech audio |
+| `ConversationSession`, `ConversationTurn`                                                   | role-plays                                                    |
+| `AdminAuditLog`                                                                             | who changed what in the dashboard                             |
+| `_prisma_migrations`                                                                        | which migrations ran — never edit by hand                     |
+
+---
+
 ## 12. Database troubleshooting
 
 | Problem                                                                                                   | Likely cause                                                                            | Fix                                                                                                                       |
@@ -389,7 +461,7 @@ WHERE u.email = 'you@example.com' AND a."isCorrect" = false ORDER BY a."createdA
 | `The table public.Language does not exist` / seed fails                                                   | Migrations not applied                                                                  | `npm run db:migrate`, then `npm run db:seed`                                                                              |
 | `permission denied for schema public` / `User was denied access`                                          | The database belongs to another user (PostgreSQL 15+ only lets the owner create tables) | `psql postgres -c "ALTER DATABASE vachan_dev OWNER TO vachan;"`                                                           |
 | `column "runStartedAt" does not exist` / `invalid input value for enum "ExerciseType": "CHARACTER_SOUND"` | Phase 3 migration not applied yet                                                       | `npm run db:migrate`                                                                                                      |
-| Lessons still show 3 units / old content                                                                  | Not re-seeded after Phase 3                                                             | `npm run db:seed`                                                                                                         |
+| Lessons still show 3 units / old content                                                                  | Content created by an older seed                                                        | Development only: `npm run db:seed:reset-content -w backend` (clears lesson progress)                                     |
 | `Cannot find module '../generated/prisma/client'` / types look outdated                                   | Prisma Client not generated after a schema change                                       | `npm run db:generate`, restart `npm run dev`                                                                              |
 | `prisma generate` fails downloading engines (403 / network)                                               | Firewall or proxy blocks `binaries.prisma.sh`                                           | Use another network, then re-run                                                                                          |
 | Seed: `DATABASE_URL is missing`                                                                           | No `backend/.env`                                                                       | Step 5                                                                                                                    |

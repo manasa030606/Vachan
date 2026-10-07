@@ -4,15 +4,19 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express } from "express";
-import { allowedOrigins } from "./config/env.ts";
+import { allowedOrigins, env } from "./config/env.ts";
 import { errorHandler } from "./middleware/error-handler.ts";
 import { notFoundHandler } from "./middleware/not-found.ts";
+import { securityHeaders } from "./middleware/security-headers.ts";
 import { apiRouter } from "./routes/index.ts";
 
 export function createApp(): Express {
   const app = express();
 
   app.disable("x-powered-by");
+  // Phase 8: trust the hosting proxy so req.ip is the learner's IP (rate limits per IP).
+  app.set("trust proxy", env.TRUST_PROXY ?? (env.NODE_ENV === "production" ? 1 : 0));
+  app.use(securityHeaders);
   // credentials: true lets the browser send the login cookie to the API.
   app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(express.json({ limit: "1mb" }));

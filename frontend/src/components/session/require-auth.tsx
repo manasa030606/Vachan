@@ -17,8 +17,13 @@ export function RequireAuth({ children, allowIncompleteOnboarding = false }: Req
   const { status, user, connectionError, didLogout } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  // Admins can open /admin without choosing a language first.
+  const adminArea = user?.role === "ADMIN" && pathname.startsWith("/admin");
   const needsOnboarding =
-    !allowIncompleteOnboarding && status === "authenticated" && !user?.profile?.onboardingDone;
+    !allowIncompleteOnboarding &&
+    !adminArea &&
+    status === "authenticated" &&
+    !user?.profile?.onboardingDone;
 
   useEffect(() => {
     if (status === "guest" && !connectionError && !didLogout) {

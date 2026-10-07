@@ -34,7 +34,10 @@ export async function listCourses(languageCode?: string) {
     orderBy: [{ language: { sortOrder: "asc" } }, { sortOrder: "asc" }],
     include: {
       language: { select: languageSelect },
-      units: { select: { _count: { select: { lessons: { where: { isPublished: true } } } } } },
+      units: {
+        where: { isPublished: true },
+        select: { _count: { select: { lessons: { where: { isPublished: true } } } } },
+      },
     },
   });
 
@@ -55,6 +58,7 @@ async function loadCourseTree(courseId: string) {
     include: {
       language: { select: languageSelect },
       units: {
+        where: { isPublished: true },
         orderBy: { sortOrder: "asc" },
         include: {
           lessons: {

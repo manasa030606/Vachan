@@ -45,6 +45,12 @@ export type ExerciseWithOptions = Prisma.ExerciseGetPayload<{ include: { options
  * Converts a database exercise into what the browser may see:
  * no `isCorrect`, no word positions, no accepted translations, no explanation.
  */
+/** A lesson learners may see: published, in a published unit of a published course (Phase 8). */
+export const PUBLISHED_LESSON = {
+  isPublished: true,
+  unit: { isPublished: true, course: { isPublished: true } },
+} as const;
+
 export function toPublicExercise(exercise: ExerciseWithOptions) {
   const base = {
     id: exercise.id,
@@ -167,7 +173,7 @@ export function toLessonProgressDto(
 
 async function loadLesson(lessonId: string) {
   const lesson = await prisma.lesson.findFirst({
-    where: { id: lessonId, isPublished: true },
+    where: { id: lessonId, ...PUBLISHED_LESSON },
     include: lessonInclude,
   });
   if (!lesson) throw notFound("LESSON_NOT_FOUND", "Lesson not found");
@@ -212,7 +218,7 @@ export async function getLessonForLearner(lessonId: string, userId: string) {
  */
 export async function startLesson(lessonId: string, userId: string, restart: boolean) {
   const lesson = await prisma.lesson.findFirst({
-    where: { id: lessonId, isPublished: true },
+    where: { id: lessonId, ...PUBLISHED_LESSON },
     select: {
       id: true,
       unit: { select: { courseId: true } },

@@ -9,7 +9,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { AUTH_COOKIE_NAME } from "../lib/auth-cookie.ts";
 import { readAuthToken } from "../lib/auth-token.ts";
-import { unauthorized } from "../lib/http-error.ts";
+import { forbidden, unauthorized } from "../lib/http-error.ts";
 import { prisma } from "../lib/prisma.ts";
 
 function extractToken(req: Request): string | null {
@@ -56,4 +56,15 @@ export async function optionalAuth(req: Request, _res: Response, next: NextFunct
 export function getUserId(req: Request): string {
   if (!req.auth) throw unauthorized();
   return req.auth.userId;
+}
+
+/**
+ * Phase 8: admin-only routes. Use AFTER requireAuth. The role is read from the database on every
+ * request (authenticate() above), so removing someone's admin role takes effect immediately.
+ */
+export function requireAdmin(req: Request, _res: Response, next: NextFunction) {
+  if (req.auth?.role !== "ADMIN") {
+    throw forbidden("ADMIN_ONLY", "Only Vachan admins can do this");
+  }
+  next();
 }

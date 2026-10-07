@@ -2,7 +2,7 @@
 
 // Profile: account details (GET /api/me), learning progress (GET /api/progress),
 // XP / streak / level (GET /api/stats), badges (GET /api/achievements) and settings.
-import { Compass } from "lucide-react";
+import { Compass, ShieldCheck } from "lucide-react";
 import { useSession } from "@/components/session/session-provider";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -66,6 +66,21 @@ export function ProfileView() {
           Take the test
         </ButtonLink>
       </Card>
+      {user?.role === "ADMIN" && (
+        <Card className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <ShieldCheck aria-hidden="true" className="size-10 shrink-0 text-brand-600" />
+          <div className="flex-1">
+            <h2 className="text-lg font-bold">Admin dashboard</h2>
+            <p className="text-sm text-slate-600">
+              Manage languages, lessons, exercises, vocabulary and the AI Tutor’s knowledge base,
+              and see learning analytics.
+            </p>
+          </div>
+          <ButtonLink href="/admin" variant="secondary">
+            Open dashboard
+          </ButtonLink>
+        </Card>
+      )}
     </div>
   );
 }
