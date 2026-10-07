@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
+/** Turns any thrown error into one readable line (includes field-level validation messages). */
 export function errorText(error: unknown): string {
   if (error instanceof ApiError) {
     const details = error.details as unknown;
@@ -24,6 +25,7 @@ export function errorText(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong";
 }
 
+/** A label + input pair; `children` receives the id that links the label to the input. */
 export function Field({
   label,
   hint,
@@ -48,12 +50,15 @@ export function Field({
 const inputClass =
   "w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-ink outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100";
 
+// Text inputs styled the same way across the admin forms.
 export function Input(props: ComponentProps<"input">) {
   return <input {...props} className={cn(inputClass, props.className)} />;
 }
+
 export function Textarea(props: ComponentProps<"textarea">) {
   return <textarea {...props} className={cn(inputClass, "font-mono text-sm", props.className)} />;
 }
+
 /**
  * Dropdown styled like the other inputs: the browser's own arrow is hidden (it sat against the
  * edge and looked different in every browser) and replaced by an indigo chevron with room around it.
@@ -96,6 +101,7 @@ export function Select({
   );
 }
 
+/** Green "Published" or grey "Draft" pill. */
 export function StatusBadge({
   published,
   labels = ["Published", "Draft"],
@@ -116,6 +122,7 @@ export function StatusBadge({
   );
 }
 
+/** A coloured message line; errors are announced to screen readers as alerts. */
 export function Notice({
   tone = "error",
   children,
@@ -139,7 +146,7 @@ export function Notice({
   );
 }
 
-/** A button that runs an async action and shows a spinner; errors go to onError. */
+/** A button that runs an async action and shows a spinner; errors go to onFail. */
 export function ActionButton({
   action,
   onFail,
@@ -250,6 +257,7 @@ export function BarList({
   max?: number;
 }) {
   const top = max ?? Math.max(1, ...rows.map((row) => row.value ?? 0));
+  const shown = (value: number | null) => (value === null ? "–" : format(value));
   return (
     <figure className="space-y-2">
       <figcaption className="font-extrabold text-ink">{title}</figcaption>
@@ -267,7 +275,7 @@ export function BarList({
               </span>
               <span
                 className="h-3 rounded-full bg-slate-100"
-                title={`${row.label}: ${row.value === null ? "–" : format(row.value)}${row.note ? ` (${row.note})` : ""}`}
+                title={`${row.label}: ${shown(row.value)}${row.note ? ` (${row.note})` : ""}`}
               >
                 <span
                   className="block h-3 rounded-full bg-brand-500"
@@ -277,7 +285,7 @@ export function BarList({
                 />
               </span>
               <span className="w-16 text-right font-bold text-ink tabular-nums">
-                {row.value === null ? "–" : format(row.value)}
+                {shown(row.value)}
               </span>
             </li>
           ))}

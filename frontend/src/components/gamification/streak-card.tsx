@@ -3,9 +3,10 @@
 import { Flame } from "lucide-react";
 import { useStats } from "@/components/session/stats-provider";
 import { Card } from "@/components/ui/card";
+import type { StatsDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
-/** First letter of the weekday for a YYYY-MM-DD date. */
+/** First letter of the weekday for a YYYY-MM-DD date (noon UTC avoids time-zone shifts). */
 function weekdayLetter(date: string): string {
   return new Date(`${date}T12:00:00Z`).toLocaleDateString("en", {
     weekday: "narrow",
@@ -13,7 +14,14 @@ function weekdayLetter(date: string): string {
   });
 }
 
-/** Current streak with the last 7 days (GET /api/stats → streak). */
+/** e.g. "Done for today · longest 4 days". */
+function streakSummary(streak: StatsDto["streak"]): string {
+  const today = streak.activeToday ? "Done for today" : "Earn XP today to keep it going";
+  const dayWord = streak.longest === 1 ? "day" : "days";
+  return `${today} · longest ${streak.longest} ${dayWord}`;
+}
+
+/** Current streak with the last 7 days (from GET /api/stats). */
 export function StreakCard() {
   const { stats } = useStats();
   const streak = stats?.streak;
@@ -28,11 +36,7 @@ export function StreakCard() {
           <h2 className="text-lg font-bold">
             {streak ? `${streak.current} day streak` : "Streak"}
           </h2>
-          <p className="text-sm text-slate-500">
-            {streak
-              ? `${streak.activeToday ? "Done for today" : "Earn XP today to keep it going"} · longest ${streak.longest} ${streak.longest === 1 ? "day" : "days"}`
-              : "Loading…"}
-          </p>
+          <p className="text-sm text-slate-500">{streak ? streakSummary(streak) : "Loading…"}</p>
         </div>
       </div>
       {streak && (

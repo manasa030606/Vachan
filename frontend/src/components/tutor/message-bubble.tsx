@@ -1,4 +1,4 @@
-// One chat message. Tutor answers show their status, examples and sources.
+// One chat message. Tutor answers also show their status, examples and sources.
 import { SearchX, ShieldAlert } from "lucide-react";
 import { LogoMark } from "@/components/brand/logo";
 import type { TutorMessageDto } from "@/lib/api/types";
@@ -6,9 +6,11 @@ import { cn } from "@/lib/cn";
 import { ReferencesList } from "./references-list";
 import { RichText } from "./rich-text";
 
+/** Time of day for a message, e.g. "14:05". */
 const time = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+/** A learner question (right side) or a tutor answer (left side). */
 export function MessageBubble({ message }: { message: TutorMessageDto }) {
   if (message.role === "user") {
     return (
@@ -23,6 +25,7 @@ export function MessageBubble({ message }: { message: TutorMessageDto }) {
     );
   }
 
+  // "insufficient": the notes don't cover the question. "refused": the question was off-topic.
   const insufficient = message.status === "insufficient";
   const refused = message.status === "refused";
   return (
@@ -79,6 +82,7 @@ export function MessageBubble({ message }: { message: TutorMessageDto }) {
   );
 }
 
+/** Animated dots shown while the tutor is answering. */
 export function TypingBubble() {
   return (
     <div className="flex items-start gap-3" role="status" aria-live="polite">

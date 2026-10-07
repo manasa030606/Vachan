@@ -1,6 +1,6 @@
-// API test for the RAG retrieval endpoints (Phase 5).
-// Needs: migrated + seeded database, `npm run rag:index -w backend`, and the embedding model
-// (downloaded on first use). Run with:  npm run test:rag -w backend
+// API tests for the RAG retrieval endpoints (knowledge-base search and stats).
+// Needs a migrated + seeded database, rag:index, and the embedding model (downloaded on first use).
+// Run with:  npm run test:rag -w backend
 import assert from "node:assert/strict";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -27,6 +27,7 @@ async function call(method: string, path: string, body?: unknown, auth = true) {
 }
 
 const search = (body: unknown) => call("POST", "/api/rag/search", body);
+// Ids of the top `n` search results.
 const topIds = (body: Json, n = 3) =>
   (body.results as Json[]).slice(0, n).map((r) => r.id as string);
 

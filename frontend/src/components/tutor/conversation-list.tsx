@@ -5,6 +5,7 @@ import { MessagesSquare, Plus, Trash2 } from "lucide-react";
 import type { TutorConversationDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
+/** Sidebar list of earlier chats with "New chat" and delete buttons. */
 export function ConversationList({
   conversations,
   activeId,

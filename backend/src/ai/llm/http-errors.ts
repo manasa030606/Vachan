@@ -1,5 +1,5 @@
 // Turns provider errors (LlmError) into clear HTTP errors for the learner.
-// Shared by the tutor (Phase 6), speech and conversation (Phase 7).
+// Shared by the tutor, speech and conversation features.
 import { HttpError } from "../../lib/http-error.ts";
 import type { LlmError } from "./types.ts";
 

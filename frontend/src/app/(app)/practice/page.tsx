@@ -1,3 +1,4 @@
+// /practice — review session, open mistakes and everything learned so far.
 import type { Metadata } from "next";
 import { PracticeView } from "@/components/practice/practice-view";
 

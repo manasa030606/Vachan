@@ -30,6 +30,13 @@ const stateClasses: Record<OptionState, string> = {
   dimmed: "border-slate-200 bg-white opacity-50",
 };
 
+/** Text size for the option label: single letters are biggest, then Indian-script words. */
+function optionTextSize(glyph?: boolean, large?: boolean): string {
+  if (glyph) return "font-display text-5xl leading-tight sm:text-6xl";
+  if (large) return "font-display text-xl sm:text-2xl";
+  return "text-lg";
+}
+
 export function OptionButton({
   option,
   state,
@@ -61,18 +68,7 @@ export function OptionButton({
         </span>
       )}
       <span className={cn("flex-1", glyph && "text-center")}>
-        <span
-          className={cn(
-            "block font-bold",
-            glyph
-              ? "font-display text-5xl leading-tight sm:text-6xl"
-              : large
-                ? "font-display text-xl sm:text-2xl"
-                : "text-lg",
-          )}
-        >
-          {option.text}
-        </span>
+        <span className={cn("block font-bold", optionTextSize(glyph, large))}>{option.text}</span>
         {showSubtext && option.subtext && (
           <span className="block text-sm text-slate-500">{option.subtext}</span>
         )}

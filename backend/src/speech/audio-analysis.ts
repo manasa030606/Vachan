@@ -1,4 +1,4 @@
-// Measures a recording WITHOUT any AI: how long it is, when there was sound, pauses,
+// Measures a recording without any AI: how long it is, when there was sound, pauses,
 // loudness, distortion. Used to reject empty/broken audio before it reaches the paid
 // speech-to-text API, and for the timing-based fluency feedback.
 //

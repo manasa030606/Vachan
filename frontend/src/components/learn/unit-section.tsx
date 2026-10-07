@@ -4,11 +4,13 @@ import type { Unit } from "@/types/learning";
 import { cn } from "@/lib/cn";
 import { LessonNode, UNIT_COLORS } from "./lesson-node";
 
-/** Horizontal offsets (px) for each lesson — makes the path wind. Mirrored for every other unit. */
+/** Horizontal offsets (px) for each lesson, so the path winds left and right. */
 const PATH_OFFSETS = [0, 52, 76, 52, 0, -52, -76, -52];
 
 export function UnitSection({ unit }: { unit: Unit }) {
   const colors = UNIT_COLORS[unit.color];
+  // Even-numbered units wind the other way, so units do not all look the same.
+  const direction = unit.number % 2 === 0 ? -1 : 1;
   const completedCount = unit.lessons.filter((lesson) => lesson.status === "completed").length;
 
   return (
@@ -19,7 +21,7 @@ export function UnitSection({ unit }: { unit: Unit }) {
           colors.banner,
         )}
       >
-        {/* decorative kolam dots */}
+        {/* Decorative kolam dots */}
         <div
           aria-hidden="true"
           className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(rgba(255,255,255,0.25)_1.5px,transparent_1.5px)] bg-[size:18px_18px]"
@@ -49,7 +51,7 @@ export function UnitSection({ unit }: { unit: Unit }) {
             lesson={lesson}
             lessonNumber={index + 1}
             color={unit.color}
-            offsetX={PATH_OFFSETS[index % PATH_OFFSETS.length] * (unit.number % 2 === 0 ? -1 : 1)}
+            offsetX={PATH_OFFSETS[index % PATH_OFFSETS.length] * direction}
           />
         ))}
       </ol>

@@ -1,7 +1,7 @@
 "use client";
 
-// "Ask the tutor" panel inside a lesson: opens next to the exercise (the lesson keeps its state),
-// starts with "Why is my answer wrong?" for the exercise the learner just answered.
+// "Ask the tutor" panel inside a lesson. It opens on top of the exercise (the lesson keeps its
+// state) and starts by asking "Why is my answer wrong?" about the exercise just answered.
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { getLanguage } from "@/data/languages";
@@ -15,6 +15,7 @@ const FOLLOW_UPS = [
   "How do I remember this?",
 ];
 
+/** Side panel with the tutor chat; closes on Escape or a click outside. */
 export function TutorDrawer({
   lessonId,
   exerciseId,
@@ -26,6 +27,7 @@ export function TutorDrawer({
 }) {
   const { languageCode } = useLearnerPreferences();
   const chat = useTutorChat({ lessonId, exerciseId });
+  // A ref (not state) so the first question is sent only once, even if the effect runs twice.
   const asked = useRef(false);
 
   useEffect(() => {

@@ -49,6 +49,7 @@ const FEATURES: Feature[] = [
   },
 ];
 
+/** Landing page: grid of the main features (some marked "Coming soon"). */
 export function FeatureGrid() {
   return (
     <section id="features" className="scroll-mt-20 bg-white py-20">

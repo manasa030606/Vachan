@@ -13,6 +13,7 @@ import { PasswordField } from "./password-field";
 
 type Values = { name: string; email: string; password: string };
 
+/** Sign-up form: creates the account, logs the user in and sends them to onboarding. */
 export function RegisterForm() {
   const router = useRouter();
   const { setUser } = useSession();
@@ -42,7 +43,7 @@ export function RegisterForm() {
       if (error instanceof ApiError && error.code === "EMAIL_ALREADY_REGISTERED") {
         setErrors({ email: "An account with this email already exists. Try logging in." });
       } else if (error instanceof ApiError && error.details?.length) {
-        // Server-side validation errors → show them under the matching fields.
+        // Validation errors from the server are shown under the matching fields.
         setErrors(
           Object.fromEntries(
             error.details.map((detail) => [detail.field, detail.message]),

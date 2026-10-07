@@ -1,6 +1,6 @@
 "use client";
 
-// Scenario selection for role-play practice + recent sessions.
+// Scenario selection for role-play practice, plus a list of recent sessions.
 import {
   Bus,
   Handshake,
@@ -25,6 +25,7 @@ export const SCENARIO_ICONS: Record<ScenarioId, LucideIcon> = {
   everyday: MessagesSquare,
 };
 
+// Display names for the partner's language level.
 const LEVEL = { beginner: "Beginner", elementary: "Elementary", intermediate: "Intermediate" };
 
 type Props = {
@@ -36,6 +37,7 @@ type Props = {
   onDelete: (sessionId: string) => void;
 };
 
+/** Grid of role-play scenarios to start, and recent role-plays to reopen or delete. */
 export function ScenarioPicker({ data, sessions, starting, onStart, onOpen, onDelete }: Props) {
   return (
     <div className="space-y-6">

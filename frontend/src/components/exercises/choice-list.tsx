@@ -1,6 +1,6 @@
 "use client";
 
-// A list of OptionButtons with single selection + number-key shortcuts.
+// A list of OptionButtons with single selection and number-key shortcuts (1, 2, 3...).
 // Shared by multiple-choice, character-sound, character-recognition and fill-in-the-blank.
 import { useCallback } from "react";
 import type { ChoiceOption } from "@/types/exercise";

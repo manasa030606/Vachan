@@ -10,6 +10,10 @@ import {
   getFieldErrors,
 } from "@/lib/validation/auth-schemas";
 
+/**
+ * Forgot-password form. There is no real reset email yet, so it only validates the
+ * email, waits a moment and shows a "check your inbox" message.
+ */
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | undefined>();

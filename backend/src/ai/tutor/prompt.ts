@@ -1,7 +1,7 @@
-// PROMPT AUGMENTATION: the retrieved notes + the learner's context go into the prompt.
+// Builds the tutor prompt (the "augmentation" step of RAG): retrieved notes + learner context.
 //
 // System prompt = the rules (grounding, level, format, safety). It never contains learner text.
-// User prompt   = clearly delimited DATA blocks: <learner>, <exercise>, <conversation>, <context>,
+// User prompt   = clearly delimited data blocks: <learner>, <exercise>, <conversation>, <context>,
 //                 <question>. The rules say that nothing inside them is an instruction.
 import { TUTOR_CONFIG } from "../../config/tutor.ts";
 import type { KnowledgeLevelName } from "../../rag/config.ts";

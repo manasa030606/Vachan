@@ -12,9 +12,12 @@ export type LevelInfo = {
   isMaxLevel: boolean;
 };
 
+/** The learner's level for a total XP: the highest threshold they have reached. */
 export function levelFor(totalXp: number, thresholds: readonly number[]): LevelInfo {
   let index = 0;
-  for (let i = 0; i < thresholds.length; i++) if (totalXp >= thresholds[i]) index = i;
+  for (let i = 0; i < thresholds.length; i++) {
+    if (totalXp >= thresholds[i]) index = i;
+  }
   const levelStartXp = thresholds[index];
   const nextLevelXp = thresholds[index + 1] ?? null;
   return {

@@ -1,3 +1,4 @@
+// /learn — the learning path of units and lessons (home page after login).
 import type { Metadata } from "next";
 import { LearnView } from "@/components/learn/learn-view";
 

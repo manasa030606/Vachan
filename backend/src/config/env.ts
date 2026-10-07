@@ -24,14 +24,14 @@ const envSchema = z.object({
     .string()
     .regex(/^\d+[smhd]$/, 'JWT_EXPIRES_IN must look like "7d", "12h" or "30m"')
     .default("7d"),
-  // Phase 5 (RAG) — optional. Folder for the embedding model files (default: backend/.cache/models).
+  // RAG (optional). Folder for the embedding model files (default: backend/.cache/models).
   RAG_MODEL_DIR: z.string().trim().min(1).optional(),
   // "false" = never download the model (use only files already in RAG_MODEL_DIR).
   RAG_ALLOW_DOWNLOAD: z.enum(["true", "false"]).default("true"),
   // RAG search loads a ~500 MB model in memory. Default: on locally, OFF in production
   // (Render's free plan has 512 MB). Set RAG_ENABLED=true on a server with ≥ 1 GB RAM.
   RAG_ENABLED: z.enum(["true", "false"]).optional(),
-  // Phase 6 (AI tutor). The API keys stay on the server — never in the frontend or in git.
+  // AI tutor. The API keys stay on the server — never in the frontend or in git.
   //   gemini = Google AI Studio (free tier) · groq = Groq (free tier) · mock = offline test double
   LLM_PROVIDER: z.enum(["gemini", "groq", "mock"]).default("gemini"),
   GEMINI_API_KEY: z.string().trim().optional(),
@@ -46,7 +46,7 @@ const envSchema = z.object({
   // Per-learner limits for POST /api/ai/tutor (protects the free API quota).
   TUTOR_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(6),
   TUTOR_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(100),
-  // Phase 7 (speech). Same API keys as the tutor; nothing new is needed for the defaults.
+  // Speech. Same API keys as the tutor; nothing new is needed for the defaults.
   // Speech-to-text: gemini (listens with the LLM model) · groq (Whisper) · mock (test double).
   // Default: the same provider as LLM_PROVIDER.
   STT_PROVIDER: z.enum(["gemini", "groq", "mock"]).optional(),
@@ -66,10 +66,10 @@ const envSchema = z.object({
   SPEECH_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(150),
   CONVERSATION_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(1000).default(8),
   CONVERSATION_RATE_LIMIT_PER_DAY: z.coerce.number().int().min(1).max(100_000).default(150),
-  // Phase 8 security: brute-force limits (login per IP + email, sign-ups per IP).
+  // Brute-force limits (login per IP + email, sign-ups per IP).
   LOGIN_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(10_000).default(10),
   REGISTER_RATE_LIMIT_PER_HOUR: z.coerce.number().int().min(1).max(100_000).default(20),
-  // Phase 8: behind a proxy (Render, Docker + nginx) the client IP is in X-Forwarded-For.
+  // Behind a proxy (Render, Docker + nginx) the client IP is in X-Forwarded-For.
   // Number of proxies to trust; default 1 in production, 0 locally.
   TRUST_PROXY: z.coerce.number().int().min(0).max(5).optional(),
 });

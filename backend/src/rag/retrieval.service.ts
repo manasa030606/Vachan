@@ -3,13 +3,13 @@
 //   question ──embedQuery──► vector ──pgvector (language filter)──► 40 nearest chunks
 //            ──rankCandidates (level, topic, exact words)──► top N + relevance details
 //
-// No LLM is called here. Phase 6 (AI tutor) will call searchKnowledge() and build its prompt
-// only from the returned chunks.
+// No LLM is called here. The AI tutor calls searchKnowledge() and builds its prompt only from
+// the returned chunks.
 import { HttpError } from "../lib/http-error.ts";
 import { prisma } from "../lib/prisma.ts";
 import { RAG_CONFIG, type KnowledgeLevelName } from "./config.ts";
 import { embedQuery, EmbeddingModelError } from "./embeddings.ts";
-import { inferLanguage, nativeTerms } from "./language-detect.ts";
+import { inferLanguage, nativeTerms, type LanguageGuess } from "./language-detect.ts";
 import { rankCandidates } from "./ranking.ts";
 import type { LanguageCode } from "./types.ts";
 import { searchSimilar } from "./vector-store.ts";
@@ -26,6 +26,13 @@ export type SearchRequest = {
 
 const fromEnum = (value: string) => value.toLowerCase().replace(/_/g, "-");
 
+/** Explains where the language filter came from (shown in the response for debugging). */
+function describeLanguageSource(request: SearchRequest, guess: LanguageGuess | null): string {
+  if (request.vectorOnly) return "ignored (vector-only)";
+  if (request.language) return "request";
+  return guess?.reason ?? "not-detected (all languages searched)";
+}
+
 export async function searchKnowledge(request: SearchRequest) {
   const started = performance.now();
   const limit = Math.min(
@@ -36,11 +43,7 @@ export async function searchKnowledge(request: SearchRequest) {
   // 1. Language: given by the caller, else inferred from the question, else all languages.
   const guess = request.language ? null : inferLanguage(request.query);
   const languageCode = request.vectorOnly ? null : (request.language ?? guess?.code ?? null);
-  const languageSource = request.vectorOnly
-    ? "ignored (vector-only)"
-    : request.language
-      ? "request"
-      : (guess?.reason ?? "not-detected (all languages searched)");
+  const languageSource = describeLanguageSource(request, guess);
 
   const indexed = await prisma.knowledgeChunk.count({
     where: languageCode ? { languageCode } : {},
@@ -80,7 +83,7 @@ export async function searchKnowledge(request: SearchRequest) {
       });
   const top = ranked.slice(0, limit);
 
-  // 5. Is the best match close enough to answer from? (Phase 6 must not answer otherwise.)
+  // 5. Is the best match close enough to answer from? (The tutor must not answer otherwise.)
   const bestSimilarity = Math.max(0, ...top.map((chunk) => chunk.relevance.similarity));
   const sufficient = bestSimilarity >= RAG_CONFIG.retrieval.minSimilarity;
   const tookMs = Math.round(performance.now() - started);
@@ -102,7 +105,7 @@ export async function searchKnowledge(request: SearchRequest) {
     relevance: chunk.relevance,
   }));
 
-  // Spec: "log retrieval results for debugging".
+  // Log the top results so retrieval problems are easy to debug.
   console.info(
     `[rag] "${request.query.slice(0, 80)}" lang=${languageCode ?? "*"} level=${request.level ?? "-"} ` +
       `topic=${request.topic ?? "-"} → ${results

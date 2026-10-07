@@ -11,7 +11,7 @@ type LessonTopBarProps = {
   exitHref: string;
 };
 
-/** Exit button, lesson progress and hearts — always visible during a lesson. */
+/** Exit button, lesson progress and hearts, always visible during a lesson. */
 export function LessonTopBar({ completed, total, hearts, exitHref }: LessonTopBarProps) {
   return (
     <div className="mx-auto flex w-full max-w-2xl items-center gap-4 px-4 pt-4 sm:pt-6">

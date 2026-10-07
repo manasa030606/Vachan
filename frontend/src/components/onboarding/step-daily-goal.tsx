@@ -8,6 +8,7 @@ type StepDailyGoalProps = {
   onChange: (id: DailyGoalId) => void;
 };
 
+/** Onboarding step: choose how much to practise each day. */
 export function StepDailyGoal({ value, onChange }: StepDailyGoalProps) {
   return (
     <fieldset>

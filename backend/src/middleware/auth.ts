@@ -41,7 +41,7 @@ async function authenticate(req: Request): Promise<Request["auth"] | null> {
 export async function requireAuth(req: Request, _res: Response, next: NextFunction) {
   const auth = await authenticate(req);
   if (!auth) {
-    throw unauthorized("You need to log in to do this. Send a valid token (see README → Postman).");
+    throw unauthorized("You need to log in to do this. Send a valid token (see docs/API.md).");
   }
   req.auth = auth;
   next();
@@ -59,8 +59,8 @@ export function getUserId(req: Request): string {
 }
 
 /**
- * Phase 8: admin-only routes. Use AFTER requireAuth. The role is read from the database on every
- * request (authenticate() above), so removing someone's admin role takes effect immediately.
+ * Admin-only routes. Use AFTER requireAuth. The role is read from the database on every request
+ * (authenticate() above), so removing someone's admin role takes effect immediately.
  */
 export function requireAdmin(req: Request, _res: Response, next: NextFunction) {
   if (req.auth?.role !== "ADMIN") {

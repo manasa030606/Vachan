@@ -8,8 +8,10 @@ import { getUserById, type UserDto } from "./user.service.ts";
 
 export type AuthResult = { user: UserDto; token: string };
 
-let dummy: Promise<string> | null = null;
-const dummyHash = () => (dummy ??= hashPassword("not-a-real-password-0"));
+// A hash of a made-up password, created once. Login checks against it when the email is
+// unknown, so that case takes as long as a real wrong password (see loginUser).
+let dummyHashPromise: Promise<string> | null = null;
+const dummyHash = () => (dummyHashPromise ??= hashPassword("not-a-real-password-0"));
 
 export async function registerUser(input: RegisterInput): Promise<AuthResult> {
   const existing = await prisma.user.findUnique({ where: { email: input.email } });
@@ -37,8 +39,8 @@ export async function loginUser(input: LoginInput): Promise<AuthResult> {
 
   // Same message whether the email or the password is wrong, so attackers
   // can't use the login form to discover which emails are registered.
-  // Phase 8: an unknown email still runs a full scrypt check, so the response time doesn't
-  // reveal whether the account exists (timing-based user enumeration).
+  // An unknown email still runs a full scrypt check, so the response time doesn't reveal
+  // whether the account exists either.
   const passwordOk = await verifyPassword(
     input.password,
     user?.passwordHash ?? (await dummyHash()),

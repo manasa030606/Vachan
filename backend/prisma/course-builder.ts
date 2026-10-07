@@ -1,6 +1,5 @@
 // Turns one language from seed-data.ts into a complete beginner course.
-// Every language gets the same high-level path (spec section 4) with its own letters,
-// words and sentences:
+// Every language gets the same path with its own letters, words and sentences:
 //
 //   Unit 1  Vowels               (Foundations)       a·aa → i·ii → u·uu → vowel review
 //   Unit 2  Consonants & sounds  (Foundations)       ka·ma → na·pa → ra·la → vowel signs
@@ -8,8 +7,8 @@
 //   Unit 4  Basic sentences      (Everyday phrases)  introductions → how are you → asking → review
 //
 // 4 units → 16 small lessons → 67 exercises per language, using all 7 exercise types.
-// Pure functions with readable, predictable ids (e.g. "te-u3-l1-e2") so you can type
-// them straight into Postman.
+// Pure functions with readable, predictable ids (e.g. "te-u3-l1-e2"), so ids are easy to
+// type when testing the API by hand.
 import type {
   ExerciseType,
   LearningStage,
@@ -95,7 +94,7 @@ export type CourseSeed = {
   placementQuestions: PlacementQuestionSeed[];
 };
 
-// ── Small helpers ────────────────────────────────────────────
+// Small helpers
 
 /** Predictable "shuffle": rotates the list by an amount derived from the exercise id. */
 export function shuffleFor<T>(id: string, items: T[]): T[] {
@@ -125,7 +124,7 @@ const SOUND_SPELLINGS: Partial<Record<string, string[]>> = {
   uu: ["uu", "oo"],
 };
 
-// ── Exercise factories ───────────────────────────────────────
+// Exercise factories
 
 /** Letter → sound ("What sound does this letter make?"). */
 function characterSound(id: string, letter: Letter, others: Letter[]): ExerciseSeed {
@@ -299,7 +298,7 @@ function buildSentence(
   };
 }
 
-// ── The course ───────────────────────────────────────────────
+// The course
 
 export function buildCourse(language: SeedLanguage): CourseSeed {
   const c = language.code;
@@ -362,7 +361,7 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
     index === 1 ? [words.milk.script, words.milk.romanization] : token,
   );
 
-  // ── Vocabulary (numbered in teaching order) ──
+  // Vocabulary (numbered in teaching order)
   const vocabulary: VocabularySeed[] = [];
   const vocab = (
     slug: string,
@@ -390,6 +389,7 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
   const phraseVocab = (slug: string, phrase: { script: string; roman: string }, meaning: string) =>
     vocab(slug, "PHRASE", phrase.script, phrase.roman, meaning, "Phrases");
 
+  // Vocabulary ids by key: V = vowels, C = consonants, S = syllables, W = words, P = phrases.
   const V = Object.fromEntries(
     VOWEL_KEYS.map((key) => [key, letterVocab(vowel[key], "Vowel", "Vowels")]),
   ) as Record<VowelKey, string>;
@@ -435,7 +435,7 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
       : spellings;
   };
 
-  // ── Unit 1: Vowels ──
+  // Unit 1: Vowels
   const u1 = [1, 2, 3, 4].map((n) => lessonId(1, n));
   const unit1: UnitSeed = {
     id: `${c}-u1`,
@@ -511,7 +511,7 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
     ],
   };
 
-  // ── Unit 2: Consonants & sounds ──
+  // Unit 2: Consonants & sounds
   const u2 = [1, 2, 3, 4].map((n) => lessonId(2, n));
   const unit2: UnitSeed = {
     id: `${c}-u2`,
@@ -576,7 +576,7 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
     ],
   };
 
-  // ── Unit 3: First words ──
+  // Unit 3: First words
   const u3 = [1, 2, 3, 4].map((n) => lessonId(3, n));
   const unit3: UnitSeed = {
     id: `${c}-u3`,
@@ -667,7 +667,7 @@ export function buildCourse(language: SeedLanguage): CourseSeed {
     ],
   };
 
-  // ── Unit 4: Basic sentences ──
+  // Unit 4: Basic sentences
   const u4 = [1, 2, 3, 4].map((n) => lessonId(4, n));
   const unit4: UnitSeed = {
     id: `${c}-u4`,

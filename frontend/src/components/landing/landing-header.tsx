@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { ButtonLink } from "@/components/ui/button";
 
+/** Sticky header of the public landing page, with in-page links and log-in buttons. */
 export function LandingHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/60 bg-paper/90 backdrop-blur">

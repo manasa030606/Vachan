@@ -1,14 +1,12 @@
 // Runs the whole ingestion pipeline:
 //   content → cleaning → chunking → embeddings → vector storage
-// Re-running is safe and cheap: a document whose cleaned chunks haven't changed is skipped,
-// and documents that were deleted from the knowledge base are removed from the database.
 //
-// Phase 8 (content management):
-//   • admin documents (written in the dashboard) are indexed like files
-//   • DRAFT documents are never indexed — their chunks are removed, so search can't find them
-//   • admin documents are never "removed as stale" (their text lives in the database)
-//   • indexDocuments() re-indexes selected documents only (the dashboard's Re-index button)
-//   • one indexing job at a time per server process (withIndexLock)
+// Re-indexing is safe:
+//   - each document has a hash of its chunks; unchanged documents are skipped (cheap re-runs)
+//   - a document's chunks are replaced in one transaction, so search never sees a half-indexed one
+//   - DRAFT documents are never indexed (their chunks are removed)
+//   - deleted files are removed, but admin documents are not (their text lives in the database)
+//   - only one indexing job runs at a time per server process (withIndexLock)
 import type { PrismaClient } from "../generated/prisma/client.ts";
 import { chunkDocument, sha256 } from "./chunking.ts";
 import { RAG_CONFIG } from "./config.ts";
@@ -28,10 +26,14 @@ export type IndexReport = {
   seconds: number;
 };
 
-const originOf = (id: string): "FILE" | "COURSE" | "ADMIN" =>
-  id.startsWith("course/") ? "COURSE" : id.startsWith("admin/") ? "ADMIN" : "FILE";
+/** Where a document came from, based on its id prefix. */
+function originOf(id: string): "FILE" | "COURSE" | "ADMIN" {
+  if (id.startsWith("course/")) return "COURSE";
+  if (id.startsWith("admin/")) return "ADMIN";
+  return "FILE";
+}
 
-// ── One job at a time ───────────────────────────────────────────
+// One job at a time
 
 let running: Promise<unknown> | null = null;
 
@@ -56,8 +58,9 @@ export async function withIndexLock<T>(job: () => Promise<T>): Promise<T> {
 
 export const isIndexing = () => running !== null;
 
-// ── Preparing documents ─────────────────────────────────────────
+// Preparing documents
 
+/** Chunks a document and computes one hash over all its chunks (and the model name). */
 export function prepare(document: SourceDocument) {
   const chunks = chunkDocument(document);
   const contentHash = sha256(
@@ -98,7 +101,7 @@ export async function removeChunks(prisma: PrismaClient, documentId: string) {
   ]);
 }
 
-// ── Full run (npm run rag:index) ────────────────────────────────
+// Full run (npm run rag:index)
 
 export async function indexKnowledgeBase(
   prisma: PrismaClient,

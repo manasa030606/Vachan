@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useStats } from "@/components/session/stats-provider";
 import { Card } from "@/components/ui/card";
 
-/** Badge count + the latest badges (full list on the Profile page). */
+/** Badge count and the latest badges. The full list is on the Profile page. */
 export function AchievementsCard() {
   const { stats } = useStats();
   const badges = stats?.achievements;

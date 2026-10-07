@@ -13,6 +13,7 @@ type ChoiceCardProps = {
   className?: string;
 };
 
+/** One option in an onboarding question, e.g. a language or a daily goal. */
 export function ChoiceCard({
   name,
   value,

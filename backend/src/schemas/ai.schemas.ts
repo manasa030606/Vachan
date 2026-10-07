@@ -1,3 +1,4 @@
+// Request validation for the AI tutor and role-play conversation routes.
 import { z } from "zod";
 import { CONVERSATION_CONFIG, SCENARIO_IDS } from "../config/conversation.ts";
 import { TUTOR_CONFIG } from "../config/tutor.ts";
@@ -41,7 +42,7 @@ export const conversationListQuerySchema = z.object({
   language: z.enum(LANGUAGE_CODES).optional(),
 });
 
-// ── Phase 7: role-play conversation ─────────────────────────────
+// Role-play conversation
 
 /** GET /api/ai/conversation/scenarios?language=te  ·  GET /api/ai/conversation?language=te */
 export const conversationLanguageQuerySchema = z.object({

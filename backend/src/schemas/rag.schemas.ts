@@ -1,3 +1,4 @@
+// Request validation for the knowledge-base search.
 import { z } from "zod";
 import { KNOWLEDGE_LEVELS, RAG_CONFIG } from "../rag/config.ts";
 import { LANGUAGE_CODES } from "../rag/types.ts";

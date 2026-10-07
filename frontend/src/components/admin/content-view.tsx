@@ -31,8 +31,10 @@ import {
 } from "./admin-ui";
 import { useLoad } from "./use-load";
 
+/** Shows a success or error message at the top of the page. */
 type Say = (tone: "error" | "success", text: string) => void;
-type Ctx = { say: Say; reload: () => void };
+/** Passed down the tree so every row can show a message and refresh the page after a change. */
+type TreeContext = { say: Say; reload: () => void };
 
 export function ContentView() {
   const languages = useLoad(() => admin.languages(), "languages");
@@ -40,15 +42,17 @@ export function ContentView() {
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
   const [addingLanguage, setAddingLanguage] = useState(false);
 
-  const list = languages.data?.languages ?? [];
-  const code = picked ?? list[0]?.code ?? "";
+  const languageList = languages.data?.languages ?? [];
+  // Show the first language until the admin picks another one.
+  const code = picked ?? languageList[0]?.code ?? "";
   const tree = useLoad(() => (code ? admin.content(code) : Promise.resolve(null)), code);
   const say: Say = (tone, text) => setMessage({ tone, text });
+  // Changes in the tree also change the language counts, so refresh both.
   const reload = () => {
     tree.reload();
     languages.reload();
   };
-  const language = list.find((l) => l.code === code);
+  const language = languageList.find((l) => l.code === code);
 
   return (
     <div className="space-y-5">
@@ -63,7 +67,7 @@ export function ContentView() {
                   setPicked(event.target.value);
                   setMessage(null);
                 }}
-                options={list.map((l) => ({
+                options={languageList.map((l) => ({
                   value: l.code,
                   label: `${l.name} (${l.code})${l.isActive ? "" : " — hidden"}`,
                 }))}
@@ -135,11 +139,12 @@ export function ContentView() {
       {(languages.error || tree.error) && <Notice>{languages.error ?? tree.error}</Notice>}
       {tree.loading && !tree.data && <p className="text-slate-500">Loading…</p>}
 
-      {tree.data && <Tree tree={tree.data} ctx={{ say, reload }} />}
+      {tree.data && <CourseTree tree={tree.data} ctx={{ say, reload }} />}
     </div>
   );
 }
 
+// Small inline form that creates a new (hidden) language.
 function NewLanguageForm({
   onDone,
   onError,
@@ -203,7 +208,8 @@ function NewLanguageForm({
   );
 }
 
-function Tree({ tree, ctx }: { tree: ContentTree; ctx: Ctx }) {
+// All courses of the selected language, plus the "Add course" button.
+function CourseTree({ tree, ctx }: { tree: ContentTree; ctx: TreeContext }) {
   const [adding, setAdding] = useState(false);
   return (
     <div className="space-y-5">
@@ -233,6 +239,276 @@ function Tree({ tree, ctx }: { tree: ContentTree; ctx: Ctx }) {
         </Button>
       )}
     </div>
+  );
+}
+
+// One course card: its details, its units and the "Add unit" form.
+function CourseBlock({ course, ctx }: { course: TreeCourse; ctx: TreeContext }) {
+  const [editing, setEditing] = useState(false);
+  const [addingUnit, setAddingUnit] = useState(false);
+  const [stage, setStage] = useState<string>(LEARNING_STAGES[0]);
+  return (
+    <Card className="space-y-4">
+      {editing ? (
+        <TitleForm
+          initial={{ title: course.title, description: course.description }}
+          submitLabel="Save course"
+          onCancel={() => setEditing(false)}
+          onError={(text) => ctx.say("error", text)}
+          onSubmit={async (values) => {
+            await admin.update("courses", course.id, values);
+            setEditing(false);
+            ctx.reload();
+          }}
+        />
+      ) : (
+        <div className="flex flex-wrap items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Course</p>
+            <h2 className="text-xl font-extrabold text-ink">{course.title}</h2>
+            <p className="text-sm text-slate-600">{course.description}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-1">
+            <StatusBadge published={course.isPublished} />
+            <PublishButton type="courses" id={course.id} published={course.isPublished} ctx={ctx} />
+            <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+              <Pencil aria-hidden="true" className="size-4" /> Edit
+            </Button>
+            <DeleteControl
+              what="course"
+              remove={(force) => admin.remove("courses", course.id, force)}
+              onDeleted={() => {
+                ctx.say("success", "Course deleted.");
+                ctx.reload();
+              }}
+              onError={(text) => ctx.say("error", text)}
+            />
+          </div>
+        </div>
+      )}
+
+      <ol className="space-y-3">
+        {course.units.map((unit, index) => (
+          <UnitBlock
+            key={unit.id}
+            unit={unit}
+            number={index + 1}
+            first={index === 0}
+            last={index === course.units.length - 1}
+            ctx={ctx}
+          />
+        ))}
+      </ol>
+
+      {addingUnit ? (
+        <div className="rounded-2xl border-2 border-dashed border-slate-200 p-4">
+          <TitleForm
+            submitLabel="Create unit"
+            onCancel={() => setAddingUnit(false)}
+            onError={(text) => ctx.say("error", text)}
+            extra={
+              <Field label="Stage">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={stage}
+                    onChange={(e) => setStage(e.target.value)}
+                    options={LEARNING_STAGES}
+                  />
+                )}
+              </Field>
+            }
+            onSubmit={async (values) => {
+              await admin.createUnit({ courseId: course.id, ...values, stage });
+              setAddingUnit(false);
+              ctx.say("success", "Unit created (unpublished).");
+              ctx.reload();
+            }}
+          />
+        </div>
+      ) : (
+        <Button size="sm" variant="secondary" onClick={() => setAddingUnit(true)}>
+          <Plus aria-hidden="true" className="size-4" /> Add unit
+        </Button>
+      )}
+    </Card>
+  );
+}
+
+// One unit inside a course: its details, its lessons and the "Add lesson" form.
+function UnitBlock({
+  unit,
+  number,
+  first,
+  last,
+  ctx,
+}: {
+  unit: TreeUnit;
+  number: number;
+  first: boolean;
+  last: boolean;
+  ctx: TreeContext;
+}) {
+  const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [stage, setStage] = useState(unit.stage);
+  const [addingLesson, setAddingLesson] = useState(false);
+  const [kind, setKind] = useState<LessonKind>("VOCABULARY");
+
+  return (
+    <li className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+      {editing ? (
+        <TitleForm
+          initial={{ title: unit.title, description: unit.description }}
+          submitLabel="Save unit"
+          onCancel={() => setEditing(false)}
+          onError={(text) => ctx.say("error", text)}
+          extra={
+            <Field label="Stage">
+              {(id) => (
+                <Select
+                  id={id}
+                  value={stage}
+                  onChange={(e) => setStage(e.target.value)}
+                  options={LEARNING_STAGES}
+                />
+              )}
+            </Field>
+          }
+          onSubmit={async (values) => {
+            await admin.update("units", unit.id, { ...values, stage });
+            setEditing(false);
+            ctx.reload();
+          }}
+        />
+      ) : (
+        <div className="flex flex-wrap items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+              Unit {number} · {unit.stage.toLowerCase().replace(/_/g, " ")}
+            </p>
+            <h3 className="font-extrabold text-ink">{unit.title}</h3>
+            <p className="text-sm text-slate-600">{unit.description}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-1">
+            <StatusBadge published={unit.isPublished} />
+            <PublishButton type="units" id={unit.id} published={unit.isPublished} ctx={ctx} />
+            <MoveButtons type="units" id={unit.id} first={first} last={last} ctx={ctx} />
+            <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+              <Pencil aria-hidden="true" className="size-4" /> Edit
+            </Button>
+            <DeleteControl
+              what="unit"
+              remove={(force) => admin.remove("units", unit.id, force)}
+              onDeleted={() => {
+                ctx.say("success", "Unit deleted.");
+                ctx.reload();
+              }}
+              onError={(text) => ctx.say("error", text)}
+            />
+          </div>
+        </div>
+      )}
+
+      <ol className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+        {unit.lessons.length === 0 && (
+          <li className="px-3 py-2 text-sm text-slate-500">No lessons yet.</li>
+        )}
+        {unit.lessons.map((lesson, index) => (
+          <LessonRow
+            key={lesson.id}
+            lesson={lesson}
+            first={index === 0}
+            last={index === unit.lessons.length - 1}
+            ctx={ctx}
+          />
+        ))}
+      </ol>
+
+      {addingLesson ? (
+        <div className="mt-3 rounded-xl border-2 border-dashed border-slate-200 bg-white p-3">
+          <TitleForm
+            submitLabel="Create and add exercises"
+            descriptionLabel="Intro text (shown before the lesson starts)"
+            onCancel={() => setAddingLesson(false)}
+            onError={(text) => ctx.say("error", text)}
+            extra={
+              <Field label="Kind">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={kind}
+                    onChange={(e) => setKind(e.target.value as LessonKind)}
+                    options={LESSON_KINDS}
+                  />
+                )}
+              </Field>
+            }
+            onSubmit={async ({ title, description }) => {
+              const { lesson } = await admin.createLesson({
+                unitId: unit.id,
+                title,
+                introText: description,
+                kind,
+              });
+              router.push(`/admin/lessons/${encodeURIComponent(lesson.id)}`);
+            }}
+          />
+        </div>
+      ) : (
+        <Button size="sm" variant="ghost" className="mt-2" onClick={() => setAddingLesson(true)}>
+          <Plus aria-hidden="true" className="size-4" /> Add lesson
+        </Button>
+      )}
+    </li>
+  );
+}
+
+// One lesson line inside a unit, with links to the lesson editor.
+function LessonRow({
+  lesson,
+  first,
+  last,
+  ctx,
+}: {
+  lesson: TreeLesson;
+  first: boolean;
+  last: boolean;
+  ctx: TreeContext;
+}) {
+  return (
+    <li className="flex flex-wrap items-center gap-2 px-3 py-2">
+      <div className="min-w-0 flex-1">
+        <Link
+          href={`/admin/lessons/${encodeURIComponent(lesson.id)}`}
+          className="font-bold text-ink hover:text-brand-700 hover:underline"
+        >
+          {lesson.title}
+        </Link>
+        <p className="text-xs text-slate-500">
+          {lesson.kind.toLowerCase()} · {lesson.exercises} exercise(s) · {lesson.vocabulary} word(s)
+          · {lesson.learnersStarted} learner(s) started
+        </p>
+      </div>
+      <StatusBadge published={lesson.isPublished} />
+      <PublishButton type="lessons" id={lesson.id} published={lesson.isPublished} ctx={ctx} />
+      <MoveButtons type="lessons" id={lesson.id} first={first} last={last} ctx={ctx} />
+      <Link
+        href={`/admin/lessons/${encodeURIComponent(lesson.id)}`}
+        className={buttonStyles({ size: "sm", variant: "ghost" })}
+      >
+        <Pencil aria-hidden="true" className="size-4" /> Edit
+      </Link>
+      <DeleteControl
+        what="lesson"
+        remove={(force) => admin.remove("lessons", lesson.id, force)}
+        onDeleted={() => {
+          ctx.say("success", "Lesson deleted.");
+          ctx.reload();
+        }}
+        onError={(text) => ctx.say("error", text)}
+      />
+    </li>
   );
 }
 
@@ -290,6 +566,7 @@ function TitleForm({
   );
 }
 
+// Toggles a course, unit or lesson between published and draft.
 function PublishButton({
   type,
   id,
@@ -299,7 +576,7 @@ function PublishButton({
   type: "courses" | "units" | "lessons";
   id: string;
   published: boolean;
-  ctx: Ctx;
+  ctx: TreeContext;
 }) {
   return (
     <ActionButton
@@ -316,6 +593,7 @@ function PublishButton({
   );
 }
 
+// Up / down arrows that change the order of units or lessons.
 function MoveButtons({
   type,
   id,
@@ -327,7 +605,7 @@ function MoveButtons({
   id: string;
   first: boolean;
   last: boolean;
-  ctx: Ctx;
+  ctx: TreeContext;
 }) {
   const move = (direction: "up" | "down") => async () => {
     await admin.move(type, id, direction);
@@ -342,7 +620,7 @@ function MoveButtons({
         title="Move up"
         disabled={first}
         action={move("up")}
-        onFail={(t) => ctx.say("error", t)}
+        onFail={(text) => ctx.say("error", text)}
       >
         <ArrowUp aria-hidden="true" className="size-4" />
       </ActionButton>
@@ -353,277 +631,10 @@ function MoveButtons({
         title="Move down"
         disabled={last}
         action={move("down")}
-        onFail={(t) => ctx.say("error", t)}
+        onFail={(text) => ctx.say("error", text)}
       >
         <ArrowDown aria-hidden="true" className="size-4" />
       </ActionButton>
     </span>
-  );
-}
-
-function CourseBlock({ course, ctx }: { course: TreeCourse; ctx: Ctx }) {
-  const [editing, setEditing] = useState(false);
-  const [addingUnit, setAddingUnit] = useState(false);
-  const [stage, setStage] = useState<string>(LEARNING_STAGES[0]);
-  return (
-    <Card className="space-y-4">
-      {editing ? (
-        <TitleForm
-          initial={{ title: course.title, description: course.description }}
-          submitLabel="Save course"
-          onCancel={() => setEditing(false)}
-          onError={(t) => ctx.say("error", t)}
-          onSubmit={async (values) => {
-            await admin.update("courses", course.id, values);
-            setEditing(false);
-            ctx.reload();
-          }}
-        />
-      ) : (
-        <div className="flex flex-wrap items-start gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Course</p>
-            <h2 className="text-xl font-extrabold text-ink">{course.title}</h2>
-            <p className="text-sm text-slate-600">{course.description}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-1">
-            <StatusBadge published={course.isPublished} />
-            <PublishButton type="courses" id={course.id} published={course.isPublished} ctx={ctx} />
-            <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
-              <Pencil aria-hidden="true" className="size-4" /> Edit
-            </Button>
-            <DeleteControl
-              what="course"
-              remove={(force) => admin.remove("courses", course.id, force)}
-              onDeleted={() => {
-                ctx.say("success", "Course deleted.");
-                ctx.reload();
-              }}
-              onError={(t) => ctx.say("error", t)}
-            />
-          </div>
-        </div>
-      )}
-
-      <ol className="space-y-3">
-        {course.units.map((unit, index) => (
-          <UnitBlock
-            key={unit.id}
-            unit={unit}
-            number={index + 1}
-            first={index === 0}
-            last={index === course.units.length - 1}
-            ctx={ctx}
-          />
-        ))}
-      </ol>
-
-      {addingUnit ? (
-        <div className="rounded-2xl border-2 border-dashed border-slate-200 p-4">
-          <TitleForm
-            submitLabel="Create unit"
-            onCancel={() => setAddingUnit(false)}
-            onError={(t) => ctx.say("error", t)}
-            extra={
-              <Field label="Stage">
-                {(id) => (
-                  <Select
-                    id={id}
-                    value={stage}
-                    onChange={(e) => setStage(e.target.value)}
-                    options={LEARNING_STAGES}
-                  />
-                )}
-              </Field>
-            }
-            onSubmit={async (values) => {
-              await admin.createUnit({ courseId: course.id, ...values, stage });
-              setAddingUnit(false);
-              ctx.say("success", "Unit created (unpublished).");
-              ctx.reload();
-            }}
-          />
-        </div>
-      ) : (
-        <Button size="sm" variant="secondary" onClick={() => setAddingUnit(true)}>
-          <Plus aria-hidden="true" className="size-4" /> Add unit
-        </Button>
-      )}
-    </Card>
-  );
-}
-
-function UnitBlock({
-  unit,
-  number,
-  first,
-  last,
-  ctx,
-}: {
-  unit: TreeUnit;
-  number: number;
-  first: boolean;
-  last: boolean;
-  ctx: Ctx;
-}) {
-  const router = useRouter();
-  const [editing, setEditing] = useState(false);
-  const [stage, setStage] = useState(unit.stage);
-  const [addingLesson, setAddingLesson] = useState(false);
-  const [kind, setKind] = useState<LessonKind>("VOCABULARY");
-
-  return (
-    <li className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-      {editing ? (
-        <TitleForm
-          initial={{ title: unit.title, description: unit.description }}
-          submitLabel="Save unit"
-          onCancel={() => setEditing(false)}
-          onError={(t) => ctx.say("error", t)}
-          extra={
-            <Field label="Stage">
-              {(id) => (
-                <Select
-                  id={id}
-                  value={stage}
-                  onChange={(e) => setStage(e.target.value)}
-                  options={LEARNING_STAGES}
-                />
-              )}
-            </Field>
-          }
-          onSubmit={async (values) => {
-            await admin.update("units", unit.id, { ...values, stage });
-            setEditing(false);
-            ctx.reload();
-          }}
-        />
-      ) : (
-        <div className="flex flex-wrap items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
-              Unit {number} · {unit.stage.toLowerCase().replace(/_/g, " ")}
-            </p>
-            <h3 className="font-extrabold text-ink">{unit.title}</h3>
-            <p className="text-sm text-slate-600">{unit.description}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-1">
-            <StatusBadge published={unit.isPublished} />
-            <PublishButton type="units" id={unit.id} published={unit.isPublished} ctx={ctx} />
-            <MoveButtons type="units" id={unit.id} first={first} last={last} ctx={ctx} />
-            <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
-              <Pencil aria-hidden="true" className="size-4" /> Edit
-            </Button>
-            <DeleteControl
-              what="unit"
-              remove={(force) => admin.remove("units", unit.id, force)}
-              onDeleted={() => {
-                ctx.say("success", "Unit deleted.");
-                ctx.reload();
-              }}
-              onError={(t) => ctx.say("error", t)}
-            />
-          </div>
-        </div>
-      )}
-
-      <ol className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
-        {unit.lessons.length === 0 && (
-          <li className="px-3 py-2 text-sm text-slate-500">No lessons yet.</li>
-        )}
-        {unit.lessons.map((lesson, index) => (
-          <LessonRow
-            key={lesson.id}
-            lesson={lesson}
-            first={index === 0}
-            last={index === unit.lessons.length - 1}
-            ctx={ctx}
-          />
-        ))}
-      </ol>
-
-      {addingLesson ? (
-        <div className="mt-3 rounded-xl border-2 border-dashed border-slate-200 bg-white p-3">
-          <TitleForm
-            submitLabel="Create and add exercises"
-            descriptionLabel="Intro text (shown before the lesson starts)"
-            onCancel={() => setAddingLesson(false)}
-            onError={(t) => ctx.say("error", t)}
-            extra={
-              <Field label="Kind">
-                {(id) => (
-                  <Select
-                    id={id}
-                    value={kind}
-                    onChange={(e) => setKind(e.target.value as LessonKind)}
-                    options={LESSON_KINDS}
-                  />
-                )}
-              </Field>
-            }
-            onSubmit={async ({ title, description }) => {
-              const { lesson } = await admin.createLesson({
-                unitId: unit.id,
-                title,
-                introText: description,
-                kind,
-              });
-              router.push(`/admin/lessons/${encodeURIComponent(lesson.id)}`);
-            }}
-          />
-        </div>
-      ) : (
-        <Button size="sm" variant="ghost" className="mt-2" onClick={() => setAddingLesson(true)}>
-          <Plus aria-hidden="true" className="size-4" /> Add lesson
-        </Button>
-      )}
-    </li>
-  );
-}
-
-function LessonRow({
-  lesson,
-  first,
-  last,
-  ctx,
-}: {
-  lesson: TreeLesson;
-  first: boolean;
-  last: boolean;
-  ctx: Ctx;
-}) {
-  return (
-    <li className="flex flex-wrap items-center gap-2 px-3 py-2">
-      <div className="min-w-0 flex-1">
-        <Link
-          href={`/admin/lessons/${encodeURIComponent(lesson.id)}`}
-          className="font-bold text-ink hover:text-brand-700 hover:underline"
-        >
-          {lesson.title}
-        </Link>
-        <p className="text-xs text-slate-500">
-          {lesson.kind.toLowerCase()} · {lesson.exercises} exercise(s) · {lesson.vocabulary} word(s)
-          · {lesson.learnersStarted} learner(s) started
-        </p>
-      </div>
-      <StatusBadge published={lesson.isPublished} />
-      <PublishButton type="lessons" id={lesson.id} published={lesson.isPublished} ctx={ctx} />
-      <MoveButtons type="lessons" id={lesson.id} first={first} last={last} ctx={ctx} />
-      <Link
-        href={`/admin/lessons/${encodeURIComponent(lesson.id)}`}
-        className={buttonStyles({ size: "sm", variant: "ghost" })}
-      >
-        <Pencil aria-hidden="true" className="size-4" /> Edit
-      </Link>
-      <DeleteControl
-        what="lesson"
-        remove={(force) => admin.remove("lessons", lesson.id, force)}
-        onDeleted={() => {
-          ctx.say("success", "Lesson deleted.");
-          ctx.reload();
-        }}
-        onError={(t) => ctx.say("error", t)}
-      />
-    </li>
   );
 }

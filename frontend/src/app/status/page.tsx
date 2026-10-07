@@ -1,4 +1,4 @@
-// Developer page from Phase 0: checks that the frontend can reach the backend and database.
+// /status — developer page that checks the frontend can reach the backend and database.
 import type { Metadata } from "next";
 import { Logo } from "@/components/brand/logo";
 import { BackendStatus } from "@/components/backend-status";

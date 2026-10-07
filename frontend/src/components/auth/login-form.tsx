@@ -20,6 +20,7 @@ function nextPath(fallback: string): string {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : fallback;
 }
 
+/** Log-in form: validates on the client, then logs in through the API. */
 export function LoginForm() {
   const router = useRouter();
   const { setUser } = useSession();

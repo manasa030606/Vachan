@@ -19,7 +19,6 @@ import {
   type KnowledgeDoc,
   type KnowledgeInput,
 } from "@/lib/api/admin";
-import { cn } from "@/lib/cn";
 import {
   ActionButton,
   ConfirmDelete,
@@ -44,10 +43,24 @@ const NEW_NOTE: KnowledgeInput = {
   body: "## First section heading\n\nWrite the explanation here. Each “## ” heading becomes one searchable chunk.\n",
 };
 
+/** How each document origin is described in the list and detail views. */
+const ORIGIN_LABEL: Record<KnowledgeDoc["origin"], string> = {
+  ADMIN: "dashboard note",
+  FILE: "file",
+  COURSE: "course vocabulary",
+};
+
+/** Why the "Re-index" button is disabled (shown as its tooltip), or undefined if it isn't. */
+function reindexBlockedReason(published: boolean, searchEnabled: boolean): string | undefined {
+  if (!searchEnabled) return "Search is off on this server";
+  if (!published) return "Publish first";
+  return undefined;
+}
+
 export function KnowledgeView() {
   const languages = useLoad(() => admin.languages(), "languages");
   const [filters, setFilters] = useState({ language: "", origin: "", status: "" });
-  const list = useLoad(() => admin.knowledge(filters), JSON.stringify(filters));
+  const docList = useLoad(() => admin.knowledge(filters), JSON.stringify(filters));
   const [open, setOpen] = useState<string | null>(null); // document id or "new"
   const [message, setMessage] = useState<{
     tone: "error" | "success" | "info";
@@ -56,7 +69,7 @@ export function KnowledgeView() {
   const say: Say = (tone, text) => setMessage({ tone, text });
   const close = () => {
     setOpen(null);
-    list.reload();
+    docList.reload();
   };
 
   if (open) {
@@ -86,14 +99,14 @@ export function KnowledgeView() {
             id={open}
             say={say}
             onDeleted={close}
-            searchEnabled={list.data?.searchEnabled ?? false}
+            searchEnabled={docList.data?.searchEnabled ?? false}
           />
         )}
       </div>
     );
   }
 
-  const data = list.data;
+  const data = docList.data;
   return (
     <div className="space-y-5">
       <Card className="flex flex-wrap items-end gap-3">
@@ -155,7 +168,7 @@ export function KnowledgeView() {
             title={
               data?.searchEnabled ? "Embed everything that changed" : "Search is off on this server"
             }
-            onFail={(t) => say("error", t)}
+            onFail={(text) => say("error", text)}
             action={async () => {
               say(
                 "info",
@@ -166,7 +179,7 @@ export function KnowledgeView() {
                 "success",
                 `Done in ${report.seconds}s: ${report.embedded.length} re-embedded, ${report.skipped.length} unchanged, ${report.removed.length} removed, ${report.drafts.length} drafts skipped.`,
               );
-              list.reload();
+              docList.reload();
             }}
           >
             <RefreshCw aria-hidden="true" className="size-4" /> Re-index all
@@ -178,7 +191,7 @@ export function KnowledgeView() {
       </Card>
 
       {message && <Notice tone={message.tone}>{message.text}</Notice>}
-      {list.error && <Notice>{list.error}</Notice>}
+      {docList.error && <Notice>{docList.error}</Notice>}
       {data && !data.searchEnabled && (
         <Notice tone="info">
           Search (RAG_ENABLED) is off on this server, so it can’t embed text. You can still write,
@@ -205,7 +218,7 @@ export function KnowledgeView() {
                   <span className="min-w-0 flex-1">
                     <span className="block font-bold text-ink">{doc.title}</span>
                     <span className="block truncate text-xs text-slate-500">
-                      {doc.languageCode} · {originLabel(doc.origin)} · {doc.id}
+                      {doc.languageCode} · {ORIGIN_LABEL[doc.origin]} · {doc.id}
                     </span>
                   </span>
                   <DocBadges doc={doc} />
@@ -222,9 +235,7 @@ export function KnowledgeView() {
   );
 }
 
-const originLabel = (origin: KnowledgeDoc["origin"]) =>
-  origin === "ADMIN" ? "dashboard note" : origin === "FILE" ? "file" : "course vocabulary";
-
+// Status pills: published/draft, "needs re-index" and the last indexing error.
 function DocBadges({ doc }: { doc: KnowledgeDoc }) {
   return (
     <span className="flex flex-wrap items-center gap-1">
@@ -246,6 +257,220 @@ function DocBadges({ doc }: { doc: KnowledgeDoc }) {
   );
 }
 
+// Form for a brand-new dashboard note (saved as a draft).
+function NewDocument({
+  languages,
+  onCreated,
+  say,
+}: {
+  languages: Array<{ value: string; label: string }>;
+  onCreated: (id: string) => void;
+  say: Say;
+}) {
+  const [language, setLanguage] = useState(languages[0]?.value ?? "");
+  const [value, setValue] = useState<KnowledgeInput>(NEW_NOTE);
+  return (
+    <Card className="space-y-4">
+      <CardHeader
+        title="New knowledge note"
+        description="Saved as a draft — drafts are never searched by the AI Tutor."
+      />
+      <div className="w-48">
+        <Field label="Language">
+          {(id) => (
+            <Select
+              id={id}
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              options={languages}
+            />
+          )}
+        </Field>
+      </div>
+      <MetadataFields value={value} onChange={setValue} />
+      <ActionButton
+        onFail={(text) => say("error", text)}
+        action={async () => {
+          const { document } = await admin.createKnowledge(language, value);
+          onCreated(document.id);
+        }}
+      >
+        Save draft
+      </ActionButton>
+    </Card>
+  );
+}
+
+// One document: its actions, its editor (dashboard notes only) and its indexed chunks.
+function DocumentDetail({
+  id,
+  say,
+  onDeleted,
+  searchEnabled,
+}: {
+  id: string;
+  say: Say;
+  onDeleted: () => void;
+  searchEnabled: boolean;
+}) {
+  const { data, error, reload } = useLoad(() => admin.knowledgeDoc(id), id);
+  const [preview, setPreview] = useState<KnowledgeChunkPreview[] | null>(null);
+  if (error && !data) return <Notice>{error}</Notice>;
+  if (!data) return <p className="text-slate-500">Loading…</p>;
+  const doc = data.document;
+  const published = doc.status === "PUBLISHED";
+
+  return (
+    <div className="space-y-4">
+      <Card className="space-y-3">
+        <div className="flex flex-wrap items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+              {doc.languageCode} · {ORIGIN_LABEL[doc.origin]}
+            </p>
+            <h2 className="text-xl font-extrabold text-ink">{doc.title}</h2>
+            <p className="text-sm break-all text-slate-500">
+              {doc.id} · source: {doc.source}
+            </p>
+          </div>
+          <DocBadges doc={doc} />
+        </div>
+        {doc.lastIndexError && (
+          <Notice>
+            Last indexing failed: {doc.lastIndexError} (the previous chunks were kept).
+          </Notice>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <ActionButton
+            variant={published ? "secondary" : "success"}
+            size="sm"
+            onFail={(text) => say("error", text)}
+            action={async () => {
+              const result = await admin.publishKnowledge(doc.id, !published);
+              // The server sends a message when it could only publish, not index (e.g. search is off).
+              if (result.message) say("info", result.message);
+              else if (published) say("success", "Unpublished — the tutor no longer finds it.");
+              else say("success", `Published and indexed: ${result.chunks} chunks are searchable.`);
+              reload();
+            }}
+          >
+            {published ? "Unpublish" : "Publish"}
+          </ActionButton>
+          <ActionButton
+            variant="secondary"
+            size="sm"
+            disabled={!published || !searchEnabled}
+            title={reindexBlockedReason(published, searchEnabled)}
+            onFail={(text) => say("error", text)}
+            action={async () => {
+              const result = await admin.reindexKnowledge(doc.id);
+              say("success", `Re-indexed: ${result.chunks} chunks.`);
+              reload();
+            }}
+          >
+            <RefreshCw aria-hidden="true" className="size-4" /> Re-index
+          </ActionButton>
+          <ActionButton
+            variant="ghost"
+            size="sm"
+            onFail={(text) => say("error", text)}
+            action={async () => setPreview((await admin.previewKnowledge(doc.id)).chunks)}
+          >
+            <Eye aria-hidden="true" className="size-4" /> Preview chunks
+          </ActionButton>
+          {doc.origin === "ADMIN" && (
+            <ConfirmDelete
+              question="Delete this note and its chunks?"
+              onConfirm={async () => {
+                await admin.deleteKnowledge(doc.id);
+                onDeleted();
+              }}
+            />
+          )}
+        </div>
+      </Card>
+
+      {preview && (
+        <ChunkList title="Preview — what indexing will produce (nothing saved)" chunks={preview} />
+      )}
+
+      {doc.origin === "ADMIN" ? (
+        // The key reloads the form whenever the saved document changes.
+        <EditNote
+          key={doc.updatedAt}
+          initial={{
+            title: doc.title,
+            source: doc.source,
+            level: (doc.level ?? "beginner").toLowerCase(),
+            topic: doc.topic ?? "",
+            contentType: (doc.contentType ?? "explanation").toLowerCase().replace(/_/g, "-"),
+            skill: (doc.skill ?? "vocabulary").toLowerCase(),
+            body: doc.body ?? "",
+          }}
+          published={published}
+          onSaved={(chunks) => {
+            setPreview(chunks);
+            say(
+              "success",
+              published ? "Saved. The old chunks stay searchable until you re-index." : "Saved.",
+            );
+            reload();
+          }}
+          id={doc.id}
+          say={say}
+        />
+      ) : (
+        <Notice tone="info">
+          {doc.origin === "FILE"
+            ? `This note's text lives in ${doc.reference}. Edit the file in git, then re-index.`
+            : "Built from the course vocabulary — edit words in the Vocabulary section, then re-index."}
+        </Notice>
+      )}
+
+      <ChunkList
+        title={`Indexed chunks (${doc.chunks.length}) — what the tutor can find now`}
+        chunks={doc.chunks}
+      />
+    </div>
+  );
+}
+
+// Edit form for an existing dashboard note.
+function EditNote({
+  id,
+  initial,
+  published,
+  onSaved,
+  say,
+}: {
+  id: string;
+  initial: KnowledgeInput;
+  published: boolean;
+  onSaved: (chunks: KnowledgeChunkPreview[]) => void;
+  say: Say;
+}) {
+  const [value, setValue] = useState(initial);
+  return (
+    <Card className="space-y-4">
+      <CardHeader
+        title="Edit note"
+        description={published ? "Saving does not change search until you re-index." : undefined}
+      />
+      <MetadataFields value={value} onChange={setValue} />
+      <ActionButton
+        onFail={(text) => say("error", text)}
+        action={async () => {
+          const { document } = await admin.updateKnowledge(id, value);
+          onSaved(document.preview);
+        }}
+      >
+        Save changes
+      </ActionButton>
+    </Card>
+  );
+}
+
+// Title, source, tags and markdown body — shared by the "new" and "edit" forms.
 function MetadataFields({
   value,
   onChange,
@@ -312,224 +537,7 @@ function MetadataFields({
   );
 }
 
-function NewDocument({
-  languages,
-  onCreated,
-  say,
-}: {
-  languages: Array<{ value: string; label: string }>;
-  onCreated: (id: string) => void;
-  say: Say;
-}) {
-  const [language, setLanguage] = useState(languages[0]?.value ?? "");
-  const [value, setValue] = useState<KnowledgeInput>(NEW_NOTE);
-  return (
-    <Card className="space-y-4">
-      <CardHeader
-        title="New knowledge note"
-        description="Saved as a draft — drafts are never searched by the AI Tutor."
-      />
-      <div className="w-48">
-        <Field label="Language">
-          {(id) => (
-            <Select
-              id={id}
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              options={languages}
-            />
-          )}
-        </Field>
-      </div>
-      <MetadataFields value={value} onChange={setValue} />
-      <ActionButton
-        onFail={(t) => say("error", t)}
-        action={async () => {
-          const { document } = await admin.createKnowledge(language, value);
-          onCreated(document.id);
-        }}
-      >
-        Save draft
-      </ActionButton>
-    </Card>
-  );
-}
-
-function DocumentDetail({
-  id,
-  say,
-  onDeleted,
-  searchEnabled,
-}: {
-  id: string;
-  say: Say;
-  onDeleted: () => void;
-  searchEnabled: boolean;
-}) {
-  const { data, error, reload } = useLoad(() => admin.knowledgeDoc(id), id);
-  const [preview, setPreview] = useState<KnowledgeChunkPreview[] | null>(null);
-  if (error && !data) return <Notice>{error}</Notice>;
-  if (!data) return <p className="text-slate-500">Loading…</p>;
-  const doc = data.document;
-  const published = doc.status === "PUBLISHED";
-
-  return (
-    <div className="space-y-4">
-      <Card className="space-y-3">
-        <div className="flex flex-wrap items-start gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
-              {doc.languageCode} · {originLabel(doc.origin)}
-            </p>
-            <h2 className="text-xl font-extrabold text-ink">{doc.title}</h2>
-            <p className="text-sm break-all text-slate-500">
-              {doc.id} · source: {doc.source}
-            </p>
-          </div>
-          <DocBadges doc={doc} />
-        </div>
-        {doc.lastIndexError && (
-          <Notice>
-            Last indexing failed: {doc.lastIndexError} (the previous chunks were kept).
-          </Notice>
-        )}
-        <div className="flex flex-wrap gap-2">
-          <ActionButton
-            variant={published ? "secondary" : "success"}
-            size="sm"
-            onFail={(t) => say("error", t)}
-            action={async () => {
-              const result = await admin.publishKnowledge(doc.id, !published);
-              say(
-                result.message ? "info" : "success",
-                result.message ??
-                  (published
-                    ? "Unpublished — the tutor no longer finds it."
-                    : `Published and indexed: ${result.chunks} chunks are searchable.`),
-              );
-              reload();
-            }}
-          >
-            {published ? "Unpublish" : "Publish"}
-          </ActionButton>
-          <ActionButton
-            variant="secondary"
-            size="sm"
-            disabled={!published || !searchEnabled}
-            title={
-              !searchEnabled
-                ? "Search is off on this server"
-                : !published
-                  ? "Publish first"
-                  : undefined
-            }
-            onFail={(t) => say("error", t)}
-            action={async () => {
-              const result = await admin.reindexKnowledge(doc.id);
-              say("success", `Re-indexed: ${result.chunks} chunks.`);
-              reload();
-            }}
-          >
-            <RefreshCw aria-hidden="true" className="size-4" /> Re-index
-          </ActionButton>
-          <ActionButton
-            variant="ghost"
-            size="sm"
-            onFail={(t) => say("error", t)}
-            action={async () => setPreview((await admin.previewKnowledge(doc.id)).chunks)}
-          >
-            <Eye aria-hidden="true" className="size-4" /> Preview chunks
-          </ActionButton>
-          {doc.origin === "ADMIN" && (
-            <ConfirmDelete
-              question="Delete this note and its chunks?"
-              onConfirm={async () => {
-                await admin.deleteKnowledge(doc.id);
-                onDeleted();
-              }}
-            />
-          )}
-        </div>
-      </Card>
-
-      {preview && (
-        <ChunkList title="Preview — what indexing will produce (nothing saved)" chunks={preview} />
-      )}
-
-      {doc.origin === "ADMIN" ? (
-        <EditNote
-          key={doc.updatedAt}
-          initial={{
-            title: doc.title,
-            source: doc.source,
-            level: (doc.level ?? "beginner").toLowerCase(),
-            topic: doc.topic ?? "",
-            contentType: (doc.contentType ?? "explanation").toLowerCase().replace(/_/g, "-"),
-            skill: (doc.skill ?? "vocabulary").toLowerCase(),
-            body: doc.body ?? "",
-          }}
-          published={published}
-          onSaved={(chunks) => {
-            setPreview(chunks);
-            say(
-              "success",
-              published ? "Saved. The old chunks stay searchable until you re-index." : "Saved.",
-            );
-            reload();
-          }}
-          id={doc.id}
-          say={say}
-        />
-      ) : (
-        <Notice tone="info">
-          {doc.origin === "FILE"
-            ? `This note's text lives in ${doc.reference}. Edit the file in git, then re-index.`
-            : "Built from the course vocabulary — edit words in the Vocabulary section, then re-index."}
-        </Notice>
-      )}
-
-      <ChunkList
-        title={`Indexed chunks (${doc.chunks.length}) — what the tutor can find now`}
-        chunks={doc.chunks}
-      />
-    </div>
-  );
-}
-
-function EditNote({
-  id,
-  initial,
-  published,
-  onSaved,
-  say,
-}: {
-  id: string;
-  initial: KnowledgeInput;
-  published: boolean;
-  onSaved: (chunks: KnowledgeChunkPreview[]) => void;
-  say: Say;
-}) {
-  const [value, setValue] = useState(initial);
-  return (
-    <Card className="space-y-4">
-      <CardHeader
-        title="Edit note"
-        description={published ? "Saving does not change search until you re-index." : undefined}
-      />
-      <MetadataFields value={value} onChange={setValue} />
-      <ActionButton
-        onFail={(t) => say("error", t)}
-        action={async () => {
-          const { document } = await admin.updateKnowledge(id, value);
-          onSaved(document.preview);
-        }}
-      >
-        Save changes
-      </ActionButton>
-    </Card>
-  );
-}
-
+// The chunks of a document (either the saved ones or an unsaved preview).
 function ChunkList({ title, chunks }: { title: string; chunks: KnowledgeChunkPreview[] }) {
   return (
     <Card>
@@ -539,7 +547,7 @@ function ChunkList({ title, chunks }: { title: string; chunks: KnowledgeChunkPre
       ) : (
         <ol className="space-y-2">
           {chunks.map((chunk) => (
-            <li key={chunk.id} className={cn("rounded-xl border border-slate-200 p-3")}>
+            <li key={chunk.id} className="rounded-xl border border-slate-200 p-3">
               <p className="font-bold text-ink">{chunk.heading}</p>
               <p className="text-xs text-slate-500">
                 {[chunk.level, chunk.topic, chunk.contentType, chunk.skill]

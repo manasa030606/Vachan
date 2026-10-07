@@ -74,12 +74,13 @@ export class MockProvider implements LlmProvider {
 
   async generate(request: GenerateRequest): Promise<GenerateResult> {
     const prompt = request.turns.at(-1)?.text ?? "";
-    const answer =
-      request.purpose === "conversation"
-        ? partnerReply(prompt)
-        : request.purpose === "conversation-summary"
-          ? sessionSummary(prompt)
-          : tutorAnswer(prompt);
-    return { text: JSON.stringify(answer), model: `mock/${this.model}` };
+    return { text: JSON.stringify(fakeAnswer(request, prompt)), model: `mock/${this.model}` };
   }
+}
+
+/** Picks the fake answer shape that matches what the caller asked for. */
+function fakeAnswer(request: GenerateRequest, prompt: string) {
+  if (request.purpose === "conversation") return partnerReply(prompt);
+  if (request.purpose === "conversation-summary") return sessionSummary(prompt);
+  return tutorAnswer(prompt);
 }

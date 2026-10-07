@@ -1,3 +1,4 @@
+// /admin/vocabulary — manage the words of each language.
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { VocabularyView } from "@/components/admin/vocabulary-view";

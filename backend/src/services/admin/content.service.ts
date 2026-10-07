@@ -1,12 +1,11 @@
-// Phase 8 — admin content management: languages → courses → units → lessons → exercises, and
-// vocabulary. Everything a developer used to change in prisma/seed-data.ts can be done here.
+// Admin content management: languages → courses → units → lessons → exercises, and vocabulary.
 //
 // Rules:
-//   • learners only see published content (Language.isActive, Course/Unit/Lesson.isPublished)
-//   • deleting something learners have used is refused (409 HAS_LEARNER_DATA) unless `force`
-//     is set — unpublishing is the safe alternative and keeps everyone's progress
-//   • exercises are validated with the same rules the answer checker uses (exercise-rules.ts)
-//   • every change is written to AdminAuditLog
+//   - learners only see published content (Language.isActive, Course/Unit/Lesson.isPublished)
+//   - deleting something learners have used is refused (409 HAS_LEARNER_DATA) unless `force`
+//     is set; unpublishing is the safe alternative and keeps everyone's progress
+//   - exercises are validated with the same rules the answer checker uses (exercise-rules.ts)
+//   - every change is written to AdminAuditLog
 import type {
   ExerciseType,
   LearningStage,
@@ -42,7 +41,7 @@ async function markCourseVocabularyStale(languageCode: string) {
   });
 }
 
-// ── Overview tree ───────────────────────────────────────────────
+// Overview tree
 
 export async function listLanguages() {
   const languages = await prisma.language.findMany({
@@ -123,7 +122,7 @@ export async function getContentTree(languageCode: string) {
   };
 }
 
-// ── Languages ───────────────────────────────────────────────────
+// Languages
 
 export type LanguageInput = {
   code: string;
@@ -192,7 +191,7 @@ export async function deleteLanguage(adminId: string, code: string, force: boole
   await audit(adminId, "language.delete", { type: "language", id: code, summary: language.name });
 }
 
-// ── Courses ─────────────────────────────────────────────────────
+// Courses
 
 export type CourseInput = { title: string; description: string; sortOrder?: number };
 
@@ -214,6 +213,7 @@ export async function updateCourse(adminId: string, id: string, input: Partial<C
   return course;
 }
 
+/** Lesson progress rows + exercise answers under a course, unit or lesson. */
 async function progressCount(where: { lesson: object }) {
   const [progress, attempts] = await Promise.all([
     prisma.userLessonProgress.count({ where }),
@@ -230,7 +230,7 @@ export async function deleteCourse(adminId: string, id: string, force: boolean) 
   await audit(adminId, "course.delete", { type: "course", id, summary: course.title });
 }
 
-// ── Units ───────────────────────────────────────────────────────
+// Units
 
 export type UnitInput = { title: string; description: string; stage: LearningStage };
 
@@ -261,7 +261,7 @@ export async function deleteUnit(adminId: string, id: string, force: boolean) {
   await audit(adminId, "unit.delete", { type: "unit", id, summary: unit.title });
 }
 
-// ── Lessons ─────────────────────────────────────────────────────
+// Lessons
 
 export type LessonInput = {
   title: string;
@@ -365,7 +365,7 @@ export async function deleteLesson(adminId: string, id: string, force: boolean) 
   await audit(adminId, "lesson.delete", { type: "lesson", id, summary: lesson.title });
 }
 
-// ── Publish / unpublish (course, unit, lesson) ──────────────────
+// Publish / unpublish (course, unit, lesson)
 
 export async function setPublished(
   adminId: string,
@@ -406,7 +406,7 @@ export async function setPublished(
   return { id, isPublished };
 }
 
-// ── Moving (sort order) ─────────────────────────────────────────
+// Moving (sort order)
 
 /** Swaps an item with its neighbour. sortOrder is unique per parent, so a temporary value is used. */
 async function swap(
@@ -451,19 +451,18 @@ export async function move(
     sortOrder: direction === "up" ? { lt: item.sortOrder } : { gt: item.sortOrder },
   };
   const orderBy = { sortOrder: direction === "up" ? ("desc" as const) : ("asc" as const) };
-  const neighbour =
-    type === "unit"
-      ? await prisma.unit.findFirst({ where, orderBy })
-      : type === "lesson"
-        ? await prisma.lesson.findFirst({ where, orderBy })
-        : await prisma.exercise.findFirst({ where, orderBy });
+  // The item just above (or below) this one in the same parent.
+  let neighbour: { id: string; sortOrder: number } | null;
+  if (type === "unit") neighbour = await prisma.unit.findFirst({ where, orderBy });
+  else if (type === "lesson") neighbour = await prisma.lesson.findFirst({ where, orderBy });
+  else neighbour = await prisma.exercise.findFirst({ where, orderBy });
   if (!neighbour) return { moved: false };
   await prisma.$transaction((tx) => swap(tx, type, item, neighbour));
   await audit(adminId, `${type}.move`, { type, id, summary: direction });
   return { moved: true };
 }
 
-// ── Exercises ───────────────────────────────────────────────────
+// Exercises
 
 export type ExerciseFields = {
   type: ExerciseType;
@@ -562,7 +561,7 @@ export async function deleteExercise(adminId: string, id: string, force: boolean
   await audit(adminId, "exercise.delete", { type: "exercise", id, summary: exercise.type });
 }
 
-// ── Vocabulary ──────────────────────────────────────────────────
+// Vocabulary
 
 export type VocabularyInput = {
   kind: VocabularyKind;
@@ -645,7 +644,7 @@ export async function deleteVocabulary(adminId: string, id: string) {
   await audit(adminId, "vocabulary.delete", { type: "vocabulary", id, summary: item.script });
 }
 
-// ── Audit log ───────────────────────────────────────────────────
+// Audit log
 
 export async function listAuditLog(limit = 50) {
   const rows = await prisma.adminAuditLog.findMany({

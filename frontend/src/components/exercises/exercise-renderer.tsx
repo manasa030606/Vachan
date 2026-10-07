@@ -12,6 +12,7 @@ import { MultipleChoice } from "./multiple-choice";
 import { Translation } from "./translation";
 import { WordOrder } from "./word-order";
 
+// The switch covers every exercise type, so TypeScript knows each branch gets the right props.
 export function ExerciseRenderer(props: ExerciseComponentProps<Exercise>) {
   const { exercise, ...rest } = props;
 

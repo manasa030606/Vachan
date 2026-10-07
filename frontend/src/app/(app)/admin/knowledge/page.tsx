@@ -1,3 +1,4 @@
+// /admin/knowledge — manage the notes the AI tutor searches.
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { KnowledgeView } from "@/components/admin/knowledge-view";

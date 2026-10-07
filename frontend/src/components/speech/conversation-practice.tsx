@@ -1,6 +1,7 @@
 "use client";
 
-// Conversation tab: scenario selection ↔ one role-play (start → reply → … → end → summary).
+// The Conversation tab: shows the scenario picker, or the open role-play
+// (start, take turns replying, end, then a summary).
 import { Info } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import type { ConversationDto, ScenarioId } from "@/lib/api/types";
 import { ConversationView } from "./conversation-view";
 import { ScenarioPicker } from "./scenario-picker";
 
+/** Switches between the scenario picker and an active role-play. */
 export function ConversationPractice({
   language,
   showRomanization,

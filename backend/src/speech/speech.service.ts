@@ -1,11 +1,10 @@
-// Speech features (Phase 7):
-//
-//   transcribe:  recording ─► audio checks ─► speech-to-text ─► transcript
-//   evaluate:    expected phrase + recording ─► audio checks
-//                   ├─► speech-to-text (never told the expected phrase) ─► CONTENT MATCH (text diff)
-//                   ├─► AI pronunciation notes (Gemini only, experimental, in parallel)
-//                   └─► FLUENCY from the audio timing (no AI)
-//                ─► feedback, saved as a SpeechAttempt (without the audio)
+// Speech features: transcribing a recording and the speaking exercise.
+//   Transcribe: check the audio, then speech-to-text gives the transcript.
+//   Evaluate (speaking exercise): check the audio, then three separate kinds of feedback:
+//     1. content match: speech-to-text (never told the expected phrase) compared with the phrase
+//     2. AI pronunciation notes (Gemini only, experimental, run in parallel with step 1)
+//     3. fluency from the audio timing (no AI)
+//   The result is saved as a SpeechAttempt (without the audio).
 import { ragEnabled } from "../config/env.ts";
 import { SPEECH_LOCALES } from "../config/speech.ts";
 import { HttpError, notFound } from "../lib/http-error.ts";
@@ -35,7 +34,7 @@ function speechToText(): SpeechToText {
   }
 }
 
-// ── Status ──────────────────────────────────────────────────────
+// Status
 
 export function getSpeechStatus() {
   const stt = getSttStatus();
@@ -63,7 +62,7 @@ export function getSpeechStatus() {
   };
 }
 
-// ── Transcribe ──────────────────────────────────────────────────
+// Transcribe
 
 export async function transcribeRecording(
   userId: string,
@@ -114,7 +113,7 @@ export async function transcribeRecording(
   };
 }
 
-// ── Speaking exercise ───────────────────────────────────────────
+// Speaking exercise
 
 type Expected = {
   vocabularyItemId: string | null;
@@ -280,7 +279,7 @@ export async function evaluateSpeaking(
   };
 }
 
-// ── Practice material ───────────────────────────────────────────
+// Practice material
 
 /** Course words and phrases of a language, in course order, with my best score for each. */
 export async function listSpeakingPhrases(userId: string, language?: LanguageCode) {
@@ -302,6 +301,7 @@ export async function listSpeakingPhrases(userId: string, language?: LanguageCod
     _count: { _all: true },
   });
   const bestById = new Map(best.map((b) => [b.vocabularyItemId, b]));
+  // Sort key: unit, then lesson; words that are in no lesson go last.
   const order = (item: (typeof items)[number]) =>
     (item.lessons[0]?.unit.sortOrder ?? 99) * 100 + (item.lessons[0]?.sortOrder ?? 99);
 

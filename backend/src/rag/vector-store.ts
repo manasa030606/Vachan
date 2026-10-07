@@ -32,7 +32,7 @@ export async function saveDocument(
 ) {
   const model = RAG_CONFIG.embedding.model;
   // One transaction: search sees either all the old chunks or all the new ones, never a mix
-  // or an empty document (Phase 8 "safe re-indexing"). Status/body set by admins are kept.
+  // or an empty document. The status and body set by admins are not touched.
   await prisma.$transaction(async (tx) => {
     await tx.knowledgeChunk.deleteMany({ where: { documentId: document.id } });
     const indexed = { chunkCount: chunks.length, needsReindex: false, lastIndexError: null };

@@ -9,6 +9,7 @@ import { useLearnerPreferences, useUpdatePreferences } from "@/lib/learner-prefe
 import { cn } from "@/lib/cn";
 import { LanguageTile } from "@/components/ui/language-tile";
 
+/** Dropdown in the top bar that changes the current course language. */
 export function LanguageSwitcher() {
   const { languageCode } = useLearnerPreferences();
   const current = getLanguage(languageCode);

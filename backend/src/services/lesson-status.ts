@@ -1,7 +1,7 @@
 // The learning-path rules: which lessons are locked, available, current or completed.
 // Pure functions (no database) so they are easy to unit-test.
 //
-// Rules (Phase 3):
+// Rules:
 //   1. Lessons unlock in order. A lesson is unlocked when it is the first lesson of the
 //      course, when the lesson before it is completed, or when the learner already has
 //      progress in it.

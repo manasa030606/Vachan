@@ -3,7 +3,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import type { MistakeDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
-/** "Today", "Yesterday" or "3 days ago". */
+/** "Today", "Yesterday" or "3 days ago" (86,400,000 ms in a day). */
 function daysAgo(isoDate: string): string {
   const days = Math.floor((Date.now() - new Date(isoDate).getTime()) / 86_400_000);
   if (days <= 0) return "Today";

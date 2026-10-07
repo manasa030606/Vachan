@@ -8,7 +8,7 @@ type RecommendedPracticeProps = {
 
 /**
  * The suggested practice: a review session of the learner's open mistakes.
- * Chosen by a transparent rule (wrong answers not yet answered correctly in a review) — not "AI".
+ * Uses a simple, visible rule rather than AI: wrong answers not yet fixed in a review.
  */
 export function RecommendedPractice({ openMistakes, resolvedMistakes }: RecommendedPracticeProps) {
   const hasMistakes = openMistakes > 0;

@@ -1,6 +1,7 @@
-// Clickable example questions (from the lesson the learner is in).
+// Clickable example questions, e.g. based on the lesson the learner is in.
 import { Lightbulb } from "lucide-react";
 
+/** Row of question buttons; hidden when there are no suggestions. */
 export function SuggestedQuestions({
   questions,
   onPick,

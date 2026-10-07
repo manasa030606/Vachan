@@ -44,10 +44,10 @@ export const RAG_CONFIG = {
     candidatePool: 40,
     /**
      * Below this cosine similarity the best match is treated as "not about this question":
-     * the response says `sufficient: false` and the tutor (Phase 6) must not answer from it.
-     * Calibrated on the evaluation set (docs/RAG_EVALUATION.md): the weakest on-topic question scored
-     * 0.813, most off-topic questions 0.74–0.80. e5 similarities sit in a narrow band, so this is a
-     * first safety net only — the Phase 6 prompt must also refuse when the chunks don't answer.
+     * the response says `sufficient: false` and the tutor must not answer from it.
+     * Calibrated on the evaluation set (docs/evaluation/RAG.md): the weakest on-topic question scored
+     * 0.813, most off-topic questions 0.74–0.80. e5 similarities sit in a narrow band, so this is
+     * only a first safety net — the tutor prompt must also refuse when the chunks don't answer.
      */
     minSimilarity: 0.81,
     /**

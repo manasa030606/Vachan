@@ -1,4 +1,5 @@
-// End-of-session summary: counted statistics (no AI) + the AI's short review.
+// End-of-session summary: statistics counted directly from the session (no AI),
+// plus a short review written by the AI.
 import {
   CheckCircle2,
   Flag,
@@ -18,6 +19,7 @@ type Props = {
   onChooseAnother: () => void;
 };
 
+/** One number in the stats row. */
 function Stat({
   icon: Icon,
   value,
@@ -36,6 +38,7 @@ function Stat({
   );
 }
 
+/** Summary card shown when a role-play ends. */
 export function ConversationSummary({ session, onAgain, onChooseAnother }: Props) {
   const summary = session.summary;
   if (!summary) return null;

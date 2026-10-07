@@ -9,6 +9,7 @@ type StepSelfAssessmentProps = {
   onChange: (id: SelfAssessmentId) => void;
 };
 
+/** Onboarding step: the learner rates how much they already know. */
 export function StepSelfAssessment({ languageName, value, onChange }: StepSelfAssessmentProps) {
   return (
     <fieldset>
@@ -25,7 +26,7 @@ export function StepSelfAssessment({ languageName, value, onChange }: StepSelfAs
             checked={value === level.id}
             onChange={(id) => onChange(id as SelfAssessmentId)}
           >
-            {/* Signal bars: more filled bars = more experience */}
+            {/* Signal bars: the further down the list, the more bars are filled. */}
             <span aria-hidden="true" className="flex h-7 shrink-0 items-end gap-0.5">
               {[0, 1, 2, 3, 4, 5].map((bar) => (
                 <span

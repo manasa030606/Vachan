@@ -1,12 +1,12 @@
-// The AI tutor pipeline (Phase 6):
-//
-//   question ─► safety check ─► learner context (language, level, unit, lesson, exercise)
-//            ─► retrieval query ─► RAG retrieval (Phase 5, language filter + level re-ranking)
-//            ─► enough evidence?  no → "not in my notes" (NO LLM call)
-//                                 yes → prompt with the retrieved notes ─► LLM ─► JSON
-//            ─► grounding checks (sources must be retrieved notes, examples must appear in them)
-//            ─► answer + references ─► saved in AIConversation / AIMessage
-//
+// The AI tutor pipeline. For each question:
+//   1. Clean the question and work out the learner context: language, level, unit, lesson and
+//      (optionally) the exercise the learner is asking about.
+//   2. Refuse prompt-injection attempts before any retrieval or LLM call.
+//   3. Build a retrieval query and search the knowledge base (RAG, filtered by language and level).
+//   4. Not enough evidence? Answer "not in my notes" without calling the LLM.
+//   5. Otherwise send the retrieved notes + question to the LLM and ask for JSON.
+//   6. Grounding checks: cited sources must be retrieved notes, examples must appear in them.
+//   7. Save the question and answer (with references) in AIConversation / AIMessage.
 // There is no code path that sends a question to the LLM without retrieved notes.
 import { ragEnabled } from "../../config/env.ts";
 import { TUTOR_CONFIG } from "../../config/tutor.ts";
@@ -57,7 +57,7 @@ const insufficientText = (language: string) =>
 const refusalText = (language: string) =>
   `I can only help you learn ${language} — words, grammar, pronunciation and phrases. Please ask me something about ${language}.`;
 
-// ── Learner context ─────────────────────────────────────────────
+// Learner context
 
 async function loadLesson(lessonId: string, languageCode: string) {
   const lesson = await prisma.lesson.findUnique({
@@ -131,6 +131,16 @@ async function loadExercise(userId: string, exerciseId: string, languageCode: st
   };
 }
 
+async function lessonLanguageCode(lessonId: string) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    select: {
+      unit: { select: { course: { select: { language: { select: { code: true } } } } } },
+    },
+  });
+  return lesson?.unit.course.language.code;
+}
+
 export async function resolveTutorContext(
   userId: string,
   input: {
@@ -148,14 +158,7 @@ export async function resolveTutorContext(
   // Language: the chat's, the request's, the lesson's (when only a lesson is given), the profile's.
   const lessonLanguage =
     !input.conversationLanguage && !input.language && input.lessonId
-      ? (
-          await prisma.lesson.findUnique({
-            where: { id: input.lessonId },
-            select: {
-              unit: { select: { course: { select: { language: { select: { code: true } } } } } },
-            },
-          })
-        )?.unit.course.language.code
+      ? await lessonLanguageCode(input.lessonId)
       : undefined;
   const languageCode =
     input.conversationLanguage ??
@@ -187,15 +190,22 @@ export async function resolveTutorContext(
   };
 }
 
-// ── Status / context for the UI ─────────────────────────────────
+// Status and context for the UI
+
+/** Why the tutor can't answer right now, or null when it is ready. */
+function unavailableReason(llm: ReturnType<typeof getLlmStatus>): string | null {
+  if (!ragEnabled) {
+    return "Knowledge-base search is turned off on this server (RAG_ENABLED=false), so the tutor can't look anything up.";
+  }
+  if (!llm.configured) {
+    return `The tutor needs ${llm.keyVariable} in backend/.env (see docs/SETUP.md).`;
+  }
+  return null;
+}
 
 export function getTutorAvailability() {
   const llm = getLlmStatus();
-  const reason = !ragEnabled
-    ? "Knowledge-base search is turned off on this server (RAG_ENABLED=false), so the tutor can't look anything up."
-    : !llm.configured
-      ? `The tutor needs ${llm.keyVariable} in backend/.env (see docs/AI_TUTOR.md → Setup).`
-      : null;
+  const reason = unavailableReason(llm);
   return {
     available: reason === null,
     reason,
@@ -234,12 +244,27 @@ export async function getTutorContext(
   };
 }
 
-// ── Ask ─────────────────────────────────────────────────────────
+// Ask
 
 const toHttpError = (error: LlmError) => llmErrorToHttp(error, "tutor", "TUTOR_NOT_CONFIGURED");
 
+/** The last few messages of a chat, oldest first, for the prompt's <conversation> block. */
+async function loadRecentHistory(conversationId: string) {
+  const rows = await prisma.aIMessage.findMany({
+    where: { conversationId },
+    orderBy: { createdAt: "desc" },
+    take: TUTOR_CONFIG.historyMessages,
+    select: { role: true, content: true },
+  });
+  return rows.reverse().map((m) => ({
+    role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
+    content: m.content,
+  }));
+}
+
 export async function askTutor(userId: string, input: AskInput) {
   const started = performance.now();
+  // Step 1: clean question + learner context.
   const question = sanitizeQuestion(input.question);
   if (question.length < 2) throw new HttpError(400, "EMPTY_QUESTION", "Type a question first");
 
@@ -261,21 +286,7 @@ export async function askTutor(userId: string, input: AskInput) {
     ? await loadExercise(userId, input.exerciseId, context.languageCode)
     : null;
 
-  const history = conversation
-    ? (
-        await prisma.aIMessage.findMany({
-          where: { conversationId: conversation.id },
-          orderBy: { createdAt: "desc" },
-          take: TUTOR_CONFIG.historyMessages,
-          select: { role: true, content: true },
-        })
-      )
-        .reverse()
-        .map((m) => ({
-          role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
-          content: m.content,
-        }))
-    : [];
+  const history = conversation ? await loadRecentHistory(conversation.id) : [];
 
   const baseContext = {
     language: context.languageCode,
@@ -286,7 +297,7 @@ export async function askTutor(userId: string, input: AskInput) {
     exerciseId: input.exerciseId ?? null,
   };
 
-  // 1. Basic prompt-injection check — refused before retrieval or any LLM call.
+  // Step 2: basic prompt-injection check, refused before retrieval or any LLM call.
   const injection = detectInjection(question);
   if (injection) {
     console.warn(`[tutor] refused (${injection}) user=${userId}`);
@@ -309,7 +320,7 @@ export async function askTutor(userId: string, input: AskInput) {
     );
   }
 
-  // 2. RAG retrieval (the tutor never answers without it).
+  // Step 3: RAG retrieval (the tutor never answers without it).
   const previousQuestion = [...history].reverse().find((m) => m.role === "user")?.content ?? null;
   const retrievalQuery = buildRetrievalQuery({
     question,
@@ -352,7 +363,7 @@ export async function askTutor(userId: string, input: AskInput) {
     sufficient: retrieval.retrieval.sufficient,
   };
 
-  // 3. Not enough evidence → say so. No LLM call, nothing invented.
+  // Step 4: not enough evidence, so say so. No LLM call, nothing invented.
   if (!retrieval.retrieval.sufficient || chunks.length === 0) {
     return save(userId, conversation?.id, context, question, {
       content: insufficientText(context.languageName),
@@ -365,7 +376,7 @@ export async function askTutor(userId: string, input: AskInput) {
     });
   }
 
-  // 4. Prompt augmentation + LLM.
+  // Step 5: prompt augmentation + LLM. A reply in the wrong format gets one retry.
   let provider;
   try {
     provider = getLlmProvider();
@@ -397,7 +408,7 @@ export async function askTutor(userId: string, input: AskInput) {
         maxOutputTokens: TUTOR_CONFIG.maxOutputTokens,
       });
       model = result.model;
-      // 5. Grounding checks on the reply.
+      // Step 6: grounding checks on the reply.
       parsed = parseTutorReply(
         result.text,
         chunks.map((c) => `${c.heading}\n${c.content}`),
@@ -405,7 +416,7 @@ export async function askTutor(userId: string, input: AskInput) {
       );
     } catch (error) {
       if (error instanceof LlmError) throw toHttpError(error);
-      if (error instanceof UnreadableAnswerError && attempt < 2) continue; // one retry
+      if (error instanceof UnreadableAnswerError && attempt < 2) continue;
       if (error instanceof UnreadableAnswerError) {
         throw new HttpError(
           502,
@@ -419,6 +430,7 @@ export async function askTutor(userId: string, input: AskInput) {
   const answer = parsed!;
   if (answer.issues.length > 0) console.info(`[tutor] checks: ${answer.issues.join(", ")}`);
 
+  // Step 7: save the question and the checked answer.
   return save(userId, conversation?.id, context, question, {
     content: answer.answer,
     status: answer.status === "answered" ? "ANSWERED" : "INSUFFICIENT",
@@ -430,7 +442,7 @@ export async function askTutor(userId: string, input: AskInput) {
   });
 }
 
-// ── Saving + DTOs ───────────────────────────────────────────────
+// Saving and DTOs
 
 type AssistantDraft = {
   content: string;

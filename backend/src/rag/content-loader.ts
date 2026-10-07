@@ -1,7 +1,7 @@
 // Step 1 of the pipeline: COLLECT CONTENT from three approved sources.
 //   1. Curated notes:   backend/knowledge-base/<language>/*.md
 //   2. Course content:  vocabulary and letters already taught in the lessons (VocabularyItem table)
-//   3. Admin notes:     written in the admin dashboard (Phase 8, KnowledgeDocument.body)
+//   3. Admin notes:     written in the admin dashboard (KnowledgeDocument.body)
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { PrismaClient } from "../generated/prisma/client.ts";
@@ -105,7 +105,7 @@ export async function loadCourseDocuments(prisma: PrismaClient): Promise<SourceD
   return documents;
 }
 
-/** Phase 8: a document written in the admin dashboard, in the same format as the files. */
+/** A document written in the admin dashboard, in the same format as the files. */
 export type AdminDocumentRow = {
   id: string;
   languageCode: string;

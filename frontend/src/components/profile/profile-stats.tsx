@@ -5,6 +5,7 @@ import type { ProgressSummaryDto } from "@/lib/api/types";
 
 type Stat = { icon: ReactNode; value: string; label: string };
 
+/** "Today", "Yesterday" or "3 days ago"; a dash if the learner has no activity yet. */
 function lastActive(isoDate: string | null | undefined): string {
   if (!isoDate) return "—";
   const days = Math.floor((Date.now() - new Date(isoDate).getTime()) / 86_400_000);
@@ -13,8 +14,12 @@ function lastActive(isoDate: string | null | undefined): string {
   return `${days} days ago`;
 }
 
-/** Lessons, accuracy, last activity (GET /api/progress) + streak, XP, level (GET /api/stats). */
+/**
+ * Grid of six numbers: lessons, accuracy and last activity (from GET /api/progress),
+ * and streak, XP and level (from GET /api/stats).
+ */
 export function ProfileStats({ progress }: { progress: ProgressSummaryDto | null }) {
+  // Named "game" so it is not confused with the `stats` list below.
   const { stats: game } = useStats();
   const stats: Stat[] = [
     {

@@ -1,3 +1,4 @@
+// /admin/lessons/[id] — edit one lesson and its exercises.
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { LessonEditor } from "@/components/admin/lesson-editor";

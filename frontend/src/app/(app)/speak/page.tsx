@@ -1,3 +1,4 @@
+// /speak — listening and speaking practice, plus AI role-play conversations.
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SpeakView } from "@/components/speech/speak-view";

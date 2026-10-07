@@ -10,6 +10,7 @@ type TextFieldProps = ComponentProps<"input"> & {
   endAdornment?: ReactNode;
 };
 
+/** Input with a label, an optional hint and an error message linked for screen readers. */
 export function TextField({
   label,
   error,
@@ -33,6 +34,7 @@ export function TextField({
         <input
           id={inputId}
           aria-invalid={error ? true : undefined}
+          // cn() is used here only to join the ids with a space and skip the empty ones.
           aria-describedby={cn(error && errorId, hint && hintId) || undefined}
           className={cn(
             "h-12 w-full rounded-2xl border-2 bg-white px-4 text-base text-ink transition outline-none",

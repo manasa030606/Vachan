@@ -1,4 +1,4 @@
-// Admin API (Phase 8) — every route requires login AND the ADMIN role (checked on the server,
+// Admin API — every route requires login AND the ADMIN role (checked on the server,
 // from the database, on every request). Learners get 403 ADMIN_ONLY.
 //
 // Content      GET    /api/admin/languages                        languages + counts
@@ -66,7 +66,7 @@ adminRouter.use(requireAuth, requireAdmin, rateLimitByUser(adminLimiter, "admin"
 const id = (req: Request) => String(req.params.id);
 const force = (req: Request) => forceQuerySchema.parse(req.query).force === "true";
 
-// ── Languages ───────────────────────────────────────────────────
+// Languages
 adminRouter.get("/languages", async (_req, res) => {
   res.json({ languages: await content.listLanguages() });
 });
@@ -93,13 +93,13 @@ adminRouter.delete("/languages/:id", async (req, res) => {
   res.json({ message: "Language deleted" });
 });
 
-// ── Content tree ────────────────────────────────────────────────
+// Content tree
 adminRouter.get("/content", async (req, res) => {
   const { language } = languageQuerySchema.parse(req.query);
   res.json(await content.getContentTree(language));
 });
 
-// ── Courses / units / lessons ───────────────────────────────────
+// Courses / units / lessons
 adminRouter.post("/courses", async (req, res) => {
   const { languageCode, ...input } = courseCreateSchema.parse(req.body);
   res.status(201).json({ course: await content.createCourse(getUserId(req), languageCode, input) });
@@ -158,7 +158,7 @@ for (const type of ["unit", "lesson", "exercise"] as const) {
   });
 }
 
-// ── Exercises ───────────────────────────────────────────────────
+// Exercises
 adminRouter.post("/exercises", async (req, res) => {
   const { lessonId, ...input } = exerciseCreateSchema.parse(req.body);
   res.status(201).json({ exercise: await content.createExercise(getUserId(req), lessonId, input) });
@@ -173,7 +173,7 @@ adminRouter.delete("/exercises/:id", async (req, res) => {
   res.json({ message: "Exercise deleted" });
 });
 
-// ── Vocabulary ──────────────────────────────────────────────────
+// Vocabulary
 adminRouter.get("/vocabulary", async (req, res) => {
   const { language, search } = languageQuerySchema.parse(req.query);
   res.json({ vocabulary: await content.listVocabulary(language, search) });
@@ -198,7 +198,7 @@ adminRouter.delete("/vocabulary/:id", async (req, res) => {
   res.json({ message: "Word deleted" });
 });
 
-// ── Knowledge base (RAG) ────────────────────────────────────────
+// Knowledge base (RAG)
 adminRouter.get("/knowledge", async (req, res) => {
   res.json(await knowledge.listDocuments(knowledgeListQuerySchema.parse(req.query)));
 });
@@ -238,7 +238,7 @@ adminRouter.delete("/knowledge/:id", async (req, res) => {
   res.json({ message: "Document deleted" });
 });
 
-// ── Analytics & audit ───────────────────────────────────────────
+// Analytics & audit
 adminRouter.get("/analytics", async (req, res) => {
   res.json(await getAnalytics(analyticsQuerySchema.parse(req.query)));
 });

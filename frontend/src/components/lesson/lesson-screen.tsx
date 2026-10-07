@@ -1,6 +1,7 @@
 "use client";
 
-// Loads a lesson from the backend (GET /api/lessons/:id) and shows the player.
+// Loads a lesson from the backend (GET /api/lessons/:id) and shows the player,
+// or a friendly message if the lesson is locked, missing or failed to load.
 import { Lock, SearchX } from "lucide-react";
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/brand/logo";
@@ -63,6 +64,7 @@ export function LessonScreen({ lessonId }: { lessonId: string }) {
   return <LessonPlayer key={data.id} lesson={data} showRomanization={showRomanization} />;
 }
 
+/** Full-page message with an icon and a "Back to Learn" button. */
 function Message({
   icon,
   title,

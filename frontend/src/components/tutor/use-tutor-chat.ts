@@ -1,7 +1,7 @@
 "use client";
 
-// State of one tutor chat: messages, sending, errors, retry, loading an old conversation.
-// The question appears immediately (optimistic); the server's copy replaces it when the answer arrives.
+// State of one tutor chat: messages, sending, errors, retry and opening an old conversation.
+// The question is shown straight away; the server's copy replaces it when the answer arrives.
 import { useCallback, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import { askTutor, getTutorConversation } from "@/lib/api/endpoints";
@@ -10,13 +10,14 @@ import type { TutorConversationDto, TutorMessageDto } from "@/lib/api/types";
 export type ChatOptions = {
   language?: string;
   lessonId?: string;
-  /** Sent with the FIRST question only ("Why is my answer wrong?" for this exercise). */
+  /** Sent with the first question only ("Why is my answer wrong?" for this exercise). */
   exerciseId?: string;
   onConversationChange?: (conversation: TutorConversationDto) => void;
 };
 
 export type ChatError = { message: string; code: string; question: string };
 
+/** A temporary copy of the learner's question, shown until the server replies. */
 const localMessage = (content: string): TutorMessageDto => ({
   id: `local-${Date.now()}`,
   role: "user",
@@ -30,6 +31,7 @@ const localMessage = (content: string): TutorMessageDto => ({
   createdAt: new Date().toISOString(),
 });
 
+/** Hook that holds one tutor conversation and talks to the tutor API. */
 export function useTutorChat(options: ChatOptions) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<TutorMessageDto[]>([]);
@@ -48,6 +50,7 @@ export function useTutorChat(options: ChatOptions) {
       const pending = localMessage(question);
       setMessages((current) => [...current, pending]);
       try {
+        // A new chat sends the language/lesson; later questions only need the conversation id.
         const result = await askTutor({
           question,
           ...(conversationId ? { conversationId } : { language, lessonId }),
@@ -56,12 +59,12 @@ export function useTutorChat(options: ChatOptions) {
         if (exerciseId) setExerciseUsed(true);
         setConversationId(result.conversation.id);
         setMessages((current) => [
-          ...current.filter((m) => m.id !== pending.id),
+          ...current.filter((message) => message.id !== pending.id),
           ...result.messages,
         ]);
         onConversationChange?.(result.conversation);
       } catch (caught) {
-        setMessages((current) => current.filter((m) => m.id !== pending.id));
+        setMessages((current) => current.filter((message) => message.id !== pending.id));
         const apiError =
           caught instanceof ApiError
             ? caught

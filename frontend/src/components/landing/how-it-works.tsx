@@ -17,6 +17,7 @@ const STEPS = [
   },
 ];
 
+/** Landing page: the four steps of how Vachan works. */
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="scroll-mt-20 py-20">

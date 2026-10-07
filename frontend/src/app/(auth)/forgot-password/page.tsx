@@ -1,3 +1,4 @@
+// /forgot-password — placeholder form; reset emails are not sent yet.
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -12,8 +13,8 @@ export default function ForgotPasswordPage() {
       subtitle="Enter your email and we'll send you a reset link."
       notice={
         <>
-          <strong>Preview:</strong> password-reset emails are not sent yet (planned for a later
-          phase). For now, ask for help or create a new account.
+          <strong>Preview:</strong> password-reset emails are not sent yet (a planned feature). For
+          now, ask for help or create a new account.
         </>
       }
       footer={

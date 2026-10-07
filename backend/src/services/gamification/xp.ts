@@ -30,16 +30,18 @@ export function xpForAnswer(outcome: AnswerOutcome, config: XpConfig): XpAward[]
     return outcome.isCorrect ? [{ reason: "REVIEW_CORRECT", amount: config.reviewCorrect }] : [];
   }
   const awards: XpAward[] = [];
-  if (outcome.newlySolved)
+  if (outcome.newlySolved) {
     awards.push({ reason: "EXERCISE_CORRECT", amount: config.exerciseCorrect });
+  }
   if (outcome.runCompleted) {
     awards.push(
       outcome.firstCompletion
         ? { reason: "LESSON_COMPLETED", amount: config.lessonCompleted }
         : { reason: "LESSON_PRACTICED", amount: config.lessonPracticed },
     );
-    if (outcome.perfectRun)
+    if (outcome.perfectRun) {
       awards.push({ reason: "PERFECT_LESSON", amount: config.perfectLessonBonus });
+    }
   }
   return awards;
 }

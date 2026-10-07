@@ -1,4 +1,4 @@
-// The six languages Vachan supports (spec section 2).
+// The six languages Vachan supports.
 // The backend database is the source of truth for names and descriptions (GET /api/languages);
 // this file adds the visual theme and is also used by the static landing page.
 import type { Language, LanguageCode } from "@/types/learning";

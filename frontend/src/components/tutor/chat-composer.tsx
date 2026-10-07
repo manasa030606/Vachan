@@ -1,12 +1,13 @@
 "use client";
 
-// The question box: Enter sends, Shift+Enter adds a line, 500 characters max.
+// The tutor's question box: Enter sends, Shift+Enter adds a new line, 500 characters max.
 import { SendHorizontal } from "lucide-react";
 import { useState, type FormEvent, type KeyboardEvent } from "react";
 import { cn } from "@/lib/cn";
 
 const MAX = 500;
 
+/** Text box and send button; questions need at least 2 characters. */
 export function ChatComposer({
   onSend,
   disabled,
@@ -54,6 +55,7 @@ export function ChatComposer({
         <span
           className={cn(
             "pointer-events-none absolute right-3 bottom-2 text-xs",
+            // Turn the counter red in the last 50 characters.
             value.length > MAX - 50 ? "text-rose-600" : "text-slate-400",
           )}
         >

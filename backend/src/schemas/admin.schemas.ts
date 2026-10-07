@@ -1,5 +1,5 @@
-// Validation for the admin API (Phase 8). Every admin input is validated here before it
-// reaches the database — the same rule as for learner requests.
+// Validation for the admin API. Every admin input is checked here before it reaches the
+// database, just like learner requests.
 import { z } from "zod";
 import { CONTENT_TYPES, SKILLS } from "../rag/types.ts";
 import { KNOWLEDGE_LEVELS } from "../rag/config.ts";
@@ -126,7 +126,7 @@ export const languageQuerySchema = z.object({
   search: z.string().trim().max(100).optional(),
 });
 
-// ── Knowledge base (RAG) ──
+// Knowledge base (RAG)
 
 const slug = z
   .string()
@@ -142,7 +142,7 @@ export const knowledgeCreateSchema = z
     topic: slug,
     contentType: z.enum(CONTENT_TYPES),
     skill: z.enum(SKILLS),
-    /** Markdown: "## Heading" + text, one section per concept (see knowledge-base/README.md). */
+    /** Markdown: "## Heading" + text, one section per concept (see docs/AI.md). */
     body: z.string().trim().min(20, "Write at least one section").max(50_000),
   })
   .strict();

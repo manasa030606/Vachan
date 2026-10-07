@@ -1,3 +1,4 @@
+// /review — practise the exercises the learner got wrong before.
 import type { Metadata } from "next";
 import { ReviewScreen } from "@/components/review/review-screen";
 import { RequireAuth } from "@/components/session/require-auth";

@@ -1,10 +1,9 @@
 "use client";
 
-// Knows who is logged in, for the whole app.
-// On page load it asks the backend GET /api/me (the browser sends the httpOnly login cookie).
-//
-//   const { status, user, setUser, logout } = useSession();
-//   status: "loading" → still asking · "authenticated" → user is set · "guest" → not logged in
+// Keeps track of who is logged in, for the whole app. On page load it calls GET /api/me
+// (the browser sends the httpOnly login cookie automatically).
+// Usage: const { status, user, setUser, logout } = useSession();
+// status is "loading" while asking, "authenticated" when user is set, or "guest".
 import {
   createContext,
   useCallback,
@@ -35,6 +34,7 @@ type SessionContextValue = {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
+/** Provides the session to every component below it. */
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<UserDto | null>(null);
   const [status, setStatus] = useState<SessionStatus>("loading");
@@ -60,6 +60,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }, [setUser]);
 
+  // Initial load. Same logic as refresh(), but ignores the answer if the component unmounted.
   useEffect(() => {
     let cancelled = false;
     getMe()
@@ -108,6 +109,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
+/** Read the current session. Must be used inside <SessionProvider>. */
 export function useSession(): SessionContextValue {
   const context = useContext(SessionContext);
   if (!context) throw new Error("useSession must be used inside <SessionProvider>");

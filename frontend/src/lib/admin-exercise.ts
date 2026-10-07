@@ -1,5 +1,5 @@
 // Helpers for the admin exercise editor (pure functions, unit-tested in admin-exercise.test.ts).
-// The server re-checks everything (services/admin/exercise-rules.ts) — these only shape the form.
+// The server re-checks everything (backend/src/services/admin/exercise-rules.ts) — these only shape the form.
 import type { AdminExercise, AdminOption, ExerciseBody, ExerciseType } from "./api/admin";
 
 export const CHOICE_TYPES: ExerciseType[] = [
@@ -36,10 +36,11 @@ export function blankExercise(type: ExerciseType): ExerciseBody {
     TRANSLATION: "Translate this sentence",
     WORD_ORDER: "Put the words in order",
   };
-  const rows = type === "TRANSLATION" ? 1 : type === "WORD_ORDER" ? 3 : 3;
+  // A translation starts with one accepted answer; every other type starts with three rows.
+  const rows = type === "TRANSLATION" ? 1 : 3;
   const options = Array.from({ length: rows }, blankOption);
-  if (optionMode(type) === "choice") options[0]!.isCorrect = true;
-  if (type === "TRANSLATION") options[0]!.isCorrect = true;
+  // Pre-mark the first row so the new exercise already passes the "one correct answer" check.
+  if (optionMode(type) === "choice" || type === "TRANSLATION") options[0]!.isCorrect = true;
   if (type === "WORD_ORDER") options.forEach((o, i) => (o.correctPosition = i + 1));
   return {
     type,

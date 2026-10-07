@@ -133,7 +133,7 @@ export const decidePlacement = (testId: string, choice: "recommended" | "beginni
     lessonsUnlocked: number;
   }>("/placement/decide", { method: "POST", body: { testId, choice } });
 
-// ── AI tutor (Phase 6) ──
+// ── AI tutor ──
 export const getTutorContext = (params: { language?: string; lessonId?: string }) => {
   const query = new URLSearchParams(
     Object.entries(params).filter((entry): entry is [string, string] => Boolean(entry[1])),
@@ -162,10 +162,11 @@ export const deleteTutorConversation = (id: string) =>
     method: "DELETE",
   });
 
-// ── Speech & conversation (Phase 7) ──
+// ── Speech & conversation ──
 const SPEECH_TIMEOUT_MS = 70_000; // speech-to-text + AI notes (with retries on a busy free tier)
 const AI_TIMEOUT_MS = 90_000;
 
+/** Builds "?a=1&b=2" from the defined, non-empty values (or "" when there are none). */
 const query = (params: Record<string, string | number | undefined>) => {
   const text = new URLSearchParams(
     Object.entries(params)

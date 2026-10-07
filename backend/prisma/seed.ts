@@ -5,13 +5,12 @@
 //   · 12 placement questions
 // plus the badge definitions (src/config/achievements.ts) and one demo account.
 //
-// Safe to run again (Phase 8): languages, badges and the demo account are updated in place, and
-// a language's course content is only created when that language has NO course yet — so
-// content edited in the admin dashboard and learners' progress are never overwritten.
+// Safe to run again: languages, badges and the demo account are updated in place, and a
+// language's course content is only created when that language has NO course yet, so content
+// edited in the admin dashboard and learners' progress are never overwritten.
 //
-//   npm run db:seed:reset-content -w backend   ⚠️ deletes and re-creates ALL course content and
-//                                        vocabulary (and therefore learners' lesson progress
-//                                        and answers). Development only.
+// `npm run db:seed:reset-content -w backend` deletes and re-creates ALL course content and
+// vocabulary (and therefore learners' lesson progress and answers). Development only.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";

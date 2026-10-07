@@ -1,4 +1,4 @@
-// Small typed helpers for calling the Vachan backend.
+// Health check call used by the developer /status page.
 import { API_URL } from "@/lib/config";
 
 /** Shape of GET /api/health (mirrors backend/src/routes/health.routes.ts). */

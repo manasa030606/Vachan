@@ -1,3 +1,4 @@
+// /admin/audit — list of recent admin changes.
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AuditView } from "@/components/admin/audit-view";

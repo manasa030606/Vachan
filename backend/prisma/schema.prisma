@@ -1,4 +1,4 @@
-// Prisma schema for Vachan (Phase 6 — AI tutor).
+// Prisma schema for Vachan.
 //
 // One set of tables serves ALL languages. Every piece of content belongs to a
 // Language row (Hindi, Telugu, …), so adding a seventh language later means
@@ -16,9 +16,11 @@
 //   User ── PlacementTest ── PlacementAnswer ── PlacementQuestion ── Exercise
 //
 //   Language ── KnowledgeDocument ── KnowledgeChunk (text + metadata + embedding vector)
-//   (Phase 5: the RAG knowledge base. The `embedding` column uses the pgvector extension.)
+//   (the RAG knowledge base; the `embedding` column uses the pgvector extension)
 //
-//   User ── AIConversation ── AIMessage   (Phase 6: AI tutor chats, with the sources of every answer)
+//   User ── AIConversation ── AIMessage   (AI tutor chats, with the sources of every answer)
+//   User ── SpeechAttempt · ConversationSession ── ConversationTurn (speaking practice, role-plays)
+//   AdminAuditLog (who changed what in the admin dashboard)
 //
 // The connection URL is NOT written here. It is read from DATABASE_URL
 // in backend/prisma.config.ts (Prisma CLI) and backend/src/lib/prisma.ts (the app).
@@ -38,7 +40,7 @@ datasource db {
 
 enum UserRole {
   LEARNER
-  ADMIN // used by the admin dashboard in Phase 8
+  ADMIN // can use the admin dashboard
 }
 
 enum DailyGoal {
@@ -237,7 +239,7 @@ model Unit {
   description String
   stage       LearningStage
   sortOrder   Int
-  /// Phase 8: hidden from learners while false (admin dashboard → unpublish)
+  /// Hidden from learners while false (unpublished in the admin dashboard)
   isPublished Boolean       @default(true)
 
   course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -381,12 +383,12 @@ model UserExerciseAttempt {
 
   @@index([userId, lessonId])
   @@index([userId, exerciseId])
-  /// Phase 8 analytics: attempts in a date range ("last 30 days")
+  /// For analytics: attempts in a date range ("last 30 days")
   @@index([createdAt])
 }
 
 // ─────────────────────────────────────────────────────────────
-// Gamification (Phase 4) — amounts and limits live in backend/src/config/gamification.ts
+// Gamification — amounts and limits live in backend/src/config/gamification.ts
 // ─────────────────────────────────────────────────────────────
 
 /// One row per learner: XP, hearts and streak.
@@ -424,7 +426,7 @@ model UserDailyActivity {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
-  /// Phase 8 analytics: active learners per day
+  /// For analytics: active learners per day
   @@index([date])
 }
 
@@ -472,7 +474,7 @@ model UserAchievement {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Placement test (Phase 4)
+// Placement test
 // ─────────────────────────────────────────────────────────────
 
 /// A placement question re-uses a course exercise; `unitNumber` is the unit it checks.
@@ -527,7 +529,7 @@ model PlacementAnswer {
 }
 
 // ─────────────────────────────────────────────────────────────
-// RAG knowledge base (Phase 5)
+// RAG knowledge base
 // ─────────────────────────────────────────────────────────────
 //
 // Content (backend/knowledge-base/*.md + course vocabulary)
@@ -589,7 +591,7 @@ model KnowledgeDocument {
   contentHash    String
   chunkCount     Int
   indexedAt      DateTime              @default(now())
-  // ── Phase 8: content management ──
+  // Content management (admin dashboard)
   /// FILE = backend/knowledge-base/*.md (text edited in git) · COURSE = course vocabulary ·
   /// ADMIN = written in the admin dashboard (text stored in `body`)
   origin         KnowledgeOrigin       @default(FILE)
@@ -629,7 +631,7 @@ model KnowledgeChunk {
   reference      String
   /// Section heading, e.g. "Hello — నమస్కారం (namaskaaram)"
   heading        String
-  /// Clean text shown to learners / given to the tutor in Phase 6
+  /// Clean text shown to learners and given to the AI tutor
   content        String
   charCount      Int
   contentHash    String
@@ -649,10 +651,10 @@ model KnowledgeChunk {
 }
 
 // ─────────────────────────────────────────────────────────────
-// AI tutor (Phase 6)
+// AI tutor
 // ─────────────────────────────────────────────────────────────
 //
-// question → RAG retrieval (Phase 5) → prompt with the retrieved notes → LLM → answer + references.
+// question → RAG retrieval → prompt with the retrieved notes → LLM → answer + references.
 // Every assistant message stores the notes it was based on, so answers can always be traced back.
 
 enum AIMessageRole {
@@ -711,7 +713,7 @@ model AIMessage {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Speaking & conversation (Phase 7)
+// Speaking & conversation
 // ─────────────────────────────────────────────────────────────
 //
 // Listening:  phrase → text-to-speech (cached in AudioClip) → play / replay / slow.
@@ -867,7 +869,7 @@ model ConversationTurn {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Admin (Phase 8)
+// Admin
 // ─────────────────────────────────────────────────────────────
 
 /// Every change made in the admin dashboard: who, what, when (no learner data).

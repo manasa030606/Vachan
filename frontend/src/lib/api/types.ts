@@ -402,7 +402,7 @@ export type PlacementResultDto = {
   rules: string[];
 };
 
-// ── AI tutor (Phase 6) ──
+// ── AI tutor ──
 export type TutorLevel = "beginner" | "elementary" | "intermediate";
 
 export type TutorReferenceDto = {
@@ -476,7 +476,7 @@ export type TutorAskBody = {
   exerciseId?: string;
 };
 
-// ── Speech & conversation (Phase 7) ──
+// ── Speech & conversation ──
 
 export type SpeechStatusDto = {
   speechToText: { provider: string; model: string; available: boolean; isTestDouble: boolean };

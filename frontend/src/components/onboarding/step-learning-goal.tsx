@@ -8,6 +8,7 @@ type StepLearningGoalProps = {
   onChange: (id: LearningGoalId) => void;
 };
 
+/** Onboarding step: why the learner wants to learn this language. */
 export function StepLearningGoal({ languageName, value, onChange }: StepLearningGoalProps) {
   return (
     <fieldset>

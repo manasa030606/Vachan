@@ -4,7 +4,7 @@ import type { ExerciseComponentProps, MultipleChoiceExercise } from "@/types/exe
 import { ChoiceList } from "./choice-list";
 import { ExerciseHeading, ScriptPrompt } from "./exercise-heading";
 
-/** "What does नमस्ते mean?" → pick one of several options. */
+/** Multiple choice, e.g. "What does नमस्ते mean?" with several options to pick from. */
 export function MultipleChoice({
   exercise,
   answer,

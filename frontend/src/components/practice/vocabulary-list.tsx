@@ -5,6 +5,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import type { VocabularyDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
+// Filter buttons; the ids match the `kind` field of each vocabulary item.
 const FILTERS = [
   { id: "all", label: "All" },
   { id: "LETTER", label: "Letters" },

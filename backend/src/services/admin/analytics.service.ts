@@ -1,9 +1,8 @@
-// Phase 8 — learning analytics for admins.
+// Learning analytics for the admin dashboard.
 //
-// PRIVACY: everything here is an aggregate (counts, rates, averages). No names, emails, user ids
-// or individual answers leave this file, and nothing new is tracked: the numbers are computed
-// from data the app already stores to work (progress, attempts, daily activity, chats).
-// Exercises in "common mistakes" are content, not people.
+// Privacy: everything here is an aggregate (counts, rates, averages). No names, emails, user ids
+// or individual answers leave this file, and nothing new is tracked: the numbers come from data
+// the app already stores (progress, attempts, daily activity, chats).
 import { Prisma } from "../../generated/prisma/client.ts";
 import { prisma } from "../../lib/prisma.ts";
 
@@ -11,6 +10,13 @@ const DAY = 24 * 60 * 60_000;
 const pct = (part: number, whole: number) =>
   whole > 0 ? Math.round((part / whole) * 1000) / 10 : null;
 const isoDate = (date: Date) => date.toISOString().slice(0, 10);
+const roundTo1 = (value: number) => Math.round(value * 10) / 10;
+
+/** Merges two averages, weighting each by how many values it was computed from. */
+function combineAverages(avgA: number, countA: number, avgB: number, countB: number) {
+  const total = countA + countB;
+  return total > 0 ? roundTo1((avgA * countA + avgB * countB) / total) : 0;
+}
 
 export async function getAnalytics(input: { days: number; language?: string }) {
   const since = new Date(Date.now() - input.days * DAY);
@@ -167,16 +173,14 @@ export async function getAnalytics(input: { days: number; language?: string }) {
   for (const row of conversations) {
     const key = row.scenario.toLowerCase();
     const entry = scenarioMap.get(key) ?? { scenario: key, sessions: 0, ended: 0, avgReplies: 0 };
-    const weightTotal = entry.sessions + row._count._all;
-    entry.avgReplies =
-      weightTotal > 0
-        ? Math.round(
-            ((entry.avgReplies * entry.sessions + (row._avg.learnerTurns ?? 0) * row._count._all) /
-              weightTotal) *
-              10,
-          ) / 10
-        : 0;
-    entry.sessions = weightTotal;
+    // One row per (scenario, status), so a scenario's average is built up row by row.
+    entry.avgReplies = combineAverages(
+      entry.avgReplies,
+      entry.sessions,
+      row._avg.learnerTurns ?? 0,
+      row._count._all,
+    );
+    entry.sessions += row._count._all;
     if (row.status === "ENDED") entry.ended += row._count._all;
     scenarioMap.set(key, entry);
   }

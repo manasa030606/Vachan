@@ -15,7 +15,7 @@ type LessonIntroProps = {
   showRomanization: boolean;
   /** Course language, for audio (e.g. "te"). */
   languageCode: string;
-  /** NOT_STARTED / IN_PROGRESS / COMPLETED — changes the start button. */
+  /** The learner's progress on this lesson; changes the start button label. */
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
   /** Exercises already done in this run (when resuming). */
   doneCount: number;
@@ -26,6 +26,7 @@ type LessonIntroProps = {
   onStart: (restart: boolean) => void;
 };
 
+/** The intro screen shown before the first exercise. */
 export function LessonIntro({
   title,
   unitTitle,
@@ -42,11 +43,9 @@ export function LessonIntro({
   onStart,
 }: LessonIntroProps) {
   const isResuming = status === "IN_PROGRESS" && doneCount > 0;
-  const startLabel = isResuming
-    ? `Continue (${doneCount} of ${totalCount} done)`
-    : status === "COMPLETED"
-      ? "Practise again"
-      : "Let's start";
+  let startLabel = "Let's start";
+  if (isResuming) startLabel = `Continue (${doneCount} of ${totalCount} done)`;
+  else if (status === "COMPLETED") startLabel = "Practise again";
 
   return (
     <div className="mx-auto w-full max-w-2xl animate-pop space-y-6 px-4 py-6 sm:py-16">
@@ -81,7 +80,7 @@ export function LessonIntro({
             </div>
             <div className="flex min-w-0 flex-col items-end gap-1.5">
               <p className="text-right text-lg font-extrabold text-ink">{word.meaning}</p>
-              {/* Phase 7: hear the word (server audio, or the browser's voice as a fallback). */}
+              {/* Play the word: server audio, or the browser's voice as a fallback. */}
               <PhraseAudio
                 compact
                 source={{ vocabularyItemId: word.id, text: word.script, language: languageCode }}

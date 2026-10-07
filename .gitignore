@@ -29,7 +29,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
-# Downloaded AI models (Phase 5 embeddings) — large binary files, never commit
+# Downloaded AI embedding models — large binary files, never commit
 .cache/
 
 # local scratch (not project code)

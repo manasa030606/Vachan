@@ -2,9 +2,9 @@
 
 // /admin/lessons/[id] — edit a lesson: details, the words it teaches, and its exercises.
 // Answers are visible here (admin only); learners never receive them before answering.
-import { ArrowDown, ArrowLeft, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, buttonStyles } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import {
@@ -13,17 +13,10 @@ import {
   LESSON_KINDS,
   type AdminExercise,
   type AdminLesson,
-  type ExerciseBody,
   type ExerciseType,
   type LessonKind,
 } from "@/lib/api/admin";
-import {
-  blankExercise,
-  draftProblems,
-  optionMode,
-  toDraft,
-  toRequestBody,
-} from "@/lib/admin-exercise";
+import { blankExercise, optionMode, toDraft } from "@/lib/admin-exercise";
 import {
   ActionButton,
   DeleteControl,
@@ -34,14 +27,18 @@ import {
   StatusBadge,
   Textarea,
 } from "./admin-ui";
+import { ExerciseForm } from "./exercise-form";
 import { useLoad } from "./use-load";
 
-const nice = (value: string) => value.toLowerCase().replace(/_/g, " ");
+type Say = (tone: "error" | "success", text: string) => void;
+
+/** "MULTIPLE_CHOICE" → "multiple choice" */
+const readable = (value: string) => value.toLowerCase().replace(/_/g, " ");
 
 export function LessonEditor({ lessonId }: { lessonId: string }) {
   const { data, error, reload } = useLoad(() => admin.lesson(lessonId), lessonId);
   const [message, setMessage] = useState<{ tone: "error" | "success"; text: string } | null>(null);
-  const say = (tone: "error" | "success", text: string) => setMessage({ tone, text });
+  const say: Say = (tone, text) => setMessage({ tone, text });
 
   if (error && !data) return <Notice>{error}</Notice>;
   if (!data) return <p className="text-slate-500">Loading…</p>;
@@ -66,7 +63,7 @@ export function LessonEditor({ lessonId }: { lessonId: string }) {
         <ActionButton
           size="sm"
           variant={lesson.isPublished ? "secondary" : "success"}
-          onFail={(t) => say("error", t)}
+          onFail={(text) => say("error", text)}
           action={async () => {
             await admin.publish("lessons", lesson.id, !lesson.isPublished);
             say(
@@ -84,6 +81,7 @@ export function LessonEditor({ lessonId }: { lessonId: string }) {
 
       {message && <Notice tone={message.tone}>{message.text}</Notice>}
 
+      {/* The key remounts the form after a save, so its fields show the saved values. */}
       <LessonDetails
         key={`${lesson.id}-${lesson.title}-${lesson.vocabulary.length}`}
         lesson={lesson}
@@ -95,13 +93,14 @@ export function LessonEditor({ lessonId }: { lessonId: string }) {
   );
 }
 
+// Title, kind, intro text and the words the lesson teaches.
 function LessonDetails({
   lesson,
   say,
   reload,
 }: {
   lesson: AdminLesson;
-  say: (tone: "error" | "success", text: string) => void;
+  say: Say;
   reload: () => void;
 }) {
   const [title, setTitle] = useState(lesson.title);
@@ -110,7 +109,8 @@ function LessonDetails({
   const [words, setWords] = useState<string[]>(lesson.vocabulary.map((v) => v.id));
   const [search, setSearch] = useState("");
   const vocabulary = useLoad(() => admin.vocabulary(lesson.language.code), lesson.language.code);
-  const shown = useMemo(() => {
+  // Words already in the lesson always stay visible; the others are filtered by the search box.
+  const visibleWords = useMemo(() => {
     const term = search.trim().toLowerCase();
     return (vocabulary.data?.vocabulary ?? []).filter(
       (v) =>
@@ -163,7 +163,7 @@ function LessonDetails({
         <div className="max-h-56 overflow-y-auto rounded-xl border border-slate-200 p-2">
           {vocabulary.error && <Notice>{vocabulary.error}</Notice>}
           <ul className="grid gap-1 sm:grid-cols-2">
-            {shown.slice(0, 200).map((v) => (
+            {visibleWords.slice(0, 200).map((v) => (
               <li key={v.id}>
                 <label className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-sm hover:bg-slate-50">
                   <input
@@ -187,7 +187,7 @@ function LessonDetails({
         </div>
       </fieldset>
       <ActionButton
-        onFail={(t) => say("error", t)}
+        onFail={(text) => say("error", text)}
         action={async () => {
           await admin.update("lessons", lesson.id, {
             title,
@@ -205,15 +205,8 @@ function LessonDetails({
   );
 }
 
-function Exercises({
-  lesson,
-  say,
-  reload,
-}: {
-  lesson: AdminLesson;
-  say: (tone: "error" | "success", text: string) => void;
-  reload: () => void;
-}) {
+// The list of exercises, with inline editing and the "Add exercise" controls.
+function Exercises({ lesson, say, reload }: { lesson: AdminLesson; say: Say; reload: () => void }) {
   const [editing, setEditing] = useState<string | null>(null); // exercise id or "new"
   const [newType, setNewType] = useState<ExerciseType>("MULTIPLE_CHOICE");
 
@@ -289,6 +282,7 @@ function Exercises({
   );
 }
 
+// One exercise in the list, showing its correct answer so admins can check it quickly.
 function ExerciseRow({
   exercise,
   number,
@@ -303,23 +297,10 @@ function ExerciseRow({
   first: boolean;
   last: boolean;
   onEdit: () => void;
-  say: (tone: "error" | "success", text: string) => void;
+  say: Say;
   reload: () => void;
 }) {
-  const mode = optionMode(exercise.type);
-  const answer =
-    mode === "pairs"
-      ? exercise.options.map((o) => `${o.text} = ${o.matchText}`).join(", ")
-      : mode === "order"
-        ? exercise.options
-            .filter((o) => o.correctPosition)
-            .sort((a, b) => a.correctPosition! - b.correctPosition!)
-            .map((o) => o.text)
-            .join(" ")
-        : exercise.options
-            .filter((o) => o.isCorrect)
-            .map((o) => o.text)
-            .join(" / ");
+  const answer = answerSummary(exercise);
   const move = (direction: "up" | "down") => async () => {
     await admin.move("exercises", exercise.id, direction);
     reload();
@@ -331,7 +312,7 @@ function ExerciseRow({
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
-          {nice(exercise.type)}
+          {readable(exercise.type)}
         </p>
         <p className="font-bold text-ink">{exercise.prompt || exercise.instruction}</p>
         <p className="text-sm text-slate-600">
@@ -350,7 +331,7 @@ function ExerciseRow({
           title="Move up"
           disabled={first}
           action={move("up")}
-          onFail={(t) => say("error", t)}
+          onFail={(text) => say("error", text)}
         >
           <ArrowUp aria-hidden="true" className="size-4" />
         </ActionButton>
@@ -361,7 +342,7 @@ function ExerciseRow({
           title="Move down"
           disabled={last}
           action={move("down")}
-          onFail={(t) => say("error", t)}
+          onFail={(text) => say("error", text)}
         >
           <ArrowDown aria-hidden="true" className="size-4" />
         </ActionButton>
@@ -375,251 +356,28 @@ function ExerciseRow({
             say("success", "Exercise deleted.");
             reload();
           }}
-          onError={(t) => say("error", t)}
+          onError={(text) => say("error", text)}
         />
       </div>
     </li>
   );
 }
 
-function ExerciseForm({
-  initial,
-  lockedType,
-  onSave,
-  onCancel,
-}: {
-  initial: ExerciseBody;
-  lockedType: boolean;
-  onSave: (body: ExerciseBody) => Promise<void>;
-  onCancel: () => void;
-}) {
-  const [draft, setDraft] = useState<ExerciseBody>(initial);
-  const [error, setError] = useState<string | null>(null);
-  const group = useId();
-  const mode = optionMode(draft.type);
-  const problems = draftProblems(draft);
-  const set = <K extends keyof ExerciseBody>(key: K, value: ExerciseBody[K]) =>
-    setDraft({ ...draft, [key]: value });
-  const setOption = (index: number, patch: Partial<ExerciseBody["options"][number]>) =>
-    set(
-      "options",
-      draft.options.map((o, i) => {
-        if (i === index) return { ...o, ...patch };
-        // Choice exercises have exactly one correct option.
-        if (mode === "choice" && patch.isCorrect) return { ...o, isCorrect: false };
-        return o;
-      }),
-    );
-
-  return (
-    <form
-      className="space-y-3 rounded-2xl border-2 border-brand-200 bg-brand-50/30 p-4"
-      onSubmit={(e) => e.preventDefault()}
-    >
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Type">
-          {(id) => (
-            <Select
-              id={id}
-              value={draft.type}
-              disabled={lockedType}
-              onChange={(e) => set("type", e.target.value as ExerciseType)}
-              options={EXERCISE_TYPES}
-            />
-          )}
-        </Field>
-        <Field label="Instruction">
-          {(id) => (
-            <Input
-              id={id}
-              value={draft.instruction}
-              onChange={(e) => set("instruction", e.target.value)}
-            />
-          )}
-        </Field>
-        <Field
-          label="Prompt"
-          hint={
-            draft.type === "MATCHING"
-              ? "Optional for matching."
-              : "What the learner reads, e.g. a word in the script."
-          }
-        >
-          {(id) => (
-            <Input id={id} value={draft.prompt} onChange={(e) => set("prompt", e.target.value)} />
-          )}
-        </Field>
-        <Field label="Prompt subtext" hint="Optional, e.g. the romanization.">
-          {(id) => (
-            <Input
-              id={id}
-              value={draft.promptSubtext ?? ""}
-              onChange={(e) => set("promptSubtext", e.target.value)}
-            />
-          )}
-        </Field>
-        {draft.type === "FILL_IN_BLANK" && (
-          <>
-            <Field label="Sentence before the blank">
-              {(id) => (
-                <Input
-                  id={id}
-                  value={draft.sentenceBefore ?? ""}
-                  onChange={(e) => set("sentenceBefore", e.target.value)}
-                />
-              )}
-            </Field>
-            <Field label="Sentence after the blank">
-              {(id) => (
-                <Input
-                  id={id}
-                  value={draft.sentenceAfter ?? ""}
-                  onChange={(e) => set("sentenceAfter", e.target.value)}
-                />
-              )}
-            </Field>
-          </>
-        )}
-        <Field label="Translation" hint="Optional, shown after answering.">
-          {(id) => (
-            <Input
-              id={id}
-              value={draft.translation ?? ""}
-              onChange={(e) => set("translation", e.target.value)}
-            />
-          )}
-        </Field>
-        <Field label="Explanation" hint="Optional, shown after answering.">
-          {(id) => (
-            <Input
-              id={id}
-              value={draft.explanation ?? ""}
-              onChange={(e) => set("explanation", e.target.value)}
-            />
-          )}
-        </Field>
-      </div>
-
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-bold text-slate-700">
-          {mode === "choice" && "Options — mark the one correct answer"}
-          {mode === "accepted" && "Accepted answers (marked) and word-bank extras (unmarked)"}
-          {mode === "order" &&
-            "Words — position in the correct sentence (leave empty for extra words)"}
-          {mode === "pairs" && "Pairs — left side and its match"}
-        </legend>
-        {draft.options.map((option, index) => (
-          <div key={index} className="flex flex-wrap items-center gap-2">
-            {(mode === "choice" || mode === "accepted") && (
-              <input
-                type={mode === "choice" ? "radio" : "checkbox"}
-                name={group}
-                aria-label={`Option ${index + 1} is correct`}
-                className="size-5 accent-emerald-600"
-                checked={Boolean(option.isCorrect)}
-                onChange={(e) => setOption(index, { isCorrect: e.target.checked })}
-              />
-            )}
-            {mode === "order" && (
-              <Input
-                aria-label={`Position of word ${index + 1}`}
-                type="number"
-                min={1}
-                className="w-20"
-                value={option.correctPosition ?? ""}
-                onChange={(e) =>
-                  setOption(index, {
-                    correctPosition: e.target.value ? Number(e.target.value) : null,
-                  })
-                }
-              />
-            )}
-            <Input
-              aria-label={`Option ${index + 1} text`}
-              className="min-w-40 flex-1"
-              value={option.text}
-              onChange={(e) => setOption(index, { text: e.target.value })}
-              placeholder="Text"
-            />
-            {mode === "pairs" ? (
-              <Input
-                aria-label={`Option ${index + 1} match`}
-                className="min-w-40 flex-1"
-                value={option.matchText ?? ""}
-                onChange={(e) => setOption(index, { matchText: e.target.value })}
-                placeholder="Match"
-              />
-            ) : (
-              <Input
-                aria-label={`Option ${index + 1} subtext`}
-                className="min-w-32 flex-1"
-                value={option.subtext ?? ""}
-                onChange={(e) => setOption(index, { subtext: e.target.value })}
-                placeholder="Subtext (optional)"
-              />
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              aria-label={`Remove option ${index + 1}`}
-              disabled={draft.options.length <= 1}
-              onClick={() =>
-                set(
-                  "options",
-                  draft.options.filter((_, i) => i !== index),
-                )
-              }
-            >
-              <Trash2 aria-hidden="true" className="size-4" />
-            </Button>
-          </div>
-        ))}
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={draft.options.length >= 12}
-          onClick={() =>
-            set("options", [
-              ...draft.options,
-              {
-                text: "",
-                subtext: "",
-                isCorrect: false,
-                correctPosition: mode === "order" ? draft.options.length + 1 : null,
-                matchText: "",
-              },
-            ])
-          }
-        >
-          <Plus aria-hidden="true" className="size-4" /> Add{" "}
-          {mode === "pairs" ? "pair" : mode === "order" ? "word" : "option"}
-        </Button>
-      </fieldset>
-
-      {problems.length > 0 && (
-        <ul className="list-inside list-disc text-sm text-amber-800">
-          {problems.map((p) => (
-            <li key={p}>{p}</li>
-          ))}
-        </ul>
-      )}
-      {error && <Notice>{error}</Notice>}
-      <div className="flex gap-2">
-        <ActionButton
-          size="sm"
-          disabled={problems.length > 0}
-          onFail={setError}
-          action={async () => {
-            setError(null);
-            await onSave(toRequestBody(draft));
-          }}
-        >
-          Save exercise
-        </ActionButton>
-        <Button size="sm" variant="ghost" onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-    </form>
-  );
+/** The correct answer of an exercise as one line of text (format depends on the type). */
+function answerSummary(exercise: AdminExercise): string {
+  const mode = optionMode(exercise.type);
+  if (mode === "pairs") {
+    return exercise.options.map((o) => `${o.text} = ${o.matchText}`).join(", ");
+  }
+  if (mode === "order") {
+    return exercise.options
+      .filter((o) => o.correctPosition)
+      .sort((a, b) => a.correctPosition! - b.correctPosition!)
+      .map((o) => o.text)
+      .join(" ");
+  }
+  return exercise.options
+    .filter((o) => o.isCorrect)
+    .map((o) => o.text)
+    .join(" / ");
 }

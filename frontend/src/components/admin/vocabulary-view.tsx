@@ -10,13 +10,15 @@ import { admin, type AdminVocabulary } from "@/lib/api/admin";
 import { ActionButton, ConfirmDelete, Field, Input, Notice, Select } from "./admin-ui";
 import { useLoad } from "./use-load";
 
+/** The editable fields of a vocabulary item. */
 type Word = Omit<AdminVocabulary, "id" | "lessons">;
-const EMPTY: Word = { kind: "WORD", script: "", romanization: "", meaning: "", topic: "" };
+const EMPTY_WORD: Word = { kind: "WORD", script: "", romanization: "", meaning: "", topic: "" };
 const KINDS = ["LETTER", "WORD", "PHRASE"] as const;
 
 export function VocabularyView() {
   const languages = useLoad(() => admin.languages(), "languages");
   const [picked, setPicked] = useState<string | null>(null);
+  // `search` is what is typed in the box; `query` is only updated when the form is submitted.
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<string | null>(null); // id or "new"
@@ -81,7 +83,7 @@ export function VocabularyView() {
       {editing === "new" && (
         <Card>
           <WordForm
-            initial={EMPTY}
+            initial={EMPTY_WORD}
             submitLabel="Add word"
             onCancel={() => setEditing(null)}
             onSave={async (word) => {
@@ -191,6 +193,7 @@ export function VocabularyView() {
   );
 }
 
+// Add / edit form for one word (shown above the table or inside a table row).
 function WordForm({
   initial,
   submitLabel,

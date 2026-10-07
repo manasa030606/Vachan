@@ -7,10 +7,11 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { getDailyGoal } from "@/data/onboarding-options";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
 
-/** Today's XP compared with the learner's daily goal (GET /api/stats → dailyGoal). */
+/** Today's XP compared with the learner's daily goal (from GET /api/stats). */
 export function DailyGoalCard({ compact = false }: { compact?: boolean }) {
   const { stats } = useStats();
   const { dailyGoalId } = useLearnerPreferences();
+  // The goal the learner picked locally is used until the server stats have loaded.
   const goal = getDailyGoal(dailyGoalId);
   const target = stats?.dailyGoal.targetXp ?? goal.xp;
   const earned = stats?.dailyGoal.earnedToday ?? 0;

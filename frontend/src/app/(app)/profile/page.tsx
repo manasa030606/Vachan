@@ -1,3 +1,4 @@
+// /profile — the learner's stats, achievements and settings.
 import type { Metadata } from "next";
 import { ProfileView } from "@/components/profile/profile-view";
 

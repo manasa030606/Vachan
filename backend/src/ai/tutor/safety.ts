@@ -6,7 +6,7 @@
 //  3. neutralizeTags   — removes look-alike prompt delimiters (<context>, <question> …) from text
 //     the learner controls, so it can't pretend to be part of the retrieved notes.
 // The system prompt adds a second layer: everything inside the delimiters is data, not instructions.
-// This is basic protection, not a guarantee — see docs/AI_TUTOR.md → Security.
+// This is basic protection, not a guarantee — see docs/SECURITY.md.
 import { TUTOR_CONFIG } from "../../config/tutor.ts";
 
 // eslint-disable-next-line no-control-regex -- removing control characters is the point

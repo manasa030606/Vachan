@@ -1,7 +1,7 @@
 "use client";
 
-// Profile: account details (GET /api/me), learning progress (GET /api/progress),
-// XP / streak / level (GET /api/stats), badges (GET /api/achievements) and settings.
+// Profile page: account details, learning progress, XP/streak/level, badges and settings.
+// Data comes from GET /api/me, /api/progress, /api/stats and /api/achievements.
 import { Compass, ShieldCheck } from "lucide-react";
 import { useSession } from "@/components/session/session-provider";
 import { ButtonLink } from "@/components/ui/button";
@@ -16,11 +16,13 @@ import { ProfileHeader } from "./profile-header";
 import { ProfileStats } from "./profile-stats";
 import { SettingsCard } from "./settings-card";
 
+/** e.g. "October 2026". */
 function formatJoined(isoDate: string | undefined): string {
   if (!isoDate) return "";
   return new Date(isoDate).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
 }
 
+/** The Profile page. */
 export function ProfileView() {
   const { user } = useSession();
   const { displayName, languageCode } = useLearnerPreferences();

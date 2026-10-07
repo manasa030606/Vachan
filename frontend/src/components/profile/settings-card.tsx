@@ -13,6 +13,7 @@ import { useLearnerPreferences, useUpdatePreferences } from "@/lib/learner-prefe
 const selectClasses =
   "h-11 w-full rounded-2xl border-2 border-slate-200 bg-white px-3 font-bold text-ink outline-none focus:border-brand-400 disabled:bg-slate-50 disabled:text-slate-500";
 
+/** Settings card on the profile page, plus the log-out button. */
 export function SettingsCard() {
   const preferences = useLearnerPreferences();
   const dailyGoalId = useId();
@@ -22,7 +23,8 @@ export function SettingsCard() {
   const { logout } = useSession();
 
   async function handleLogout() {
-    await logout(); // POST /api/auth/logout — the old token stops working, then go to "/"
+    // POST /api/auth/logout makes the old token invalid, then the app goes to "/".
+    await logout();
   }
 
   return (

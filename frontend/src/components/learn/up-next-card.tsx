@@ -9,7 +9,7 @@ type UpNextCardProps = {
   lesson: LessonSummary;
 };
 
-/** "Continue where you left off" — the recommended next lesson (in progress, or the next one to start). */
+/** The recommended next lesson: either one already in progress, or the next one to start. */
 export function UpNextCard({ language, unit, lesson }: UpNextCardProps) {
   return (
     <section

@@ -1,6 +1,6 @@
 "use client";
 
-// Four onboarding questions + a summary. Each step is its own small component;
+// Onboarding: four questions and a summary. Each step is its own small component;
 // this file only keeps the answers and decides which step to show.
 import { useState } from "react";
 import Link from "next/link";
@@ -36,6 +36,7 @@ type Answers = {
 
 const STEPS = ["language", "goal", "daily-goal", "level", "summary"] as const;
 
+/** The onboarding flow shown right after sign-up. */
 export function OnboardingWizard() {
   const router = useRouter();
   const updatePreferences = useUpdatePreferences();
@@ -51,6 +52,7 @@ export function OnboardingWizard() {
   });
 
   const step = STEPS[stepIndex];
+  // Until a language is picked, fall back to Hindi so later steps always have a name to show.
   const language =
     languages.find((item) => item.code === answers.languageCode) ??
     getLanguage(answers.languageCode ?? "hi");
@@ -94,6 +96,14 @@ export function OnboardingWizard() {
   const level = answers.selfAssessmentId ? getSelfAssessmentLevel(answers.selfAssessmentId) : null;
   const goal = LEARNING_GOALS.find((item) => item.id === answers.learningGoalId);
   const dailyGoal = getDailyGoal(answers.dailyGoalId ?? "regular");
+  // Anyone who did not pick "new" is offered the placement test next.
+  const goesToPlacement = answers.selfAssessmentId !== "new";
+
+  let nextLabel = "Continue";
+  if (step === "summary") {
+    if (isSaving) nextLabel = "Saving…";
+    else nextLabel = goesToPlacement ? "Continue to placement" : "Start learning";
+  }
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -163,7 +173,7 @@ export function OnboardingWizard() {
             dailyGoalLabel={`${dailyGoal.label} · ${dailyGoal.xp} XP`}
             levelLabel={level?.label ?? "—"}
             startHint={level?.startHint ?? "You'll start at Unit 1"}
-            offersPlacement={answers.selfAssessmentId !== "new"}
+            offersPlacement={goesToPlacement}
           />
         )}
         {saveError && (
@@ -184,13 +194,7 @@ export function OnboardingWizard() {
             disabled={!canContinue}
             className="w-full sm:w-auto sm:min-w-44"
           >
-            {step !== "summary"
-              ? "Continue"
-              : isSaving
-                ? "Saving…"
-                : answers.selfAssessmentId !== "new"
-                  ? "Continue to placement"
-                  : "Start learning"}
+            {nextLabel}
           </Button>
         </div>
       </div>

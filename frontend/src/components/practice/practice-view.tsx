@@ -14,6 +14,7 @@ import { MistakesList } from "./mistakes-list";
 import { RecommendedPractice } from "./recommended-practice";
 import { VocabularyList } from "./vocabulary-list";
 
+/** The Practice page. */
 export function PracticeView() {
   const { languageCode, showRomanization } = useLearnerPreferences();
   const language = getLanguage(languageCode);

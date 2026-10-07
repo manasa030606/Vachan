@@ -1,4 +1,4 @@
-// Unit tests for the admin dashboard's pure parts (Phase 8).
+// Unit tests for the pure parts of the admin dashboard (exercise rules, admin knowledge notes).
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { adminDocumentSource } from "../../rag/content-loader.ts";

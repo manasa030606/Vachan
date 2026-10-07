@@ -1,10 +1,10 @@
-// AI tutor (Phase 6) — requires login. The LLM API key never leaves the server.
+// AI tutor and role-play conversation — requires login. The LLM API key never leaves the server.
 //   POST   /api/ai/tutor                 ask a question → grounded answer + references (rate-limited)
 //   GET    /api/ai/tutor/context         learner context, suggested questions, tutor availability
 //   GET    /api/ai/conversations         my tutor chats (?language=te)
 //   GET    /api/ai/conversations/:id     one chat with all messages
 //   DELETE /api/ai/conversations/:id     delete one chat
-// Role-play conversation (Phase 7):
+// Role-play conversation:
 //   GET    /api/ai/conversation/scenarios      the 6 scenarios + key words, level, availability
 //   POST   /api/ai/conversation                { scenario, language?, level? } → session + partner's first line
 //   GET    /api/ai/conversation                my role-plays (?language=te)
@@ -86,7 +86,7 @@ aiRouter.delete("/conversations/:id", async (req, res) => {
   res.json({ message: "Conversation deleted" });
 });
 
-// ── Role-play conversation (Phase 7) ────────────────────────────
+// Role-play conversation
 
 aiRouter.get("/conversation/scenarios", async (req, res) => {
   const { language } = conversationLanguageQuerySchema.parse(req.query);

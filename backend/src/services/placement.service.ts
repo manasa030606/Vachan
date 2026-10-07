@@ -2,7 +2,6 @@
 //
 // Questions: 3 per unit (12 for the 4-unit course), re-using real course exercises and
 // covering script/character recognition, vocabulary, translation and sentence understanding.
-// (Listening questions are added with audio in Phase 7.)
 // Scoring: transparent rules in gamification/placement-scoring.ts — not machine learning.
 // Placement answers never cost hearts, give XP or count as mistakes.
 import { GAMIFICATION } from "../config/gamification.ts";
@@ -34,8 +33,9 @@ export const PLACEMENT_RULES = [
 async function resolveLanguage(userId: string, languageCode?: string) {
   if (languageCode) {
     const language = await prisma.language.findUnique({ where: { code: languageCode } });
-    if (!language)
+    if (!language) {
       throw new HttpError(400, "UNKNOWN_LANGUAGE", `Language "${languageCode}" is not supported`);
+    }
     return language;
   }
   const profile = await prisma.userProfile.findUnique({
@@ -195,8 +195,9 @@ export async function getPlacementResult(userId: string, testId?: string) {
       where: { userId, languageId: language.id },
       orderBy: { startedAt: "desc" },
     });
-    if (!test)
+    if (!test) {
       throw notFound("PLACEMENT_NOT_FOUND", "You haven't taken a placement test for this language");
+    }
   }
 
   const [answers, questions, units, language] = await Promise.all([

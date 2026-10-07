@@ -1,8 +1,8 @@
 "use client";
 
-// The role-play chat: partner lines (native script, romanization, English, Listen), learner
-// replies with the partner's feedback, reply suggestions, and a composer that accepts typing or
-// the microphone (recording → transcript the learner can check and edit → send).
+// The role-play chat: partner lines (script, romanization, English and a Listen button),
+// the learner's replies with feedback, reply suggestions, and a reply box. The learner can type,
+// or record with the microphone and then check and edit the transcript before sending.
 import {
   ArrowLeft,
   BookOpen,
@@ -34,8 +34,10 @@ type Props = {
   onRestart: (scenario: ScenarioId) => void;
 };
 
+/** Details of a spoken reply, sent with the text so the server can log it. */
 type Voice = { durationMs: number; bytes: number; sttModel: string };
 
+/** A message from the AI partner. */
 function PartnerBubble({
   turn,
   language,
@@ -88,6 +90,7 @@ function PartnerBubble({
   );
 }
 
+/** A reply from the learner, with the partner's feedback underneath. */
 function LearnerBubble({ turn, language }: { turn: ConversationTurnDto; language: string }) {
   const feedback = turn.feedback;
   return (
@@ -136,6 +139,7 @@ function LearnerBubble({ turn, language }: { turn: ConversationTurnDto; language
   );
 }
 
+/** One role-play session from start to summary. */
 export function ConversationView({
   conversation,
   showRomanization,
@@ -145,6 +149,7 @@ export function ConversationView({
 }: Props) {
   const { session, turns } = conversation;
   const language = session.language.code;
+  // English translations are shown by default except at the intermediate level.
   const [showEnglish, setShowEnglish] = useState(session.level !== "intermediate");
   const [text, setText] = useState("");
   const [voice, setVoice] = useState<Voice | null>(null);
@@ -157,16 +162,19 @@ export function ConversationView({
   const Icon = SCENARIO_ICONS[session.scenario];
 
   const ended = session.status === "ended";
-  const full = session.learnerTurns >= session.maxLearnerTurns;
-  const lastPartner = [...turns].reverse().find((t) => t.speaker === "partner");
+  const outOfReplies = session.learnerTurns >= session.maxLearnerTurns;
+  // Reply suggestions come from the partner's latest line.
+  const lastPartner = [...turns].reverse().find((turn) => turn.speaker === "partner");
 
+  // Keep the newest message in view.
   useEffect(() => {
     listEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [turns.length, sending, ended]);
 
-  const message = (cause: unknown) =>
+  const errorText = (cause: unknown) =>
     cause instanceof ApiError ? cause.message : "Something went wrong. Please try again.";
 
+  // Defaults to the current text box; Retry passes the earlier reply again.
   const send = async (reply = text, spoken = voice) => {
     const trimmed = reply.trim();
     if (!trimmed || sending) return;
@@ -182,7 +190,7 @@ export function ConversationView({
       setText("");
       setVoice(null);
     } catch (cause) {
-      setError({ message: message(cause), retry: () => void send(trimmed, spoken) });
+      setError({ message: errorText(cause), retry: () => void send(trimmed, spoken) });
     } finally {
       setSending(false);
     }
@@ -201,7 +209,8 @@ export function ConversationView({
       });
     } catch (cause) {
       setError({
-        message: message(cause),
+        message: errorText(cause),
+        // 415 and 422 mean the audio itself was unusable, so retrying would not help.
         retry:
           cause instanceof ApiError && cause.status !== 422 && cause.status !== 415
             ? () => void transcribe(recording)
@@ -218,7 +227,7 @@ export function ConversationView({
     try {
       onChange(await endConversation(session.id));
     } catch (cause) {
-      setError({ message: message(cause), retry: () => void end() });
+      setError({ message: errorText(cause), retry: () => void end() });
     } finally {
       setEnding(false);
     }
@@ -254,7 +263,7 @@ export function ConversationView({
           <button
             type="button"
             aria-pressed={showEnglish}
-            onClick={() => setShowEnglish((v) => !v)}
+            onClick={() => setShowEnglish((shown) => !shown)}
             className="rounded-full px-3 py-1 text-sm font-bold text-brand-700 ring-2 ring-brand-100 ring-inset hover:bg-brand-50"
           >
             {showEnglish ? "Hide English" : "Show English"}
@@ -322,20 +331,24 @@ export function ConversationView({
         </div>
       )}
 
-      {ended ? (
+      {/* At the bottom: the summary when ended, a "see summary" prompt when out of replies,
+          otherwise the reply box. */}
+      {ended && (
         <ConversationSummary
           session={session}
           onAgain={() => onRestart(session.scenario)}
           onChooseAnother={onExit}
         />
-      ) : full ? (
+      )}
+      {!ended && outOfReplies && (
         <div className="rounded-card bg-emerald-50 p-4 text-center">
           <p className="font-bold text-emerald-800">Role-play complete — well done!</p>
           <Button className="mt-3" onClick={() => void end()} disabled={ending}>
             {ending ? "Preparing your summary…" : "See my summary"}
           </Button>
         </div>
-      ) : (
+      )}
+      {!ended && !outOfReplies && (
         <div className="space-y-3 rounded-card border border-slate-200 bg-white p-3">
           {lastPartner && lastPartner.suggestions.length > 0 && (
             <div>

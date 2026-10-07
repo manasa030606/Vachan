@@ -1,4 +1,4 @@
-// Phase 8: records every admin change (who, what, when). Never stores learner data.
+// Records every admin change (who, what, when). Never stores learner data.
 import { prisma } from "./prisma.ts";
 
 export async function audit(

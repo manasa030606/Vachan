@@ -1,5 +1,5 @@
 // The learner's settings, read from the logged-in user's profile (GET /api/me)
-// and saved with PATCH /api/me. (Phase 1 kept these in localStorage; Phase 2 uses the database.)
+// and saved with PATCH /api/me.
 import { useCallback } from "react";
 import { useSession } from "@/components/session/session-provider";
 import { DEFAULT_LANGUAGE_CODE, isLanguageCode } from "@/data/languages";

@@ -1,13 +1,14 @@
 "use client";
 
-// Top bar inside the app: course language + streak, XP and hearts.
-// Values come from GET /api/stats (useStats). On desktop the Learn page also shows cards.
+// Top bar inside the app: course language switcher, plus streak, XP and hearts.
+// The numbers come from GET /api/stats through useStats.
 import { Flame, Heart, Zap } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { StatPill } from "@/components/ui/stat-pill";
 import { useStats } from "@/components/session/stats-provider";
 import { LanguageSwitcher } from "./language-switcher";
 
+/** Sticky header with the learner's main stats. */
 export function TopStatsBar() {
   const { stats } = useStats();
   const streak = stats?.streak.current ?? 0;

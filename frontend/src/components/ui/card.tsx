@@ -21,6 +21,7 @@ type CardHeaderProps = {
   as?: "h2" | "h3";
 };
 
+/** Title, optional description and an optional action on the right, at the top of a Card. */
 export function CardHeader({ title, description, action, as: Heading = "h2" }: CardHeaderProps) {
   return (
     <div className="mb-4 flex items-start justify-between gap-3">

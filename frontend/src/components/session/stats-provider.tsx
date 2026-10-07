@@ -1,10 +1,8 @@
 "use client";
 
 // XP, level, streak, hearts, daily goal and badges for the logged-in learner (GET /api/stats).
-// Loaded once after login and again after every page change, so the numbers are fresh
-// when the learner comes back from a lesson.
-//
-//   const { stats, reload } = useStats();
+// Loaded after login and again after every page change, so the numbers are fresh
+// when the learner comes back from a lesson. Usage: const { stats, reload } = useStats();
 import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { getStats } from "@/lib/api/endpoints";
@@ -15,6 +13,7 @@ type StatsContextValue = { stats: StatsDto | null; reload: () => void };
 
 const StatsContext = createContext<StatsContextValue>({ stats: null, reload: () => {} });
 
+/** Loads the learner's stats and shares them with the whole app. */
 export function StatsProvider({ children }: { children: ReactNode }) {
   const { status, user } = useSession();
   const pathname = usePathname();
@@ -46,6 +45,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/** Read the learner's stats (null while loading or when logged out). */
 export function useStats(): StatsContextValue {
   return useContext(StatsContext);
 }

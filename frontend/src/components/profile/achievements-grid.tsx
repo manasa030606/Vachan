@@ -3,7 +3,12 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import type { AchievementDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
-/** Badges (GET /api/achievements): earned ones are colourful, the others show progress. */
+/** Short date such as "5 Oct". */
+function shortDate(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
+/** All badges (GET /api/achievements): earned ones are colourful, the others show progress. */
 export function AchievementsGrid({ achievements }: { achievements: AchievementDto[] | null }) {
   const earnedCount = achievements?.filter((item) => item.unlocked).length ?? 0;
 
@@ -41,8 +46,7 @@ export function AchievementsGrid({ achievements }: { achievements: AchievementDt
               {achievement.unlocked ? (
                 <p className="mt-1 text-xs font-bold text-marigold-700">
                   ✓ Earned
-                  {achievement.unlockedAt &&
-                    ` · ${new Date(achievement.unlockedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                  {achievement.unlockedAt && ` · ${shortDate(achievement.unlockedAt)}`}
                 </p>
               ) : (
                 <>

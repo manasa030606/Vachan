@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
 
+// Next.js settings: security headers and the optional /api proxy to the backend.
+
 // BACKEND_URL (server-side only, e.g. https://vachan-api.onrender.com) turns on the API proxy:
 // requests to https://<frontend>/api/... are forwarded to <BACKEND_URL>/api/...
 // The browser only ever talks to the frontend's domain, so the httpOnly login cookie is
 // first-party and no cross-site cookie/CORS problems appear. See docs/DEPLOYMENT.md.
 const backendUrl = process.env.BACKEND_URL?.trim().replace(/\/+$/, "");
 
-// Phase 8: security headers for every page.
+// Security headers sent with every page.
 //   frame-ancestors / X-Frame-Options  no clickjacking (the app can't be framed)
 //   nosniff                            no content-type guessing
 //   Permissions-Policy                 the microphone only for Vachan itself (speaking practice);

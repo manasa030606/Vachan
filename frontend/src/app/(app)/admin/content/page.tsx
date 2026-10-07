@@ -1,3 +1,4 @@
+// /admin/content — manage languages, courses, units and lessons.
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ContentView } from "@/components/admin/content-view";

@@ -1,6 +1,7 @@
 import { ButtonLink } from "@/components/ui/button";
 import { HeroVisual } from "./hero-visual";
 
+/** Landing page: top section with the headline and sign-up buttons. */
 export function Hero() {
   return (
     <section className="relative overflow-hidden">

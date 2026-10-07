@@ -1,13 +1,10 @@
 "use client";
 
 // Records the learner's voice in the browser and returns a 16 kHz mono WAV.
-//
-// Why not MediaRecorder? It produces WebM/Ogg/MP4 depending on the browser, which the server
-// would need ffmpeg to measure. Here an AudioWorklet copies the raw samples instead, and
-// lib/audio/wav.ts writes a small WAV — the same format from every browser.
-//
-// Microphone problems are turned into clear, fixable messages (denied, no microphone, in use,
-// not a secure page, old browser).
+// We don't use MediaRecorder because it gives WebM/Ogg/MP4 depending on the browser, and the
+// server would need ffmpeg to read those. Instead an AudioWorklet copies the raw samples and
+// lib/audio/wav.ts writes a small WAV, so every browser sends the same format.
+// Microphone problems are turned into clear messages the learner can act on.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { level as levelOf, toUploadWav } from "@/lib/audio/wav";
 
@@ -42,6 +39,7 @@ const WORKLET = `class VachanRecorder extends AudioWorkletProcessor {
 }
 registerProcessor("vachan-recorder", VachanRecorder);`;
 
+/** Maps the browser's getUserMedia error to one of our error codes. */
 function errorFrom(error: unknown): RecorderError {
   const name = error instanceof DOMException ? error.name : "";
   if (name === "NotAllowedError" || name === "SecurityError") return "denied";
@@ -50,13 +48,14 @@ function errorFrom(error: unknown): RecorderError {
   return "failed";
 }
 
+/** Hook for recording from the microphone, with a timer, input level and friendly errors. */
 export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}) {
   const [state, setState] = useState<State>("idle");
   const [error, setError] = useState<RecorderError | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [inputLevel, setInputLevel] = useState(0);
 
-  const parts = useRef<{
+  const activeRecording = useRef<{
     stream: MediaStream;
     context: AudioContext;
     chunks: Float32Array[];
@@ -66,12 +65,12 @@ export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}
   } | null>(null);
 
   const cleanup = useCallback(() => {
-    const current = parts.current;
+    const current = activeRecording.current;
     if (!current) return;
     window.clearInterval(current.timer);
     current.stream.getTracks().forEach((track) => track.stop());
     void current.context.close().catch(() => undefined);
-    parts.current = null;
+    activeRecording.current = null;
     setInputLevel(0);
   }, []);
 
@@ -79,7 +78,7 @@ export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}
 
   /** Stops recording. Returns the WAV, or null if it was too short. */
   const stop = useCallback((): Recording | null => {
-    const current = parts.current;
+    const current = activeRecording.current;
     if (!current) return null;
     const { chunks, context } = current;
     const sampleRate = context.sampleRate;
@@ -101,11 +100,11 @@ export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}
   }, [cleanup, minDurationMs]);
 
   /**
-   * Starts recording. The returned promise resolves when recording stops — by stop(), or
-   * automatically after maxDurationMs.
+   * Starts recording. The returned promise resolves when recording stops, either through
+   * stop() or automatically after maxDurationMs.
    */
   const start = useCallback(async (): Promise<Recording | null> => {
-    if (parts.current) return null;
+    if (activeRecording.current) return null;
     setError(null);
     setElapsedMs(0);
     if (typeof window === "undefined" || !window.isSecureContext) {
@@ -140,12 +139,14 @@ export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}
     try {
       const source = context.createMediaStreamSource(stream);
       const silent = context.createGain();
-      silent.gain.value = 0; // keeps the graph running without playing the voice back
+      // A muted output keeps the audio graph running without playing the voice back.
+      silent.gain.value = 0;
       silent.connect(context.destination);
       let lastLevelUpdate = 0;
       const onSamples = (samples: Float32Array) => {
         chunks.push(samples);
         const now = performance.now();
+        // Update the level meter at most every 80 ms to avoid re-rendering on every block.
         if (now - lastLevelUpdate > 80) {
           lastLevelUpdate = now;
           setInputLevel(levelOf(samples));
@@ -183,7 +184,7 @@ export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}
         setElapsedMs(elapsed);
         if (elapsed >= maxDurationMs) stop();
       }, 100);
-      parts.current = { stream, context, chunks, startedAt, timer, resolve };
+      activeRecording.current = { stream, context, chunks, startedAt, timer, resolve };
       // If the microphone is unplugged mid-recording, stop with what we have.
       stream.getAudioTracks()[0]?.addEventListener("ended", () => stop());
       setState("recording");
@@ -192,12 +193,13 @@ export function useRecorder({ maxDurationMs = 15_000, minDurationMs = 400 } = {}
 
   /** Stops without returning anything (e.g. the learner left the page). */
   const cancel = useCallback(() => {
-    const current = parts.current;
+    const current = activeRecording.current;
     cleanup();
     current?.resolve?.(null);
     setState("idle");
   }, [cleanup]);
 
+  /** Clears an error so the mic button is ready again. */
   const reset = useCallback(() => {
     setError(null);
     setState("idle");

@@ -1,4 +1,4 @@
-// Every number and default the AI tutor (Phase 6) uses, in one place.
+// Every number and default the AI tutor uses, in one place.
 
 export const TUTOR_CONFIG = {
   providers: {
@@ -35,7 +35,8 @@ export const TUTOR_CONFIG = {
   historyMessageChars: 400,
   /** Low temperature = consistent, less creative answers (we want facts from the notes). */
   temperature: 0.2,
-  maxOutputTokens: 2048, // newer Gemini models "think" first; thinking tokens count towards this limit
+  /** Newer Gemini models "think" first, and thinking tokens count towards this limit. */
+  maxOutputTokens: 2048,
 
   /** Word budget per learner level — the prompt asks for answers of about this length. */
   levelStyle: {

@@ -1,5 +1,5 @@
 {
-  "description": "AI tutor evaluation (Phase 6). Every case runs the full pipeline (retrieval → prompt → LLM → grounding checks). 'sources' = chunk ids that count as relevant (a trailing * matches a prefix); 'mention' = at least one of these strings must appear in the answer; 'llmOnly' cases test the model's own refusal and are skipped with the offline test double.",
+  "description": "AI tutor evaluation. Every case runs the full pipeline (retrieval → prompt → LLM → grounding checks). 'sources' = chunk ids that count as relevant (a trailing * matches a prefix); 'mention' = at least one of these strings must appear in the answer; 'llmOnly' cases test the model's own refusal and are skipped with the offline test double.",
   "levelWordLimits": {
     "beginner": 180,
     "elementary": 255,

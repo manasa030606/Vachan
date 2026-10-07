@@ -10,6 +10,12 @@ import { LlmError, type GenerateRequest, type LlmProvider } from "./types.ts";
 const looksLikePlaceholder = (key: string | undefined) =>
   !key || key.length < 20 || /^(your|replace|xxx|paste)/i.test(key);
 
+function apiKeyFor(name: ProviderName): string | undefined {
+  if (name === "gemini") return env.GEMINI_API_KEY;
+  if (name === "groq") return env.GROQ_API_KEY;
+  return undefined;
+}
+
 export function getProviderName(): ProviderName {
   return env.LLM_PROVIDER;
 }
@@ -18,9 +24,7 @@ export function getProviderName(): ProviderName {
 export function getLlmStatus() {
   const name = env.LLM_PROVIDER;
   const provider = TUTOR_CONFIG.providers[name];
-  const key =
-    name === "gemini" ? env.GEMINI_API_KEY : name === "groq" ? env.GROQ_API_KEY : undefined;
-  const configured = name === "mock" || !looksLikePlaceholder(key);
+  const configured = name === "mock" || !looksLikePlaceholder(apiKeyFor(name));
   return {
     provider: name,
     providerLabel: provider.label,
@@ -72,16 +76,19 @@ export function getLlmProvider(): LlmProvider {
     const info = TUTOR_CONFIG.providers[status.provider];
     throw new LlmError(
       "LLM_NOT_CONFIGURED",
-      `The AI tutor needs ${info.keyVariable} in backend/.env (free key: ${info.keyUrl}). See docs/AI_TUTOR.md → Setup.`,
+      `The AI tutor needs ${info.keyVariable} in backend/.env (free key: ${info.keyUrl}). See docs/SETUP.md.`,
     );
   }
   const base = env.LLM_BASE_URL ?? TUTOR_CONFIG.providers[status.provider].baseUrl;
-  const make = (model: string): LlmProvider =>
-    status.provider === "gemini"
-      ? new GeminiProvider(env.GEMINI_API_KEY!, model, base, env.LLM_TIMEOUT_MS)
-      : status.provider === "groq"
-        ? new GroqProvider(env.GROQ_API_KEY!, model, base, env.LLM_TIMEOUT_MS)
-        : new MockProvider();
+  const make = (model: string): LlmProvider => {
+    if (status.provider === "gemini") {
+      return new GeminiProvider(env.GEMINI_API_KEY!, model, base, env.LLM_TIMEOUT_MS);
+    }
+    if (status.provider === "groq") {
+      return new GroqProvider(env.GROQ_API_KEY!, model, base, env.LLM_TIMEOUT_MS);
+    }
+    return new MockProvider();
+  };
   const primary = make(status.model);
   cached =
     env.LLM_FALLBACK_MODEL && status.provider !== "mock"

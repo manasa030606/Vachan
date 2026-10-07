@@ -1,7 +1,7 @@
 "use client";
 
-// LISTENING COMPREHENSION: hear a word/phrase (play, replay, slower), choose its meaning or how
-// it is written. The answer is checked by the server, then shown with its script and romanization.
+// Listening comprehension: hear a word or phrase (play, replay, slower) and choose its meaning
+// or how it is written. The server checks the answer, then we show the script and romanization.
 import { ArrowRight, CheckCircle2, Headphones, RotateCcw, XCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,21 @@ import type { ListeningAnswerDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { PhraseAudio } from "./phrase-audio";
 
+/** Colours for an answer option, before and after the answer is checked. */
+function optionClass(checked: boolean, isChosen: boolean, isRight: boolean): string {
+  if (!checked) {
+    return isChosen
+      ? "border-brand-500 bg-brand-50 text-brand-800"
+      : "border-slate-200 bg-white text-ink hover:border-brand-200";
+  }
+  if (isRight) return "border-emerald-400 bg-emerald-50 text-emerald-800";
+  if (isChosen) return "border-rose-300 bg-rose-50 text-rose-800";
+  return "border-slate-200 text-slate-400";
+}
+
+/** The Listen tab: a round of listening questions and a score at the end. */
 export function ListeningPractice({ language }: { language: string }) {
+  // Changing the round number makes useApi fetch a new set of questions.
   const [round, setRound] = useState(0);
   const data = useApi(() => getListeningRound(language), `listening:${language}:${round}`);
   const [index, setIndex] = useState(0);
@@ -28,7 +42,7 @@ export function ListeningPractice({ language }: { language: string }) {
   const finished = questions.length > 0 && index >= questions.length;
 
   const restart = () => {
-    setRound((r) => r + 1);
+    setRound((current) => current + 1);
     setIndex(0);
     setChoice(null);
     setAnswer(null);
@@ -42,7 +56,7 @@ export function ListeningPractice({ language }: { language: string }) {
     try {
       const result = await checkListeningAnswer(question.token, choice);
       setAnswer(result);
-      if (result.correct) setCorrectCount((c) => c + 1);
+      if (result.correct) setCorrectCount((count) => count + 1);
     } catch (cause) {
       setError(cause instanceof ApiError ? cause.message : "Couldn't check the answer.");
     } finally {
@@ -51,7 +65,7 @@ export function ListeningPractice({ language }: { language: string }) {
   };
 
   const next = () => {
-    setIndex((i) => i + 1);
+    setIndex((current) => current + 1);
     setChoice(null);
     setAnswer(null);
   };
@@ -128,15 +142,7 @@ export function ListeningPractice({ language }: { language: string }) {
               className={cn(
                 "flex items-center justify-between gap-2 rounded-2xl border-2 px-4 py-3 text-left font-bold transition",
                 question.type === "script" ? "font-display text-2xl" : "text-lg",
-                answer
-                  ? isRight
-                    ? "border-emerald-400 bg-emerald-50 text-emerald-800"
-                    : isWrongChoice
-                      ? "border-rose-300 bg-rose-50 text-rose-800"
-                      : "border-slate-200 text-slate-400"
-                  : isChosen
-                    ? "border-brand-500 bg-brand-50 text-brand-800"
-                    : "border-slate-200 bg-white text-ink hover:border-brand-200",
+                optionClass(Boolean(answer), isChosen, isRight),
               )}
             >
               {option.label}

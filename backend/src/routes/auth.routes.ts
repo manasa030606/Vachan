@@ -9,7 +9,7 @@ import { loginUser, logoutUser, registerUser } from "../services/auth.service.ts
 
 export const authRouter = Router();
 
-// Phase 8: brute-force protection. Login: per IP + email (a wrong-password storm on one account
+// Brute-force protection. Login: per IP + email (a wrong-password storm on one account
 // is slowed down; other learners on the same school/office IP are not affected). Register: per IP.
 const loginLimiter = new RateLimiter([
   { name: "minute", limit: env.LOGIN_RATE_LIMIT_PER_MINUTE, windowMs: 60_000 },

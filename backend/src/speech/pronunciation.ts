@@ -1,4 +1,4 @@
-// PRONUNCIATION NOTES — "where supported" (Gemini only; Whisper and the mock can't do it).
+// Pronunciation notes, "where supported" (Gemini only; Whisper and the mock can't do it).
 //
 // Gemini listens to the recording together with the expected phrase and gives up to three
 // short observations about specific sounds. This is an AI opinion, NOT a measured

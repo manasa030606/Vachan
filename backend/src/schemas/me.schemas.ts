@@ -1,9 +1,10 @@
+// Request validation for the learner's own profile and settings (PATCH /api/me).
 import { z } from "zod";
 import { isValidTimeZone } from "../services/gamification/dates.ts";
 
 export const DAILY_GOALS = ["casual", "regular", "serious", "intense"] as const;
 
-/** The six self-assessment answers from the spec (section 3), as stored ids. */
+/** The six onboarding self-assessment answers, as stored ids. */
 export const SELF_ASSESSMENTS = [
   "new", // Completely new — I know nothing
   "few-words", // I know a few words

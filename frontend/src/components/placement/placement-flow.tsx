@@ -1,10 +1,9 @@
 "use client";
 
-// Placement test: intro → 12 questions (3 per unit) → result → choose where to start.
-//   POST /api/placement/start · POST /api/placement/answer · GET /api/placement/result
-//   POST /api/placement/decide
-// Answers aren't marked right/wrong during the test; the result shows the score per unit
-// and the simple rule that picked the starting unit. No hearts, no XP, no mistakes recorded.
+// Placement test: an intro, 12 questions (3 per unit), then the result and a choice of where to start.
+// Uses the /api/placement start, answer, result and decide endpoints.
+// Answers are not marked right or wrong during the test; the result shows the score per unit
+// and the rules that picked the starting unit. No hearts, XP or mistakes are recorded.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Compass, X, XCircle } from "lucide-react";
@@ -36,6 +35,7 @@ const SKILL_LABELS: Record<PlacementSkill, string> = {
 
 type Phase = "intro" | "questions" | "result";
 
+/** The whole placement test, from intro screen to result. */
 export function PlacementFlow() {
   const router = useRouter();
   const { languageCode, selfAssessmentId, showRomanization } = useLearnerPreferences();
@@ -51,6 +51,7 @@ export function PlacementFlow() {
   const exercise = question ? toExercise(question.exercise) : null;
   const canSubmit = exercise ? isAnswerReady(exercise, answer) && !busy : false;
 
+  // Runs an API call with a shared busy flag and error message.
   const run = useCallback(async (task: () => Promise<void>) => {
     setBusy(true);
     setError(null);
@@ -97,7 +98,7 @@ export function PlacementFlow() {
       router.push("/learn");
     });
 
-  // Enter = Next
+  // Pressing Enter moves to the next question (focused buttons handle Enter themselves).
   useEffect(() => {
     if (phase !== "questions") return;
     function onKey(event: KeyboardEvent) {
@@ -165,6 +166,9 @@ export function PlacementFlow() {
   }
 
   if (phase === "questions" && test && question && exercise) {
+    const isLastQuestion = index + 1 === test.questions.length;
+    let nextLabel = isLastQuestion ? "See my result" : "Next";
+    if (busy) nextLabel = "Saving…";
     return (
       <div className="flex min-h-dvh flex-col">
         <div className="mx-auto flex w-full max-w-2xl items-center gap-4 px-4 pt-4 sm:pt-6">
@@ -209,7 +213,7 @@ export function PlacementFlow() {
               disabled={!canSubmit}
               className="w-full sm:w-auto sm:min-w-44"
             >
-              {busy ? "Saving…" : index + 1 === test.questions.length ? "See my result" : "Next"}
+              {nextLabel}
             </Button>
           </div>
         </div>

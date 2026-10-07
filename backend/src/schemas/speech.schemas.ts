@@ -1,3 +1,4 @@
+// Request validation for the speech routes (text-to-speech, recordings, listening practice).
 import { z } from "zod";
 import { SPEECH_CONFIG } from "../config/speech.ts";
 import { KNOWLEDGE_LEVELS } from "../rag/config.ts";

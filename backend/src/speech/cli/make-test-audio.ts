@@ -1,7 +1,7 @@
-// npx tsx src/speech/cli/make-test-audio.ts   (from backend/)
-// Re-creates the small test recordings in postman/audio/ used by Postman and the API tests:
-//   speech-sample.wav  2.2 s, two voice-like sounds (passes the audio checks; NOT real speech —
-//                      with STT_PROVIDER=mock it "transcribes" to the language's word for hello)
+// Re-creates the small test recordings in postman/audio/ used by Postman and the API tests.
+// Run (from backend/): npx tsx src/speech/cli/make-test-audio.ts
+//   speech-sample.wav  2.2 s, two voice-like sounds (passes the audio checks; not real speech,
+//                      but with STT_PROVIDER=mock it "transcribes" to the word for hello)
 //   silence.wav        1.5 s of digital silence      → 422 AUDIO_SILENT
 //   too-short.wav      0.2 s                          → 422 AUDIO_TOO_SHORT
 //   not-audio.txt      a text file                    → 415 UNSUPPORTED_AUDIO_FORMAT
@@ -13,8 +13,10 @@ import { encodeWav } from "../wav.ts";
 const RATE = 16_000;
 const dir = new URL("../../../../postman/audio/", import.meta.url);
 
+/** A WAV of `seconds` length with a voice-like sound during each [start, end) burst. */
 function voiced(seconds: number, bursts: Array<[number, number]>) {
   const samples = new Float32Array(Math.round(RATE * seconds));
+  // Tiny seeded random generator, so the files are the same on every run.
   let seed = 7;
   const noise = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648 - 0.5;
   for (let i = 0; i < samples.length; i++) {

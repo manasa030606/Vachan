@@ -1,7 +1,7 @@
 "use client";
 
-// Play / Replay / speed controls for a phrase. Every control has visible text (spec §8: audio
-// controls need visible text/context), and the state is announced to screen readers.
+// Play, Replay and speed controls for a phrase. Every control has visible text, not just
+// an icon, and the playback state is announced to screen readers.
 import { Loader2, RotateCcw, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
@@ -19,11 +19,23 @@ type PhraseAudioProps = {
   className?: string;
 };
 
+/** Audio player for one phrase; `compact` shows only a small "Listen" button. */
 export function PhraseAudio({ source, label, compact = false, className }: PhraseAudioProps) {
   const audio = usePhraseAudio();
   const [speed, setSpeed] = useState<Speed>(1);
   const [played, setPlayed] = useState(false);
   const busy = audio.state === "loading";
+
+  let playLabel = "Play";
+  if (busy) playLabel = "Loading…";
+  else if (audio.state === "playing") playLabel = "Playing…";
+
+  // Status line under the controls: an error, a browser-voice note, or the slow-mode speed.
+  let statusText: string | null = "";
+  if (audio.state === "error") statusText = audio.message;
+  else if (audio.usedBrowserVoice && audio.state === "playing")
+    statusText = "Playing with your browser's voice (server audio unavailable).";
+  else if (speed !== 1) statusText = `Slow mode: ${speed}× speed.`;
 
   const play = (rate: Speed = speed) => {
     setPlayed(true);
@@ -71,7 +83,7 @@ export function PhraseAudio({ source, label, compact = false, className }: Phras
           ) : (
             <Volume2 aria-hidden="true" className="size-5" />
           )}
-          {busy ? "Loading…" : audio.state === "playing" ? "Playing…" : "Play"}
+          {playLabel}
         </button>
         {played && (
           <button
@@ -118,13 +130,7 @@ export function PhraseAudio({ source, label, compact = false, className }: Phras
           audio.state === "error" ? "font-bold text-rose-700" : "text-slate-500",
         )}
       >
-        {audio.state === "error"
-          ? audio.message
-          : audio.usedBrowserVoice && audio.state === "playing"
-            ? "Playing with your browser's voice (server audio unavailable)."
-            : speed !== 1
-              ? `Slow mode: ${speed}× speed.`
-              : ""}
+        {statusText}
       </p>
     </div>
   );

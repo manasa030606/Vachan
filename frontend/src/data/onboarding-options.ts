@@ -51,7 +51,7 @@ export function getDailyGoal(id: DailyGoalId) {
 }
 
 /**
- * Self-assessment levels — the six statements from the spec (section 3). Stored in the profile.
+ * Self-assessment levels: "how much do you already know?". Stored in the profile.
  * Everyone except "new" is offered the placement test after onboarding (it can be skipped).
  */
 export const SELF_ASSESSMENT_LEVELS = [

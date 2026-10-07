@@ -45,6 +45,7 @@ export function buttonStyles({ variant = "primary", size = "md", fullWidth }: St
 
 type ButtonProps = ComponentProps<"button"> & StyleOptions;
 
+/** A styled <button>. Defaults to type="button" so it never submits a form by accident. */
 export function Button({
   variant,
   size,
@@ -64,6 +65,7 @@ export function Button({
 
 type ButtonLinkProps = ComponentProps<typeof Link> & StyleOptions;
 
+/** A Next.js link that looks like a button. */
 export function ButtonLink({ variant, size, fullWidth, className, ...props }: ButtonLinkProps) {
   return <Link className={cn(buttonStyles({ variant, size, fullWidth }), className)} {...props} />;
 }

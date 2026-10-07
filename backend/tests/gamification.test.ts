@@ -1,6 +1,6 @@
-// Phase 4 end-to-end test: XP, levels, streak days, hearts, daily goal, badges,
-// recommendations and the placement test — against a migrated + seeded database.
-// Day changes are simulated by editing UserStats.lastActiveDate (no fake clocks in the app).
+// API tests for gamification (XP, levels, streaks, hearts, daily goal, badges,
+// recommendations) and the placement test. Needs a migrated + seeded database.
+// Day changes are simulated by editing UserStats.lastActiveDate (the app has no fake clock).
 // Run with:  npm run test:api -w backend
 import assert from "node:assert/strict";
 import type { Server } from "node:http";
@@ -27,6 +27,7 @@ async function call(token: string, method: string, path: string, body?: unknown)
   return { status: response.status, body: (await response.json()) as Json };
 }
 
+/** Registers a fresh learner and finishes onboarding for the given language. */
 async function newUser(languageCode: string, selfAssessment = "few-words") {
   const email = `gam-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
   users.push(email);
@@ -46,6 +47,7 @@ async function newUser(languageCode: string, selfAssessment = "few-words") {
   return { token: token as string, userId: user.id as string };
 }
 
+/** Builds a right (or deliberately wrong) answer for an exercise from the database. */
 async function answerFor(exerciseId: string, correct = true) {
   const exercise = await prisma.exercise.findUniqueOrThrow({
     where: { id: exerciseId },
@@ -96,6 +98,7 @@ async function completeLesson(token: string, lessonId: string) {
   return last;
 }
 
+/** Edits a learner's stats directly, to set up hearts, XP or streak days. */
 const setStats = (userId: string, data: Json) =>
   prisma.userStats.update({ where: { userId }, data });
 
@@ -111,7 +114,7 @@ after(async () => {
   await prisma.$disconnect();
 });
 
-describe("Phase 4 — gamification", () => {
+describe("gamification", () => {
   let token = "";
   let userId = "";
 
@@ -266,7 +269,7 @@ describe("Phase 4 — gamification", () => {
   });
 });
 
-describe("Phase 4 — placement test", () => {
+describe("placement test", () => {
   let token = "";
   let testId = "";
   let questions: Json[] = [];

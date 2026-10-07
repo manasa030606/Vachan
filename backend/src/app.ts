@@ -1,6 +1,5 @@
-// Builds the Express application: middleware → routes → 404 → error handler.
-// Kept separate from server.ts so the app can later be imported by automated tests
-// without actually opening a network port.
+// Builds the Express app: middleware → routes → 404 → error handler.
+// Kept separate from server.ts so tests can import the app without opening a port.
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express } from "express";
@@ -14,7 +13,7 @@ export function createApp(): Express {
   const app = express();
 
   app.disable("x-powered-by");
-  // Phase 8: trust the hosting proxy so req.ip is the learner's IP (rate limits per IP).
+  // Trust the hosting proxy so req.ip is the learner's IP (rate limits per IP).
   app.set("trust proxy", env.TRUST_PROXY ?? (env.NODE_ENV === "production" ? 1 : 0));
   app.use(securityHeaders);
   // credentials: true lets the browser send the login cookie to the API.

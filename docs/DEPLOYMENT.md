@@ -1,261 +1,101 @@
-# Vachan — Deployment guide (Phases 4.5–8)
+# Deployment
 
-How Vachan runs on the internet, step by step. No previous deployment experience needed. Every service below has a free plan and lets you sign in with GitHub.
+Vachan can be deployed in two ways:
 
-## 1. Architecture
+- **Option A — free cloud:** Vercel + Render + Neon. This is how the live demo runs.
+- **Option B — one server with Docker.**
+
+## Option A: Vercel + Render + Neon
 
 ```
- Browser
-    │  https://<your-app>.vercel.app            (pages + /api/* on the SAME domain)
-    ▼
- Vercel ── Next.js frontend
-    │  /api/*  is forwarded (next.config.ts rewrite, BACKEND_URL)
-    ▼
- Render ── Express API (backend/)           https://<your-api>.onrender.com/api/...
-    │  Prisma Client (driver adapter: pg)
-    ▼
- Neon ── PostgreSQL 16/17 (hosted)
+Browser ─► Vercel (Next.js) ──/api/*──► Render (Express API) ─► Neon (PostgreSQL + pgvector)
 ```
 
-| Part     | Host       | Why this host                                                                                                                                                                                      |
-| -------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Frontend | **Vercel** | Made for Next.js; deploys on every `git push`.                                                                                                                                                     |
-| Backend  | **Render** | Runs the existing Express server as a normal long-running Node process (no rewrite into serverless functions). Free web service, monorepo "root directory", health checks, build + start commands. |
-| Database | **Neon**   | Hosted PostgreSQL with a free plan, SSL, a web SQL editor, and a normal connection string for Prisma migrations.                                                                                   |
+| Part     | Host   | Why                                      |
+| -------- | ------ | ---------------------------------------- |
+| Frontend | Vercel | Built for Next.js, deploys on every push |
+| Backend  | Render | Runs Express as a normal Node server     |
+| Database | Neon   | Free hosted PostgreSQL with pgvector     |
 
-**Why the `/api` proxy?** The login token lives in an httpOnly cookie. If the browser called `*.onrender.com` directly from `*.vercel.app`, that cookie would be a _third-party_ cookie, which Safari (and privacy settings in other browsers) block — login would silently fail. With the proxy, the browser only talks to the Vercel domain, the cookie is first-party, and no cross-site CORS is needed. Locally nothing changes (`localhost:3000` → `localhost:4000`).
+**Why the `/api` proxy?** The browser only talks to the Vercel domain, and Vercel forwards `/api/*`
+to Render. That keeps the login cookie on the same site. If the browser called Render directly,
+browsers like Safari would block the cookie.
 
-**Three databases, three purposes**
+### Environment variables
 
-| Database                                  | Where                  | Used for                                                             |
-| ----------------------------------------- | ---------------------- | -------------------------------------------------------------------- |
-| Local                                     | PostgreSQL on your Mac | Development, `npm run dev`, tests                                    |
-| Staging / initial deployment (this phase) | Neon free project      | The public demo — real accounts, real data, but not mission-critical |
-| Final production (when real users arrive) | Paid/managed plan      | Backups, no sleeping, monitoring — see §7 for the checklist          |
+| Variable         | Where              | Secret? | Purpose                                  |
+| ---------------- | ------------------ | ------- | ---------------------------------------- |
+| `DATABASE_URL`   | Render             | Yes     | Neon connection string                   |
+| `JWT_SECRET`     | Render (generated) | Yes     | Signs login tokens                       |
+| `GEMINI_API_KEY` | Render             | Yes     | AI features                              |
+| `CORS_ORIGIN`    | Render             | No      | The Vercel URL                           |
+| `NODE_ENV`       | Render             | No      | `production`                             |
+| `TRUST_PROXY`    | Render             | No      | `2` (Vercel + Render are two proxies)    |
+| `BACKEND_URL`    | Vercel             | No      | The Render URL, used by the `/api` proxy |
 
-Never point the deployed backend at your local database, and never run tests against the deployed one.
+Never put secrets in Vercel or in any `NEXT_PUBLIC_*` variable.
 
-## 2. Environment variables
+### Steps
 
-| Variable              | Where it is set                                | Visible in browser?              | Purpose                                                                     |
-| --------------------- | ---------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------- |
-| `DATABASE_URL`        | Render (+ your terminal for migrate/seed)      | **No — secret**                  | Neon connection string                                                      |
-| `JWT_SECRET`          | Render (auto-generated)                        | **No — secret**                  | Signs login tokens. Different from your local one.                          |
-| `JWT_EXPIRES_IN`      | Render (`7d`)                                  | No                               | Login lifetime                                                              |
-| `NODE_ENV`            | Render (`production`)                          | No                               | Secure cookies, generic 500 messages, no demo account in the seed           |
-| `CORS_ORIGIN`         | Render                                         | No                               | Your Vercel URL (exact, no trailing slash)                                  |
-| `PORT`                | Render sets it automatically                   | No                               | Don't set it yourself                                                       |
-| `NODE_VERSION`        | Render (`22`)                                  | No                               | Node.js version for build and run                                           |
-| `BACKEND_URL`         | Vercel                                         | **No** (server-only, build time) | Render URL, used by the `/api` proxy                                        |
-| `NEXT_PUBLIC_API_URL` | **Not set on Vercel**; local `.env.local` only | Yes                              | Local only: `http://localhost:4000`. Unset in production = use `/api` proxy |
-
-Templates with explanations: `backend/.env.example`, `frontend/.env.example`. Real values are typed only into the dashboards — never into Git.
-
-## 3. Step-by-step
-
-### Step 0 — Push the code to GitHub
-
-```bash
-cd ~/Desktop/Vachan
-git status                 # backend/.env and frontend/.env.local must NOT be listed
-git add .
-git commit -m "Phase 4.5: deployment setup"
-git push
-```
-
-### Step 1 — Create the database (Neon)
-
-1. Go to **https://neon.tech** → **Sign up** → **Continue with GitHub**.
-2. Create a project: **Project name** `vachan`, **Postgres version** the default (16 or 17), **Region** `AWS Asia Pacific (Singapore)` (closest to India and to the Render region below) → **Create project**.
-3. On the project dashboard click **Connect** (or **Connection string**):
-   - Database: `neondb` · Role: `neondb_owner`
-   - **Turn "Connection pooling" OFF** (you need the _direct_ string — its host has **no** `-pooler` — so Prisma migrations work).
-   - Copy the string. It looks like
-     `postgresql://neondb_owner:********@ep-xxxx-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
-   - Delete `&channel_binding=require` from the end, keep `?sslmode=require`.
-4. Keep it private (password manager / notes). This is your production `DATABASE_URL`.
-
-### Step 2 — Create the tables and load the course (from your Mac)
-
-The database is empty. Use the existing Prisma migrations (never create tables by hand):
-
-```bash
-cd ~/Desktop/Vachan
-export DATABASE_URL='postgresql://neondb_owner:********@ep-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require'
-export NODE_ENV=production
-
-npm run db:deploy      # prisma migrate deploy → applies the 3 migrations
-npm run db:seed        # 6 languages, 96 lessons, 402 exercises, 72 placement questions, 8 badges
-                       # (no demo account in production)
-
-unset DATABASE_URL NODE_ENV    # back to your local database for everyday work
-```
-
-Expected: `All migrations have been successfully applied.` and `✅ Seed finished.` (with `– Demo account skipped (production)`).
-
-Prisma Client is generated automatically by `npm install` / during the Render build (`postinstall`), so there is no separate step.
-
-**Verify:** Neon dashboard → **SQL Editor** → run:
-
-```sql
-SELECT (SELECT count(*) FROM "Language") AS languages, (SELECT count(*) FROM "Lesson") AS lessons,
-       (SELECT count(*) FROM "Exercise") AS exercises, (SELECT count(*) FROM "PlacementQuestion") AS placement,
-       (SELECT count(*) FROM "Achievement") AS badges, (SELECT count(*) FROM "_prisma_migrations") AS migrations;
--- expected: 6 | 96 | 402 | 72 | 8 | 3
-```
-
-(Or **Tables** in the left menu to browse.)
-
-### Step 3 — Deploy the backend (Render)
-
-1. Go to **https://render.com** → **Get Started** → **GitHub**, and allow Render to see the `Vachan` repository.
-2. **New +** → **Blueprint** → select the `Vachan` repo → Render finds `render.yaml` and shows a service **vachan-api** (Node, free, Singapore).
-3. It asks for the two secrets marked `sync: false`:
-   - `DATABASE_URL` → paste the Neon string from Step 1.
-   - `CORS_ORIGIN` → type `https://example.com` for now (you'll replace it with the Vercel URL in Step 5).
-   - `JWT_SECRET` is generated by Render automatically (a long random value). Don't copy your local one.
-4. **Apply**. The first build takes ~3–5 minutes. What `render.yaml` runs:
-   - Build: `npm ci --include=dev -w backend && npm run build -w backend && npm run db:deploy -w backend`
-     (installs the backend workspace incl. TypeScript/Prisma CLI, compiles to `backend/dist`, applies any new migrations)
-   - Start: `npm run start -w backend` → `node dist/server.js`
-   - Health check: `/api/health` · Node 22 · root directory = repository root (npm workspaces lockfile)
-5. When the status is **Live**, copy the URL at the top (e.g. `https://vachan-api.onrender.com` — yours may have a suffix).
-6. Open `https://<your-api>.onrender.com/api/health`. Expected:
-   ```json
-   {
-     "status": "ok",
-     "service": "vachan-backend",
-     "environment": "production",
-     "database": { "status": "connected" }
-   }
+1. **Neon** — create a project (region Singapore). In **Connect**, turn connection pooling off and
+   copy the connection string (keep `?sslmode=require`).
+2. **Create the tables** from your computer:
+   ```bash
+   DATABASE_URL='<neon url>' npm run db:deploy
+   DATABASE_URL='<neon url>' NODE_ENV=production npm run db:seed
    ```
-
-_No Blueprint?_ **New +** → **Web Service** → repo `Vachan` → Root Directory: _(empty)_ → Runtime **Node** → Build/Start commands from item 4 → Instance **Free** → Region Singapore → **Advanced** → Health Check Path `/api/health` → add the environment variables from section 2 (`JWT_SECRET`: run `openssl rand -hex 32` and paste) → **Create Web Service**.
-
-### Step 4 — Deploy the frontend (Vercel)
-
-1. Go to **https://vercel.com** → **Sign Up** → **Continue with GitHub**.
-2. **Add New…** → **Project** → **Import** `Vachan`.
-3. **Root Directory** → **Edit** → choose `frontend` → **Continue**.
-4. Framework Preset: **Next.js** (detected). Build/Install commands: leave the defaults — `frontend/vercel.json` already sets
-   - Install: `cd .. && npm ci -w frontend` (installs from the repository's lockfile, frontend only)
-   - Build: `next build`
-5. **Environment Variables** → add `BACKEND_URL` = `https://<your-api>.onrender.com` (no `/api`, no trailing slash). Do **not** add `NEXT_PUBLIC_API_URL`.
-6. **Deploy** (~2 minutes). Copy the URL Vercel shows (e.g. `https://vachan-xxxx.vercel.app`; Project → **Domains** shows the main one).
-7. Open `https://<your-app>.vercel.app/api/health` — the same JSON as Step 3, now through the proxy.
-
-### Step 5 — Connect the two
-
-1. Render → **vachan-api** → **Environment** → edit `CORS_ORIGIN` → `https://<your-app>.vercel.app` (exact, no trailing slash) → **Save Changes** (Render restarts the service).
-2. Open the Vercel URL → **Start learning** → register → onboarding → a lesson. You're live.
-
-## 4. Redeploying after code changes
-
-```bash
-git add . && git commit -m "…" && git push
-```
-
-- **Vercel** rebuilds the frontend automatically (every push; branches get preview URLs).
-- **Render** rebuilds the backend automatically when `backend/**`, `package.json`, `package-lock.json` or `render.yaml` change, and the build applies **new migrations** (`prisma migrate deploy`) before the new version starts.
-- **Seed:** only when course content changes, run Step 2 again. ⚠️ Re-seeding re-creates the courses and therefore **clears every learner's lesson progress** (accounts, XP and badges stay).
-- Changed `BACKEND_URL` on Vercel? It's read at build time → Vercel → Deployments → **Redeploy**.
-
-## 5. Free-plan behaviour (good to know)
-
-- **Render free** sleeps after ~15 minutes without traffic. The first request afterwards takes ~30–60 s; the site may show "Can't reach the Vachan server" once — wait and reload. Open `/api/health` first before a demo.
-- **Neon free** pauses the database when idle and wakes in about a second on the next query.
-- Render free has no shell access → run migrations/seed from your Mac (Step 2) or rely on the build.
-
-## 5b. Phase 5 (RAG) on the deployed site
-
-- The next Render build applies the Phase 5 migration on Neon automatically (pgvector is built into Neon).
-- **Knowledge-base search stays off on Render free** (`NODE_ENV=production` → `RAG_ENABLED` defaults to `false`, `POST /api/rag/search` → `503 RAG_DISABLED`): the embedding model needs ≈ 550 MB of RAM and the free plan has 512 MB. The rest of the app is unaffected. Details and how to enable it later: [RAG.md §8](RAG.md#8-deployment).
-
-## 5c. Phase 6 (AI tutor) on the deployed site
-
-- The next Render build applies the `20261008090000_phase6_ai_tutor` migration on Neon.
-- The tutor needs RAG search, which is off on Render free (see 5b), so `/tutor` shows "The tutor isn't available on this server yet" and `POST /api/ai/tutor` answers `503 TUTOR_UNAVAILABLE`. When you enable it on a bigger instance, add `GEMINI_API_KEY` in Render → **vachan-api** → **Environment** (never in Vercel). Details: [AI_TUTOR.md §8](AI_TUTOR.md#8-deployment).
-
-## 5d. Phase 7 (speech & conversation) on the deployed site
-
-- The next Render build applies `20261009090000_phase7_speech_conversation` on Neon (run `npm run db:deploy -w backend` from your Mac if your build doesn't migrate).
-- Re-index the knowledge base on Neon for the new `conversation.md` notes: `DATABASE_URL=<neon url> npm run rag:index -w backend` (from your Mac).
-- Add `GEMINI_API_KEY` in Render → **vachan-api** → **Environment** (never in Vercel). Speech-to-text, text-to-speech and the role-play work on the free plan; with RAG off the role-play partner uses only the course vocabulary (the UI says so).
-- Optional: pre-generate the demo audio into Neon: `DATABASE_URL=<neon url> npm run speech:prefetch -w backend -- --language te`.
-- The microphone needs https — Vercel is https, so it works. Details: [SPEECH.md §15](SPEECH.md#15-deployment-notes).
-
-## 5e. Phase 8 (admin dashboard, analytics, security) on the deployed site
-
-1. Push. The Render build applies `20261010090000_phase8_admin_analytics` on Neon (`prisma migrate deploy`).
-   `render.yaml` now also sets `TRUST_PROXY=2` (Vercel proxy + Render proxy) so login/register rate limits
-   see the learner's real IP. If you created the service by hand, add `TRUST_PROXY` = `2` in Render → Environment.
-2. Make yourself admin on the deployed database (from your Mac; the account must be registered on the site first):
+3. **Render** — **New → Blueprint** → choose the repository. It reads `render.yaml` and asks for
+   `DATABASE_URL`, `CORS_ORIGIN` and `GEMINI_API_KEY`. Each build also applies new migrations.
+4. **Vercel** — import the repository, set **Root Directory** to `frontend`, add `BACKEND_URL`
+   (the Render URL without `/api`), deploy.
+5. **Connect them** — set `CORS_ORIGIN` on Render to the exact Vercel URL.
+6. **Admin and knowledge base** — register on the live site, then from your computer:
    ```bash
    DATABASE_URL='<neon url>' npm run admin:grant -w backend -- you@example.com
-   ```
-3. Open `https://<your-app>.vercel.app/admin`. Content, vocabulary, analytics and the audit log work on
-   Render free. Knowledge-base **publishing** works too, but embedding is off there (`RAG_ENABLED=false`),
-   so after publishing or editing notes run, from your Mac:
-   ```bash
    DATABASE_URL='<neon url>' npm run rag:index -w backend
    ```
-4. Seeding is now safe to repeat — it never overwrites content you edited in the dashboard.
+7. **Check** — open `https://<your-app>.vercel.app/api/health`. It should show `"database": {"status": "connected"}`.
 
-## 6. Troubleshooting
+### Updating
 
-| Problem                                                                      | Why                                                                                     | Fix                                                                                                                                          |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vercel build: `Couldn't find any pages or app directory` / wrong files       | Root Directory not `frontend`                                                           | Vercel → Settings → General → Root Directory = `frontend` → Redeploy                                                                         |
-| Vercel install: `npm ci can only install with an existing package-lock.json` | Install ran inside `frontend/`                                                          | Keep `frontend/vercel.json` (`cd .. && npm ci -w frontend`); Settings → "Include files outside the root directory" must stay **enabled**     |
-| Site loads but every action says "Can't reach the Vachan server"             | `BACKEND_URL` missing/wrong, or Render asleep                                           | Check `https://<app>.vercel.app/api/health`; fix `BACKEND_URL` and **Redeploy**; wait ~1 min for Render to wake                              |
-| `/api/health` on Vercel returns the Next.js 404 page                         | `BACKEND_URL` was added after the build                                                 | Redeploy on Vercel                                                                                                                           |
-| Render build: `tsc: not found` / `prisma: not found`                         | Dev dependencies skipped because `NODE_ENV=production`                                  | Build command must contain `npm ci --include=dev`                                                                                            |
-| Render: `❌ Invalid environment configuration … DATABASE_URL / JWT_SECRET`   | Variable missing                                                                        | Render → Environment → add it → Save                                                                                                         |
-| Render: `JWT_SECRET is still the example value`                              | Example secret copied                                                                   | Use Render's generated value or `openssl rand -hex 32`                                                                                       |
-| Health: `"database": {"status": "disconnected"}` (503)                       | Wrong `DATABASE_URL`, `-pooler` host, missing `?sslmode=require`                        | Copy the direct Neon string again (Step 1)                                                                                                   |
-| `P1001 Can't reach database server` during `db:deploy`                       | Typo in URL / Neon project paused or deleted                                            | Check the string; open the Neon dashboard (wakes it)                                                                                         |
-| `P3009` / failed migration                                                   | A migration was interrupted                                                             | Neon SQL Editor: inspect `_prisma_migrations`; for a fresh staging DB the easiest fix is Neon → Branches → reset/recreate, then Step 2 again |
-| `relation "Language" does not exist` / empty course list                     | Seed or migrations not run on Neon                                                      | Step 2                                                                                                                                       |
-| Login "works" but you are immediately logged out                             | Opening the backend URL directly in the browser, or `NEXT_PUBLIC_API_URL` set on Vercel | Always use the Vercel URL; remove `NEXT_PUBLIC_API_URL` from Vercel and redeploy                                                             |
-| CORS error in the console                                                    | Browser calling Render directly with an origin not in `CORS_ORIGIN`                     | Use the `/api` proxy; set `CORS_ORIGIN` to the exact Vercel URL                                                                              |
-| Node version errors                                                          | Old Node                                                                                | Render `NODE_VERSION=22`; Vercel → Settings → Node.js Version 22.x                                                                           |
-| Works locally, fails on Linux with "Module not found"                        | File name case differs (`Button.tsx` vs `button.tsx`)                                   | Match the import exactly (Linux is case-sensitive)                                                                                           |
-| `/admin` says "Admins only"                                                  | The account isn't an admin on **that** database                                         | `DATABASE_URL='<neon url>' npm run admin:grant -w backend -- you@example.com`, then reload                                                   |
-| Registering fails with `429` for everyone                                    | `TRUST_PROXY` too low behind the Vercel proxy, all learners share one IP                | Render → Environment → `TRUST_PROXY=2` → Save                                                                                                |
+`git push` — Vercel and Render rebuild automatically, and Render applies new migrations first.
 
-## 7. Option B — everything on one server with Docker
+### Free plan limits
 
-For a VPS or a college server (≥ 2 GB RAM so the AI Tutor's embedding model fits), Docker Compose runs
-PostgreSQL + pgvector, the API and the web app together:
+- Render sleeps after 15 minutes without visitors; the first request then takes 30–60 seconds.
+- Render's 512 MB of memory is too small for the embedding model, so the AI tutor's knowledge-base
+  search is off there (`RAG_ENABLED=false`). Speech and role-play work.
+
+## Option B: Docker on one server
+
+Needs a server with at least 2 GB of memory (so the AI tutor's search can run too).
 
 ```bash
-git clone <your repo> vachan && cd vachan
-cp .env.production.example .env.production      # fill in POSTGRES_PASSWORD, JWT_SECRET, GEMINI_API_KEY, PUBLIC_URL
+cp .env.production.example .env.production      # fill in passwords, JWT_SECRET, GEMINI_API_KEY
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
 docker compose -f docker-compose.prod.yml --env-file .env.production exec backend npm run db:seed -w backend
 docker compose -f docker-compose.prod.yml --env-file .env.production exec backend npm run rag:index -w backend
 docker compose -f docker-compose.prod.yml --env-file .env.production exec backend npm run admin:grant -w backend -- you@example.com
 ```
 
-- Migrations run automatically each time the backend container starts (`prisma migrate deploy`).
-- Only port 3000 (the web app) is published; the API and database are reachable only inside the
-  Docker network. The browser reaches the API through the same `/api` proxy as on Vercel.
-- For a public domain put a TLS proxy in front (e.g. Caddy: `vachan.example.com { reverse_proxy localhost:3000 }`),
-  set `PUBLIC_URL=https://vachan.example.com` and restart.
-- Update: `git pull && docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build`.
-- Backups: DATABASE.md §11b.
+- Three containers: PostgreSQL (pgvector), the backend and the frontend. Only port 3000 is public.
+- Migrations run automatically every time the backend container starts.
+- For a public domain, put an HTTPS proxy such as Caddy in front of port 3000.
 
-Files: `backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.prod.yml`, `.env.production.example`, `.dockerignore`.
+## Migration strategy
 
-## 8. Production checklist
+- In development, `npm run db:migrate` creates migration files, which are committed to git.
+- In production, only `npm run db:deploy` runs. It applies new migrations and never resets data.
+- All migrations so far only add tables or columns, so existing data is never lost.
 
-| Item                                                           | Free demo (Vercel + Render + Neon) | Real users                                      |
-| -------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------- |
-| Secrets only in dashboards / `.env.production`                 | ✅                                 | ✅                                              |
-| `NODE_ENV=production`, fresh `JWT_SECRET`, exact `CORS_ORIGIN` | ✅                                 | ✅                                              |
-| Migrations with `db:deploy` only                               | ✅ (Render build)                  | ✅ (CI or container start)                      |
-| Backups                                                        | Neon history / branches            | daily `pg_dump` off-site or managed PITR        |
-| No cold starts                                                 | ❌ Render free sleeps              | paid instance                                   |
-| AI Tutor search (RAG) on the server                            | ❌ 512 MB RAM                      | ≥ 1 GB RAM, `RAG_ENABLED=true`                  |
-| Monitoring / alerts                                            | `/api/health` by hand              | uptime monitor on `/api/health`, error tracking |
-| Admin accounts reviewed                                        | `npm run admin:list -w backend`    | same, regularly                                 |
+## Troubleshooting
+
+| Problem                                   | Fix                                                                               |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| Site says "Can't reach the server"        | `BACKEND_URL` is wrong or Render is asleep — open `/api/health` and wait a minute |
+| `/api/health` on Vercel shows a 404 page  | `BACKEND_URL` was added after the build — redeploy on Vercel                      |
+| Render build fails with `tsc: not found`  | The build command must use `npm ci --include=dev`                                 |
+| Health shows the database as disconnected | Wrong `DATABASE_URL` or missing `?sslmode=require`                                |
+| Logged in but immediately logged out      | Use the Vercel URL, and don't set `NEXT_PUBLIC_API_URL` on Vercel                 |
+| Everyone gets `429` when registering      | Set `TRUST_PROXY=2` on Render                                                     |
+| `/admin` shows "Admins only"              | Run `admin:grant` against the Neon database, then reload                          |

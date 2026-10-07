@@ -40,7 +40,7 @@ export type SentenceToken = {
   romanization: string;
 };
 
-/** Small, accurate demo content for one language (expanded into full courses in Phase 3). */
+/** Small, accurate demo content for one language (the full courses come from the API). */
 export type LanguageContent = {
   letters: ScriptLetter[];
   words: {

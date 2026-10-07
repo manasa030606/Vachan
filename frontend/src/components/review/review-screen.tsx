@@ -11,6 +11,7 @@ import { getReviewSession } from "@/lib/api/endpoints";
 import { toReviewLesson } from "@/lib/api/mappers";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
 
+/** The /review page. */
 export function ReviewScreen() {
   const { languageCode, showRomanization } = useLearnerPreferences();
   const { data, error, isLoading, reload } = useApi(

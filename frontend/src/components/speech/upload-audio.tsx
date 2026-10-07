@@ -1,7 +1,7 @@
 "use client";
 
-// "Upload a recording" — for learners without a microphone (or for testing). The file is
-// converted to 16 kHz mono WAV in the browser before it is sent.
+// "Upload a recording" button for learners without a microphone (also handy for testing).
+// The file is converted to 16 kHz mono WAV in the browser before it is sent.
 import { Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { AudioFileError, fileToUploadWav } from "@/lib/audio/convert";
@@ -28,6 +28,7 @@ export function UploadAudio({ onRecording, maxDurationMs, disabled }: UploadAudi
       setError(cause instanceof AudioFileError ? cause.message : "This file can't be used.");
     } finally {
       setBusy(false);
+      // Clear the input so choosing the same file again still fires onChange.
       if (input.current) input.current.value = "";
     }
   };

@@ -4,7 +4,7 @@
 export type ChatTurn = {
   role: "user" | "assistant";
   text: string;
-  /** Phase 7: a recording sent with the text (Gemini only — it can listen to audio). */
+  /** A recording sent with the text (Gemini only, since it can listen to audio). */
   audio?: { mimeType: string; data: Buffer };
 };
 

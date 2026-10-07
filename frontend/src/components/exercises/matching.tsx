@@ -1,6 +1,6 @@
 "use client";
 
-// Two columns (script word ↔ English meaning). Tap one item on each side to match them.
+// Matching exercise: two columns (script word and English meaning). Tap one item on each side to match them.
 // Wrong pairs flash red briefly; correct pairs turn green and stay matched.
 import { useState } from "react";
 import { Check } from "lucide-react";
@@ -29,13 +29,13 @@ export function Matching({
   const [selected, setSelected] = useState<{ side: Side; id: string } | null>(null);
   const [wrongPair, setWrongPair] = useState<{ left: string; right: string } | null>(null);
 
-  // Show the right column in a different order so it isn't a straight line across.
+  // Rotate the right column by two places so each answer is not directly across from its word.
   const rightItems = [...exercise.pairs.slice(2), ...exercise.pairs.slice(0, 2)];
 
   function handleTap(side: Side, id: string) {
     if (isLocked || matchedIds.includes(id)) return;
 
-    // First tap, or tapping the same side again → just (re)select.
+    // First tap, or another tap on the same side: just change the selection.
     if (!selected || selected.side === side) {
       setSelected({ side, id });
       return;
@@ -52,6 +52,7 @@ export function Matching({
         onAnswerChange({ type: "matching", complete: true, matchedIds: nextMatched });
       }
     } else {
+      // Clear the red "wrong" state after a short shake animation.
       setWrongPair({ left: leftId, right: rightId });
       window.setTimeout(() => setWrongPair(null), 700);
     }

@@ -1,6 +1,6 @@
-# Vachan knowledge base (Phase 5 — RAG)
+# Vachan knowledge base (RAG)
 
-Curated language-learning notes that the retrieval system (and, in Phase 6, the AI tutor) uses as **grounding**. The tutor may only explain what is written here or in the course content — it must not invent grammar rules.
+Curated language-learning notes that the retrieval system and the AI tutor use as **grounding**. The tutor may only explain what is written here or in the course content — it must not invent grammar rules.
 
 ```
 knowledge-base/

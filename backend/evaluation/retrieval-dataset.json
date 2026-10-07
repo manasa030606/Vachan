@@ -1,5 +1,5 @@
 {
-  "description": "Retrieval evaluation for the Vachan RAG knowledge base (Phase 5). Each case lists the chunk ids that count as a correct answer; a case is a hit@k if ANY of them appears in the top k results. Out-of-scope questions must come back with sufficient=false. Cases with id 'hard-*' were added after the first run as harder paraphrased / native-language questions, so the score is not measured only on questions written next to the content.",
+  "description": "Retrieval evaluation for the Vachan RAG knowledge base. Each case lists the chunk ids that count as a correct answer; a case is a hit@k if ANY of them appears in the top k results. Out-of-scope questions must come back with sufficient=false. Cases with id 'hard-*' were added after the first run as harder paraphrased / native-language questions, so the score is not measured only on questions written next to the content.",
   "thresholds": {
     "hitAt3": 0.85,
     "mrr": 0.7,

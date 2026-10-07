@@ -1,4 +1,4 @@
-// Role-play conversation scenarios (Phase 7) and their settings, in one place.
+// Role-play conversation scenarios and their settings, in one place.
 // The scenario text is English and the same for every language; the AI partner speaks the
 // learner's target language, using the course vocabulary and the knowledge-base notes.
 import type { KnowledgeLevelName } from "../rag/config.ts";

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { NAV_ITEMS } from "./nav-items";
 
+/** Bottom tab bar for phones. */
 export function BottomNav() {
   const pathname = usePathname();
 

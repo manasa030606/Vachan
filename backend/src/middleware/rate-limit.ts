@@ -3,7 +3,7 @@
 // Fixed windows kept in memory: N requests per minute and M per day for each user id.
 // Protects the free AI quota from one learner (or a script) using it all.
 // Limits reset when the server restarts and are per server process — fine for one Render
-// instance; with several instances a shared store (e.g. Redis) would be needed (Phase 8).
+// instance; with several instances a shared store (e.g. Redis) would be needed.
 import type { NextFunction, Request, Response } from "express";
 import { HttpError } from "../lib/http-error.ts";
 
@@ -26,9 +26,11 @@ export class RateLimiter {
     for (const rule of this.rules) {
       const id = `${rule.name}:${key}`;
       const window = this.windows.get(id);
-      if (!window || window.resetsAt <= now)
+      if (!window || window.resetsAt <= now) {
         this.windows.set(id, { count: 1, resetsAt: now + rule.windowMs });
-      else window.count += 1;
+      } else {
+        window.count += 1;
+      }
     }
     if (this.windows.size > 10_000) this.cleanup(now);
     return null;
@@ -39,13 +41,21 @@ export class RateLimiter {
   }
 }
 
+/** The 429 message for the rule that blocked the request. */
+function rateLimitMessage(rule: string, retryAfterSeconds: number, feature: string): string {
+  if (rule === "minute") return `Too many requests. Please wait ${retryAfterSeconds} seconds.`;
+  if (rule === "day") return `You've reached today's ${feature} limit. Please come back tomorrow.`;
+  const minutes = Math.ceil(retryAfterSeconds / 60);
+  return `Too many ${feature} attempts. Please try again in ${minutes} minutes.`;
+}
+
 /** Express middleware (after requireAuth): limits by user id. */
 export function rateLimitByUser(limiter: RateLimiter, feature = "tutor") {
   return rateLimitBy(limiter, (req) => req.auth?.userId ?? req.ip ?? "anonymous", feature);
 }
 
 /**
- * Phase 8: limits by any key — e.g. client IP + email for login (slows down password guessing
+ * Limits by any key — e.g. client IP + email for login (slows down password guessing
  * without locking a real user out from a different network). Behind Render/Vercel the client IP
  * comes from X-Forwarded-For, which Express only trusts when `trust proxy` is set (app.ts).
  */
@@ -57,11 +67,7 @@ export function rateLimitBy(limiter: RateLimiter, key: (req: Request) => string,
       throw new HttpError(
         429,
         "RATE_LIMITED",
-        blocked.rule === "minute"
-          ? `Too many requests. Please wait ${blocked.retryAfterSeconds} seconds.`
-          : blocked.rule === "day"
-            ? `You've reached today's ${feature} limit. Please come back tomorrow.`
-            : `Too many ${feature} attempts. Please try again in ${Math.ceil(blocked.retryAfterSeconds / 60)} minutes.`,
+        rateLimitMessage(blocked.rule, blocked.retryAfterSeconds, feature),
         { retryAfterSeconds: blocked.retryAfterSeconds, limit: blocked.rule },
       );
     }

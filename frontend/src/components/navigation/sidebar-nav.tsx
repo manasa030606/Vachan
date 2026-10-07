@@ -1,8 +1,7 @@
 "use client";
 
-// Desktop / tablet navigation.
-//   md (tablet): narrow icon-only rail
-//   lg (desktop): full sidebar with labels
+// Desktop and tablet navigation: a narrow icon-only rail on tablets (md)
+// and a full sidebar with labels on desktops (lg).
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
@@ -11,6 +10,7 @@ import { useSession } from "@/components/session/session-provider";
 import { cn } from "@/lib/cn";
 import { NAV_ITEMS } from "./nav-items";
 
+/** Side navigation for tablet and desktop screens. */
 export function SidebarNav() {
   const pathname = usePathname();
   const { user } = useSession();

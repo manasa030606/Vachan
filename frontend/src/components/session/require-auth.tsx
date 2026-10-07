@@ -1,8 +1,8 @@
 "use client";
 
-// Wraps pages that need a logged-in learner.
-//   - not logged in → /login?next=<this page>
-//   - logged in but onboarding not finished → /onboarding (unless allowIncompleteOnboarding)
+// Wraps pages that need a logged-in learner. Guests are sent to /login?next=<this page>,
+// and learners who have not finished onboarding are sent to /onboarding
+// (unless allowIncompleteOnboarding is set).
 import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LogoMark } from "@/components/brand/logo";
@@ -25,6 +25,7 @@ export function RequireAuth({ children, allowIncompleteOnboarding = false }: Req
     status === "authenticated" &&
     !user?.profile?.onboardingDone;
 
+  // Right after logout we skip the /login redirect, because logout already goes to "/".
   useEffect(() => {
     if (status === "guest" && !connectionError && !didLogout) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);

@@ -1,6 +1,5 @@
-// ALL gamification numbers live here (spec section 6: "values should be configurable and
-// stored in backend logic rather than scattered as hard-coded frontend constants").
-// Change a value here, restart the backend, and every rule + the UI follow.
+// All gamification numbers live here, on the backend, instead of being scattered in the frontend.
+// Change a value here, restart the backend, and every rule and the UI follow.
 
 export const GAMIFICATION = {
   xp: {

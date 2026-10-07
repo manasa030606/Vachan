@@ -1,6 +1,6 @@
 // Exercise types. Each exercise has a `type` field so TypeScript (and the
 // ExerciseRenderer) knows exactly which shape and which component to use.
-// Since Phase 2 the correct answers are NOT sent to the browser: the backend
+// The correct answers are NOT sent to the browser: the backend
 // checks every answer (POST /api/exercises/:id/attempt).
 import type { VocabularyWord } from "./learning";
 

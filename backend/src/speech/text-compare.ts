@@ -1,7 +1,7 @@
-// CONTENT MATCH: compares what speech-to-text heard with the phrase the learner was asked to say.
+// Content match: compares what speech-to-text heard with the phrase the learner was asked to say.
 //
-// This is plain text comparison (edit distance) — no AI. It answers "were the right words
-// said?", NOT "was the pronunciation good?": a speech-to-text system often writes the right
+// This is plain text comparison (edit distance), no AI. It answers "were the right words
+// said?", not "was the pronunciation good?": a speech-to-text system often writes the right
 // word even when the pronunciation is far from native, and sometimes writes a wrong word for a
 // good pronunciation. The UI says so.
 //
@@ -113,7 +113,8 @@ export function alignWords(expected: string[], heard: string[]) {
       );
     }
   }
-  // Walk back from the end to recover the alignment.
+  // Walk back from the end to recover the alignment. Two words are only paired when they are at
+  // least about one-third similar; otherwise it counts as a missing word plus an extra word.
   const words: WordResult[] = [];
   const extra: string[] = [];
   let i = n;
@@ -129,7 +130,7 @@ export function alignWords(expected: string[], heard: string[]) {
       words.unshift({
         expected: expected[i - 1]!,
         heard: heard[j - 1]!,
-        status: sim >= 0.999 ? "correct" : sim >= SPEECH_CONFIG.match.closeWord ? "close" : "wrong",
+        status: wordStatus(sim),
         similarity: Math.round(sim * 100) / 100,
       });
       i--;
@@ -143,6 +144,12 @@ export function alignWords(expected: string[], heard: string[]) {
     }
   }
   return { words, extra };
+}
+
+function wordStatus(sim: number): WordResult["status"] {
+  if (sim >= 0.999) return "correct";
+  if (sim >= SPEECH_CONFIG.match.closeWord) return "close";
+  return "wrong";
 }
 
 function verdictFor(score: number): ContentMatch["verdict"] {

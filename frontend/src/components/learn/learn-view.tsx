@@ -1,12 +1,8 @@
 "use client";
 
-// The Home / Learn screen: course header, recommended lesson, the unit path,
-// and (on desktop) a right-hand column with daily goal, streak, level and hearts.
-//
-// The course, units, lessons and their completed / current / available / locked status
-// come from the backend (GET /api/courses?languageCode=… then GET /api/courses/:id);
-// XP, level, streak, hearts, daily goal and badges come from GET /api/stats (useStats);
-// recommended practice from GET /api/recommendations.
+// The Home / Learn screen: course header, recommended lesson and the unit path,
+// plus (on desktop) a right-hand column with daily goal, streak, level and hearts.
+// The course and lesson statuses come from the courses API; the stat cards read GET /api/stats.
 import { PartyPopper } from "lucide-react";
 import { AchievementsCard } from "@/components/gamification/achievements-card";
 import { DailyGoalCard } from "@/components/gamification/daily-goal-card";
@@ -40,6 +36,7 @@ async function loadCourseFor(languageCode: string) {
   return (await getCourse(courses[0].id)).course;
 }
 
+/** The main learning path page for the learner's current language. */
 export function LearnView() {
   const { languageCode } = useLearnerPreferences();
   const {
@@ -50,6 +47,7 @@ export function LearnView() {
   } = useApi(() => loadCourseFor(languageCode), `course-for:${languageCode}`);
   const language = course ? withTheme(course.language) : getLanguage(languageCode);
   const units = course ? toUnits(course) : [];
+  // The server tells us which lesson to do next; find it and its unit for the "Up next" card.
   const recommendedId = course?.progress.currentLessonId ?? null;
   const currentUnit = units.find((unit) =>
     unit.lessons.some((lesson) => lesson.id === recommendedId),
@@ -130,7 +128,7 @@ export function LearnView() {
               </p>
             </div>
 
-            {/* Phones/tablets: the rest of the stats below the path (desktop: right column). */}
+            {/* On phones/tablets the other stats sit below the path; on desktop they are in the right column. */}
             <div className="space-y-4 lg:hidden">
               <StreakCard />
               <LevelCard />

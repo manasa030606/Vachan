@@ -23,7 +23,9 @@ export type PartnerReply = {
   issues: string[];
 };
 
+/** Any character from the Indian scripts' Unicode blocks (Devanagari up to Sinhala). */
 const INDIC = /[ऀ-෿]/u;
+/** A model field as a clean single-line string (anything that isn't a string becomes ""). */
 const str = (value: unknown, max = 400) =>
   typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max) : "";
 
@@ -85,18 +87,23 @@ export function parsePartnerReply(
 
   let feedback: PartnerReply["feedback"] = null;
   if (options.expectFeedback && data.feedback && typeof data.feedback === "object") {
-    const f = data.feedback as Record<string, unknown>;
-    const c = f.correction as Record<string, unknown> | null | undefined;
+    const rawFeedback = data.feedback as Record<string, unknown>;
+    const rawCorrection = rawFeedback.correction as Record<string, unknown> | null | undefined;
+    // A correction is only kept when it is really written in the target script.
     const correction =
-      c && typeof c === "object" && INDIC.test(str(c.text))
+      rawCorrection && typeof rawCorrection === "object" && INDIC.test(str(rawCorrection.text))
         ? {
-            text: str(c.text, 300),
-            romanization: str(c.romanization, 300),
-            explanation: str(c.explanation, 240),
+            text: str(rawCorrection.text, 300),
+            romanization: str(rawCorrection.romanization, 300),
+            explanation: str(rawCorrection.explanation, 240),
           }
         : null;
-    if (c && !correction) issues.push("dropped-invalid-correction");
-    feedback = { understood: f.understood !== false, correction, note: str(f.note, 200) };
+    if (rawCorrection && !correction) issues.push("dropped-invalid-correction");
+    feedback = {
+      understood: rawFeedback.understood !== false,
+      correction,
+      note: str(rawFeedback.note, 200),
+    };
   }
 
   const suggestions = (Array.isArray(data.suggestions) ? data.suggestions : [])

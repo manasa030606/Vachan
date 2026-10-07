@@ -1,3 +1,4 @@
+// /login — sign in with email and password.
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";

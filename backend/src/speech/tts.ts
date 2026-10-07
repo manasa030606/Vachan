@@ -1,10 +1,10 @@
-// TEXT-TO-SPEECH providers (listening practice: "play phrase").
+// Text-to-speech providers (listening practice: "play phrase").
 //
-//   gemini  — Gemini's text-to-speech models (free tier, Indian languages supported). The audio
-//             is cached in the database by tts.service.ts, so each phrase is generated once.
-//   browser — no server audio: the frontend uses the browser's own voice (speechSynthesis)
-//             when the device has a voice for the language.
-//   mock    — OFFLINE TEST DOUBLE: short beeps (one per word), not speech.
+//   gemini:  Gemini's text-to-speech models (free tier, Indian languages supported). The audio
+//            is cached in the database by tts.service.ts, so each phrase is generated once.
+//   browser: no server audio; the frontend uses the browser's own voice (speechSynthesis)
+//            when the device has a voice for the language.
+//   mock:    offline test double that makes short beeps (one per word), not speech.
 import { env } from "../config/env.ts";
 import { TUTOR_CONFIG } from "../config/tutor.ts";
 import { LlmError, postJson } from "../ai/llm/types.ts";
@@ -27,19 +27,25 @@ export interface TextToSpeech {
   synthesize(input: SynthesisInput): Promise<Synthesis>;
 }
 
+/** Without TTS_PROVIDER: Gemini when the tutor uses Gemini, mock in tests, else the browser. */
+function defaultTtsProvider(): "gemini" | "browser" | "mock" {
+  if (env.LLM_PROVIDER === "gemini") return "gemini";
+  if (env.LLM_PROVIDER === "mock") return "mock";
+  return "browser";
+}
+
 /** Safe-to-show TTS configuration (never contains the key). */
 export function getTtsStatus() {
-  const provider =
-    env.TTS_PROVIDER ??
-    (env.LLM_PROVIDER === "gemini" ? "gemini" : env.LLM_PROVIDER === "mock" ? "mock" : "browser");
+  const provider = env.TTS_PROVIDER ?? defaultTtsProvider();
   const key = env.GEMINI_API_KEY;
   const configured =
     provider !== "gemini" || Boolean(key && key.length >= 20 && !/^(your|replace)/i.test(key));
+  let model: string | null = null; // null = picked automatically (newest Gemini "flash … tts" model)
+  if (provider === "gemini") model = env.TTS_MODEL ?? null;
+  else if (provider === "mock") model = "mock-beeps";
   return {
     provider,
-    /** null = picked automatically (newest Gemini "flash … tts" model) */
-    model:
-      provider === "gemini" ? (env.TTS_MODEL ?? null) : provider === "mock" ? "mock-beeps" : null,
+    model,
     voice: provider === "gemini" ? env.TTS_VOICE : null,
     configured,
     serverAudio: provider !== "browser",
@@ -47,7 +53,7 @@ export function getTtsStatus() {
   };
 }
 
-// ── Gemini TTS ──────────────────────────────────────────────────
+// Gemini TTS
 
 type GeminiAudioResponse = {
   candidates?: Array<{
@@ -105,7 +111,7 @@ class GeminiTextToSpeech implements TextToSpeech {
   }
 
   async cacheTag() {
-    // "v2": audio made by the first Phase 7 prompt (which some models read out in full) is ignored.
+    // "v2": audio cached with an older prompt (which some models read out in full) is ignored.
     return `gemini/${await this.resolveModel()}/${this.voice}/v2`;
   }
 
@@ -120,7 +126,7 @@ class GeminiTextToSpeech implements TextToSpeech {
             role: "user",
             parts: [
               {
-                // ONLY the text. Newer TTS models read a style instruction ("Read aloud…:") out
+                // Only the text. Newer TTS models read a style instruction ("Read aloud…:") out
                 // loud as well, which made a one-word clip 8 seconds long. Slower speech is done
                 // in the player (0.75× / 0.5×) instead.
                 text: input.text,
@@ -158,7 +164,7 @@ class GeminiTextToSpeech implements TextToSpeech {
   }
 }
 
-// ── Offline test double ─────────────────────────────────────────
+// Offline test double
 
 class MockTextToSpeech implements TextToSpeech {
   readonly name = "mock";
@@ -198,7 +204,7 @@ export function getTextToSpeech(): TextToSpeech | null {
   if (!status.configured) {
     throw new LlmError(
       "LLM_NOT_CONFIGURED",
-      "Text-to-speech needs GEMINI_API_KEY in backend/.env (see docs/SPEECH.md).",
+      "Text-to-speech needs GEMINI_API_KEY in backend/.env (see docs/AI.md).",
     );
   }
   const base =

@@ -1,4 +1,4 @@
-// Speech (Phase 7) — requires login. API keys never leave the server; recordings are not stored.
+// Speech — requires login. API keys never leave the server; recordings are not stored.
 //   GET  /api/speech/status                 what is available (providers, limits) — no secrets
 //   GET  /api/speech/tts                    WAV audio (?vocabularyItemId=… | ?question=<token> | ?language=&text=)
 //   POST /api/speech/transcribe             multipart: audio (WAV) [+ language, source] → transcript
@@ -62,6 +62,7 @@ speechRouter.get("/status", (_req, res) => {
 
 speechRouter.get(
   "/tts",
+  // Validate first, so invalid requests don't count towards the rate limit.
   (req, _res, next) => {
     ttsQuerySchema.parse(req.query);
     next();

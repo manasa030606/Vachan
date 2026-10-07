@@ -12,6 +12,7 @@ import type { useTutorChat } from "./use-tutor-chat";
 
 type Chat = ReturnType<typeof useTutorChat>;
 
+/** Chat UI driven by a useTutorChat() object passed in from the parent. */
 export function TutorChat({
   chat,
   languageName,
@@ -27,6 +28,7 @@ export function TutorChat({
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Keep the newest message in view.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [chat.messages.length, chat.isSending, chat.error]);
@@ -53,6 +55,7 @@ export function TutorChat({
               <TriangleAlert aria-hidden="true" className="size-5" />
               {chat.error.message}
             </p>
+            {/* Retrying straight away after a rate limit would just fail again. */}
             {chat.error.question && chat.error.code !== "RATE_LIMITED" && (
               <Button
                 size="sm"
@@ -72,12 +75,12 @@ export function TutorChat({
         {chat.messages.length < 2 && (
           <SuggestedQuestions
             questions={suggestions}
-            onPick={(q) => void chat.send(q)}
+            onPick={(question) => void chat.send(question)}
             disabled={chat.isSending}
           />
         )}
         <ChatComposer
-          onSend={(q) => void chat.send(q)}
+          onSend={(question) => void chat.send(question)}
           disabled={chat.isSending}
           placeholder={`Ask about ${languageName} words, grammar or pronunciation…`}
         />

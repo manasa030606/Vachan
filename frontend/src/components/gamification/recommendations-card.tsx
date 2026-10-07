@@ -8,6 +8,7 @@ import { getRecommendations } from "@/lib/api/endpoints";
 import type { RecommendationDto } from "@/lib/api/types";
 import { useLearnerPreferences } from "@/lib/learner-preferences";
 
+// One icon per recommendation type.
 const ICONS: Record<RecommendationDto["type"], typeof BookOpen> = {
   "earn-hearts": HeartPulse,
   "repeated-mistakes": RotateCcw,
@@ -17,13 +18,14 @@ const ICONS: Record<RecommendationDto["type"], typeof BookOpen> = {
   "next-lesson": BookOpen,
 };
 
+/** Where a recommendation links to: the review page or a specific lesson. */
 export function recommendationHref(item: RecommendationDto): string {
   return item.action.kind === "review" ? "/review" : `/lesson/${item.action.lessonId}`;
 }
 
 /**
- * Recommended practice (GET /api/recommendations). Chosen by simple, visible rules —
- * each item says why it is recommended.
+ * Recommended practice (GET /api/recommendations). The server picks items with simple
+ * rules, and each item says why it was recommended.
  */
 export function RecommendationsCard({ limit = 3 }: { limit?: number }) {
   const { languageCode } = useLearnerPreferences();

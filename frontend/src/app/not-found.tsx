@@ -1,3 +1,4 @@
+// Shown for any URL that doesn't match a page (404).
 import { LogoMark } from "@/components/brand/logo";
 import { ButtonLink } from "@/components/ui/button";
 

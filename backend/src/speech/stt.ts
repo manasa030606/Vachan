@@ -1,9 +1,9 @@
-// SPEECH-TO-TEXT providers. The audio (a WAV recording) goes to the provider; the API key
+// Speech-to-text providers. The audio (a WAV recording) goes to the provider; the API key
 // stays on the server.
 //
-//   gemini — Gemini listens to the audio (same key and model family as the tutor). Default.
-//   groq   — Groq's hosted Whisper (whisper-large-v3), a dedicated speech-to-text model.
-//   mock   — OFFLINE TEST DOUBLE, not speech recognition: returns a fixed text (for tests).
+//   gemini: Gemini listens to the audio (same key and model family as the tutor). Default.
+//   groq:   Groq's hosted Whisper (whisper-large-v3), a dedicated speech-to-text model.
+//   mock:   offline test double, not speech recognition: returns a fixed text (for tests).
 //
 // The transcription prompt never contains the phrase the learner was asked to say, so the
 // model can't "correct" a mistake into the expected answer.
@@ -36,7 +36,7 @@ export interface SpeechToText {
 const looksLikePlaceholder = (key: string | undefined) =>
   !key || key.length < 20 || /^(your|replace|xxx|paste)/i.test(key);
 
-// ── Gemini ──────────────────────────────────────────────────────
+// Gemini
 
 export function transcriptionPrompt(languageName: string, scriptName: string) {
   return [
@@ -110,7 +110,7 @@ class GeminiSpeechToText implements SpeechToText {
   }
 }
 
-// ── Groq Whisper ────────────────────────────────────────────────
+// Groq Whisper
 
 class GroqSpeechToText implements SpeechToText {
   readonly name = "groq";
@@ -147,7 +147,7 @@ class GroqSpeechToText implements SpeechToText {
   }
 }
 
-// ── Offline test double ─────────────────────────────────────────
+// Offline test double
 
 /** Fixed "transcripts" per language: the word for "hello" (see prisma/seed-data.ts). */
 const MOCK_HEARD: Record<string, string> = {
@@ -172,7 +172,7 @@ class MockSpeechToText implements SpeechToText {
   }
 }
 
-// ── Choosing the provider ───────────────────────────────────────
+// Choosing the provider
 
 export const STT_DEFAULT_MODELS = {
   gemini: () => getLlmStatus().model, // the tutor's Gemini model can listen to audio
@@ -180,16 +180,26 @@ export const STT_DEFAULT_MODELS = {
   mock: () => "mock-fixed-transcript",
 };
 
+type SttProviderName = keyof typeof STT_DEFAULT_MODELS;
+
+function sttApiKey(provider: SttProviderName): string | undefined {
+  if (provider === "gemini") return env.GEMINI_API_KEY;
+  if (provider === "groq") return env.GROQ_API_KEY;
+  return undefined;
+}
+
+function defaultSttModel(provider: SttProviderName): string {
+  // Gemini for speech while the tutor uses another provider: the tutor's model name won't fit.
+  if (provider === "gemini" && env.LLM_PROVIDER !== "gemini") {
+    return TUTOR_CONFIG.providers.gemini.defaultModel;
+  }
+  return STT_DEFAULT_MODELS[provider]();
+}
+
 export function getSttStatus() {
   const provider = env.STT_PROVIDER ?? env.LLM_PROVIDER;
-  const key =
-    provider === "gemini" ? env.GEMINI_API_KEY : provider === "groq" ? env.GROQ_API_KEY : null;
-  const configured = provider === "mock" || !looksLikePlaceholder(key ?? undefined);
-  const model =
-    env.STT_MODEL ??
-    (provider === "gemini" && env.LLM_PROVIDER !== "gemini"
-      ? TUTOR_CONFIG.providers.gemini.defaultModel
-      : STT_DEFAULT_MODELS[provider]());
+  const configured = provider === "mock" || !looksLikePlaceholder(sttApiKey(provider));
+  const model = env.STT_MODEL ?? defaultSttModel(provider);
   return {
     provider,
     model,
@@ -207,18 +217,19 @@ export function getSpeechToText(): SpeechToText {
   if (!status.configured) {
     throw new LlmError(
       "LLM_NOT_CONFIGURED",
-      `Speech-to-text needs ${status.keyVariable} in backend/.env (see docs/SPEECH.md).`,
+      `Speech-to-text needs ${status.keyVariable} in backend/.env (see docs/AI.md).`,
     );
   }
   // LLM_BASE_URL is only used when the tutor and speech use the same provider (proxies, tests).
   const base = (name: "gemini" | "groq") =>
     (env.LLM_PROVIDER === name ? env.LLM_BASE_URL : undefined) ??
     TUTOR_CONFIG.providers[name].baseUrl;
-  cached =
-    status.provider === "gemini"
-      ? new GeminiSpeechToText(status.model)
-      : status.provider === "groq"
-        ? new GroqSpeechToText(env.GROQ_API_KEY!, status.model, base("groq"))
-        : new MockSpeechToText();
+  if (status.provider === "gemini") {
+    cached = new GeminiSpeechToText(status.model);
+  } else if (status.provider === "groq") {
+    cached = new GroqSpeechToText(env.GROQ_API_KEY!, status.model, base("groq"));
+  } else {
+    cached = new MockSpeechToText();
+  }
   return cached;
 }

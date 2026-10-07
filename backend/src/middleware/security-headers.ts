@@ -1,4 +1,4 @@
-// Phase 8: security headers for every API response (no library needed — the API only returns
+// Security headers for every API response (no library needed — the API only returns
 // JSON and audio, so a strict policy is safe).
 //   nosniff            browsers must not guess content types (stops "JSON as HTML" tricks)
 //   frame-ancestors    the API can't be embedded in a frame (clickjacking)

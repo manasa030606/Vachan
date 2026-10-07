@@ -41,16 +41,16 @@ const lessonInclude = {
 
 export type ExerciseWithOptions = Prisma.ExerciseGetPayload<{ include: { options: true } }>;
 
-/**
- * Converts a database exercise into what the browser may see:
- * no `isCorrect`, no word positions, no accepted translations, no explanation.
- */
-/** A lesson learners may see: published, in a published unit of a published course (Phase 8). */
+/** A lesson learners may see: published, in a published unit of a published course. */
 export const PUBLISHED_LESSON = {
   isPublished: true,
   unit: { isPublished: true, course: { isPublished: true } },
 } as const;
 
+/**
+ * Converts a database exercise into what the browser may see:
+ * no `isCorrect`, no word positions, no accepted translations, no explanation.
+ */
 export function toPublicExercise(exercise: ExerciseWithOptions) {
   const base = {
     id: exercise.id,
@@ -94,7 +94,8 @@ export function toPublicExercise(exercise: ExerciseWithOptions) {
     case "WORD_ORDER":
       return { ...base, prompt: exercise.prompt, tokens: choices };
     case "MATCHING":
-      // Matching gives instant feedback per tap, so the pairs are sent; the final result is still checked on the server.
+      // Matching gives instant feedback per tap, so the pairs are sent.
+      // The final answer is still checked on the server.
       return {
         ...base,
         pairs: choices.map((choice) => ({

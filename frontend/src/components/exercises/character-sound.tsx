@@ -4,7 +4,7 @@ import type { CharacterSoundExercise, ExerciseComponentProps } from "@/types/exe
 import { ChoiceList } from "./choice-list";
 import { ExerciseHeading, ScriptPrompt } from "./exercise-heading";
 
-/** Character → sound: shows one big letter (e.g. "ఆ") and asks which sound it makes. */
+/** Character to sound: shows one big letter (e.g. "ఆ") and asks which sound it makes. */
 export function CharacterSound({
   exercise,
   answer,

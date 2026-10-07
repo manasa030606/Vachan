@@ -1,4 +1,5 @@
-// Shown when every exercise has been answered correctly (a lesson or a mistake review).
+// Shown when every exercise has been answered correctly (a lesson or a mistake review),
+// with confetti, the run's results and any new badges.
 import { CloudCheck, Flame, Heart, ListChecks, RotateCcw, Target, Trophy, Zap } from "lucide-react";
 import type { VocabularyWord } from "@/types/learning";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -27,6 +28,16 @@ type LessonCompleteProps = {
   onPracticeAgain: () => void;
 };
 
+/** The sentence after "You finished <lesson>." It starts with a space on purpose. */
+function lessonSummaryTail(mistakesReviewed: number, resumed: boolean): string {
+  if (mistakesReviewed > 0) {
+    const noun = mistakesReviewed === 1 ? "mistake" : "mistakes";
+    return ` You reviewed ${mistakesReviewed} ${noun} along the way.`;
+  }
+  if (resumed) return " Welcome back — you picked up right where you left off.";
+  return " Not a single mistake — brilliant!";
+}
+
 export function LessonComplete({
   lessonTitle,
   exercisesCompleted,
@@ -42,6 +53,7 @@ export function LessonComplete({
   rewards,
   onPracticeAgain,
 }: LessonCompleteProps) {
+  // Totals after the last checked answer (level, streak, daily goal), or null.
   const last = rewards.last;
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-4 py-10 text-center">
@@ -61,11 +73,7 @@ export function LessonComplete({
         ) : (
           <>
             You finished <span className="font-bold">{lessonTitle}</span>.
-            {mistakesReviewed > 0
-              ? ` You reviewed ${mistakesReviewed} ${mistakesReviewed === 1 ? "mistake" : "mistakes"} along the way.`
-              : resumed
-                ? " Welcome back — you picked up right where you left off."
-                : " Not a single mistake — brilliant!"}
+            {lessonSummaryTail(mistakesReviewed, resumed)}
           </>
         )}
       </p>

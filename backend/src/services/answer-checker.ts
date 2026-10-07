@@ -25,7 +25,7 @@ export type CheckResult = {
   correctAnswer: string;
 };
 
-// ── Text helpers ─────────────────────────────────────────────
+// Text helpers
 
 /**
  * Makes two answers comparable:
@@ -76,7 +76,7 @@ export function editDistance(a: string, b: string): number {
   return d[a.length][b.length];
 }
 
-// ── Checking ─────────────────────────────────────────────────
+// Checking
 
 /** The right answer as text (feedback banner, review list). */
 export function correctAnswerText(exercise: CheckableExercise): string {
@@ -184,8 +184,9 @@ export function checkAnswer(exercise: CheckableExercise, answer: AttemptAnswer):
     }
 
     case "MATCHING": {
-      if (!("pairs" in answer))
+      if (!("pairs" in answer)) {
         throw wrongShape('{ "pairs": [{ "leftId": "...", "rightId": "..." }] }');
+      }
       // Each option is one pair, so a correct match pairs an option with itself.
       const matchedIds = new Set(
         answer.pairs.filter((pair) => pair.leftId === pair.rightId).map((pair) => pair.leftId),

@@ -1,8 +1,8 @@
 "use client";
 
-// Plays a phrase: server text-to-speech (cached as a blob URL), or — when the server can't
-// make audio (TTS_PROVIDER=browser, missing key, quota used up) — the browser's own voice for
-// the language, if the device has one. Speed: 1×, 0.75×, 0.5× (pitch is kept).
+// Plays a phrase using server text-to-speech (cached as a blob URL). When the server cannot
+// make audio (TTS_PROVIDER=browser, missing key, quota used up) it falls back to the browser's
+// own voice for the language, if the device has one. Slower speeds keep the original pitch.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import { getSpeechAudio } from "@/lib/api/endpoints";
@@ -14,6 +14,7 @@ export type AudioSource =
 
 export type PlaybackState = "idle" | "loading" | "playing" | "error";
 
+// Course language code to the locale used by browser voices.
 const LOCALES: Record<string, string> = {
   hi: "hi-IN",
   te: "te-IN",
@@ -23,15 +24,23 @@ const LOCALES: Record<string, string> = {
   bn: "bn-IN",
 };
 
-const blobUrls = new Map<string, string>(); // shared by every player on the page
-let shared: HTMLAudioElement | null = null;
+// Module-level, so every player on the page shares the cache and only one clip plays at a time.
+const blobUrls = new Map<string, string>();
+let sharedAudio: HTMLAudioElement | null = null;
 
-const keyOf = (source: AudioSource) =>
-  "question" in source
-    ? `q:${source.question}`
-    : "vocabularyItemId" in source
-      ? `v:${source.vocabularyItemId}`
-      : `t:${source.language}:${source.text}`;
+/** Cache key for an audio source. */
+function keyOf(source: AudioSource): string {
+  if ("question" in source) return `q:${source.question}`;
+  if ("vocabularyItemId" in source) return `v:${source.vocabularyItemId}`;
+  return `t:${source.language}:${source.text}`;
+}
+
+/** The request body for the server: only the fields that identify the audio. */
+function toAudioRequest(source: AudioSource) {
+  if ("question" in source) return { question: source.question };
+  if ("vocabularyItemId" in source) return { vocabularyItemId: source.vocabularyItemId };
+  return { text: source.text, language: source.language };
+}
 
 /** A browser voice for the language, if this device has one. */
 function browserVoice(language: string): SpeechSynthesisVoice | null {
@@ -60,20 +69,24 @@ const SERVER_AUDIO_UNAVAILABLE = new Set([
   "TIMEOUT",
 ]);
 
+/** Hook that plays phrases and reports the playback state and any error message. */
 export function usePhraseAudio() {
   const [state, setState] = useState<PlaybackState>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [usedBrowserVoice, setUsedBrowserVoice] = useState(false);
-  const active = useRef(0);
+  // Each play() gets a new number; an older request that finishes late is ignored.
+  const latestRequest = useRef(0);
 
+  // Stop any sound when the component using this hook unmounts.
   useEffect(
     () => () => {
-      shared?.pause();
+      sharedAudio?.pause();
       if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     },
     [],
   );
 
+  // Returns false when the device has no voice for this language.
   const speakWithBrowser = useCallback((text: string, language: string, rate: number) => {
     const voice = browserVoice(language);
     if (!voice) return false;
@@ -92,26 +105,20 @@ export function usePhraseAudio() {
 
   const play = useCallback(
     async (source: AudioSource, rate = 1) => {
-      const ticket = ++active.current;
+      const ticket = ++latestRequest.current;
       setMessage(null);
-      shared?.pause();
+      sharedAudio?.pause();
       window.speechSynthesis?.cancel();
       const key = keyOf(source);
       let url = blobUrls.get(key);
       if (!url) {
         setState("loading");
         try {
-          const blob = await getSpeechAudio(
-            "question" in source
-              ? { question: source.question }
-              : "vocabularyItemId" in source
-                ? { vocabularyItemId: source.vocabularyItemId }
-                : { text: source.text, language: source.language },
-          );
+          const blob = await getSpeechAudio(toAudioRequest(source));
           url = URL.createObjectURL(blob);
           blobUrls.set(key, url);
         } catch (error) {
-          if (ticket !== active.current) return;
+          if (ticket !== latestRequest.current) return;
           const code = error instanceof ApiError ? error.code : "UNKNOWN";
           const text = "text" in source ? source.text : undefined;
           const language = "language" in source ? source.language : undefined;
@@ -119,30 +126,30 @@ export function usePhraseAudio() {
             if (speakWithBrowser(text, language, rate)) return;
           }
           setState("error");
-          setMessage(
-            code === "TTS_BROWSER_ONLY" || SERVER_AUDIO_UNAVAILABLE.has(code)
-              ? "Audio isn't available right now, and this device has no voice for this language. Read the romanization instead."
-              : error instanceof ApiError
-                ? error.message
-                : "Couldn't play the audio.",
-          );
+          if (SERVER_AUDIO_UNAVAILABLE.has(code)) {
+            setMessage(
+              "Audio isn't available right now, and this device has no voice for this language. Read the romanization instead.",
+            );
+          } else {
+            setMessage(error instanceof ApiError ? error.message : "Couldn't play the audio.");
+          }
           return;
         }
       }
-      if (ticket !== active.current) return;
-      shared ??= new Audio();
-      shared.src = url;
-      shared.playbackRate = rate;
-      shared.preservesPitch = true;
-      shared.onended = () => setState("idle");
-      shared.onerror = () => {
+      if (ticket !== latestRequest.current) return;
+      sharedAudio ??= new Audio();
+      sharedAudio.src = url;
+      sharedAudio.playbackRate = rate;
+      sharedAudio.preservesPitch = true;
+      sharedAudio.onended = () => setState("idle");
+      sharedAudio.onerror = () => {
         setState("error");
         setMessage("This audio can't be played in your browser.");
       };
       setUsedBrowserVoice(false);
       setState("playing");
       try {
-        await shared.play();
+        await sharedAudio.play();
       } catch {
         setState("error");
         setMessage("The browser blocked playback. Click Play again.");
@@ -152,8 +159,8 @@ export function usePhraseAudio() {
   );
 
   const stop = useCallback(() => {
-    active.current++;
-    shared?.pause();
+    latestRequest.current++;
+    sharedAudio?.pause();
     window.speechSynthesis?.cancel();
     setState("idle");
   }, []);

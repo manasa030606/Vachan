@@ -1,5 +1,6 @@
 import { Logo } from "@/components/brand/logo";
 
+/** Footer of the public landing page. */
 export function LandingFooter() {
   return (
     <footer className="border-t border-slate-200 bg-white">

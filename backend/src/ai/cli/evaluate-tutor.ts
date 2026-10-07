@@ -1,16 +1,16 @@
-// npm run tutor:eval -w backend
-//
-// Runs backend/evaluation/tutor-dataset.json through the FULL tutor pipeline with the configured
-// LLM (Gemini/Groq) and checks, per question:
-//   • status        — answered / insufficient / refused as expected
-//   • retrieval     — a relevant note was retrieved AND cited by the answer
-//   • grounded      — the answer mentions the expected word/idea, cites ≥ 1 note, and every
-//                     native-script word in it appears in the retrieved notes (nothing invented)
-//   • level         — the answer is short enough for the learner's level
-// Writes backend/evaluation/tutor-latest-results.json and docs/AI_TUTOR_EVALUATION.md.
-// Exit code 1 if a threshold is missed.
-//   --delay 6500   milliseconds between LLM calls (free tiers allow ~10 requests/minute)
-import { readFile, writeFile } from "node:fs/promises";
+// Tutor evaluation: runs backend/evaluation/tutor-dataset.json through the full tutor pipeline
+// with the configured LLM (Gemini/Groq) and checks, per question:
+//   - status:    answered / insufficient / refused as expected
+//   - retrieval: a relevant note was retrieved AND cited by the answer
+//   - grounded:  the answer mentions the expected word/idea, cites at least one note, and every
+//                native-script word in it appears in the retrieved notes (nothing invented)
+//   - level:     the answer is short enough for the learner's level
+// Writes backend/evaluation/tutor-latest-results.json and docs/evaluation/TUTOR.md, and exits
+// with code 1 if a threshold is missed.
+// Run: npm run tutor:eval -w backend   (--delay 6500 = ms between LLM calls; free tiers allow
+// about 10 requests per minute)
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { HttpError } from "../../lib/http-error.ts";
@@ -42,11 +42,29 @@ type Dataset = {
   >;
   cases: Case[];
 };
+/** The result for one question. */
+type Row = {
+  testCase: Case;
+  status: string | null;
+  statusOk: boolean;
+  retrievalOk: boolean;
+  groundedOk: boolean;
+  levelOk: boolean;
+  words: number;
+  nativeCount: number;
+  unsupported: string[];
+  usedIds: string[];
+  ms: number;
+  model: string | null;
+  answer: string;
+};
+type Check = { name: string; value: number; min: number; passed: boolean };
 
 const { values } = parseArgs({ options: { delay: { type: "string" } } });
 const status = getLlmStatus();
 const delayMs = Number(values.delay ?? (status.isTestDouble ? 0 : 6500));
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /** Calls the tutor; if the provider is busy or out of quota, waits 20 s and tries once more. */
 async function askWithPatience(...args: Parameters<typeof askTutor>) {
   try {
@@ -60,10 +78,12 @@ async function askWithPatience(...args: Parameters<typeof askTutor>) {
   }
 }
 
-const docsPath = fileURLToPath(new URL("../../../../docs/AI_TUTOR_EVALUATION.md", import.meta.url));
+const docsPath = fileURLToPath(new URL("../../../../docs/evaluation/TUTOR.md", import.meta.url));
 const pct = (value: number) => `${Math.round(value * 1000) / 10}%`;
+/** Expected source ids may end in "*" to match any id with that prefix. */
 const matchesSource = (patterns: string[], id: string) =>
   patterns.some((p) => (p.endsWith("*") ? id.startsWith(p.slice(0, -1)) : id === p));
+/** Words of 2+ characters in an Indian script (Devanagari up to Malayalam, plus ZWNJ/ZWJ). */
 const nativeWords = (text: string) => text.normalize("NFC").match(/[ऀ-ൿ‌‍]{2,}/gu) ?? [];
 const squash = (text: string) => text.normalize("NFC").replace(/\s+/g, "");
 
@@ -86,21 +106,6 @@ async function main() {
     },
   });
 
-  type Row = {
-    testCase: Case;
-    status: string | null;
-    statusOk: boolean;
-    retrievalOk: boolean;
-    groundedOk: boolean;
-    levelOk: boolean;
-    words: number;
-    nativeCount: number;
-    unsupported: string[];
-    usedIds: string[];
-    ms: number;
-    model: string | null;
-    answer: string;
-  };
   const rows: Row[] = [];
   try {
     for (const testCase of dataset.cases) {
@@ -238,17 +243,15 @@ async function main() {
       await sleep(delayMs);
     }
   } finally {
-    await prisma.user.delete({ where: { id: user.id } }); // conversations cascade
+    await prisma.user.delete({ where: { id: user.id } }); // its test conversations are deleted too
   }
 
-  const share = (
-    pick: (r: (typeof rows)[number]) => boolean,
-    filter: (r: (typeof rows)[number]) => boolean = () => true,
-  ) => {
+  // Share of rows (optionally only some of them) that pass a check; 1 when there are none.
+  const share = (pick: (r: Row) => boolean, filter: (r: Row) => boolean = () => true) => {
     const subset = rows.filter(filter);
     return subset.length ? subset.filter(pick).length / subset.length : 1;
   };
-  const answerRows = (r: (typeof rows)[number]) => r.testCase.expect === "answered";
+  const answerRows = (r: Row) => r.testCase.expect === "answered";
   const nativeTotal = rows.reduce((sum, r) => sum + r.nativeCount, 0);
   const nativeBad = rows.reduce((sum, r) => sum + r.unsupported.length, 0);
   const summary = {
@@ -258,12 +261,14 @@ async function main() {
     levelRespected: share((r) => r.levelOk, answerRows),
     nativeWordsFromNotes: nativeTotal ? (nativeTotal - nativeBad) / nativeTotal : 1,
   };
-  const checks = (Object.keys(dataset.thresholds) as Array<keyof typeof summary>).map((name) => ({
-    name,
-    value: summary[name],
-    min: dataset.thresholds[name],
-    passed: summary[name] >= dataset.thresholds[name],
-  }));
+  const checks: Check[] = (Object.keys(dataset.thresholds) as Array<keyof typeof summary>).map(
+    (name) => ({
+      name,
+      value: summary[name],
+      min: dataset.thresholds[name],
+      passed: summary[name] >= dataset.thresholds[name],
+    }),
+  );
 
   console.log("");
   for (const check of checks)
@@ -276,9 +281,21 @@ async function main() {
     `${RAG_PATHS.evaluation}tutor-latest-results.json`,
     `${JSON.stringify({ generatedAt, provider: status.provider, model: status.model, summary, checks, rows }, null, 2)}\n`,
   );
-  await writeFile(
-    docsPath,
-    `# Vachan — AI tutor evaluation
+  await mkdir(dirname(docsPath), { recursive: true });
+  await writeFile(docsPath, buildReport(dataset, checks, rows, generatedAt));
+  console.log(
+    `\n  Saved backend/evaluation/tutor-latest-results.json and docs/evaluation/TUTOR.md\n`,
+  );
+  if (status.isTestDouble) {
+    console.log(
+      "  ℹ️  Offline test double: the pipeline ran end-to-end, but answer-quality numbers are not meaningful.\n     Run with LLM_PROVIDER=gemini (or groq) for the real evaluation.\n",
+    );
+  } else if (checks.some((c) => !c.passed)) process.exitCode = 1;
+}
+
+/** The Markdown report written to docs/evaluation/TUTOR.md. */
+function buildReport(dataset: Dataset, checks: Check[], rows: Row[], generatedAt: string) {
+  return `# Vachan — AI tutor evaluation
 
 > Generated by \`npm run tutor:eval -w backend\` on ${generatedAt.slice(0, 10)} — do not edit by hand.
 > Provider: **${status.provider} / ${status.model}**${status.isTestDouble ? " — ⚠️ OFFLINE TEST DOUBLE (checks the pipeline, not answer quality)" : ""} · dataset: \`backend/evaluation/tutor-dataset.json\`
@@ -291,10 +308,10 @@ ${checks.map((c) => `| ${c.passed ? "✅" : "❌"} ${c.name} | ${pct(c.value)} |
 - **relevantRetrieval** — a relevant note was retrieved and cited.
 - **grounded** — cites ≥ 1 retrieved note, mentions the expected word, and contains no native-script word that isn't in the notes.
 - **levelRespected** — answer length within the level's word limit (${Object.entries(
-      dataset.levelWordLimits,
-    )
-      .map(([level, limit]) => `${level} ≤ ${limit}`)
-      .join(", ")}).
+    dataset.levelWordLimits,
+  )
+    .map(([level, limit]) => `${level} ≤ ${limit}`)
+    .join(", ")}).
 - **nativeWordsFromNotes** — share of all native-script words in all answers that appear in the retrieved notes.
 
 ## Answers
@@ -312,16 +329,7 @@ ${rows
 > ${r.answer.replace(/\n/g, "\n> ")}
 `,
   )
-  .join("\n")}`,
-  );
-  console.log(
-    `\n  Saved backend/evaluation/tutor-latest-results.json and docs/AI_TUTOR_EVALUATION.md\n`,
-  );
-  if (status.isTestDouble) {
-    console.log(
-      "  ℹ️  Offline test double: the pipeline ran end-to-end, but answer-quality numbers are not meaningful.\n     Run with LLM_PROVIDER=gemini (or groq) for the real evaluation.\n",
-    );
-  } else if (checks.some((c) => !c.passed)) process.exitCode = 1;
+  .join("\n")}`;
 }
 
 try {

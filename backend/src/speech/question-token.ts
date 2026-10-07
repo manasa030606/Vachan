@@ -19,6 +19,7 @@ export function sealQuestion(itemId: string, correct: string, now = Date.now()):
   return Buffer.concat([iv, cipher.getAuthTag(), data]).toString("base64url");
 }
 
+// Token layout (base64url): 12-byte IV | 16-byte auth tag | encrypted JSON.
 export function openQuestion(token: string, now = Date.now()): QuestionSecret {
   try {
     const raw = Buffer.from(token, "base64url");

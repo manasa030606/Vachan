@@ -27,7 +27,7 @@ services:
         value: "22"
       - key: JWT_EXPIRES_IN
         value: 7d
-      # Phase 8: browser → Vercel (/api proxy) → Render's proxy → this app = 2 proxies, so the
+      # browser → Vercel (/api proxy) → Render's proxy → this app = 2 proxies, so the
       # learner's IP (used by the login/register rate limits) is 2 hops back in X-Forwarded-For.
       - key: TRUST_PROXY
         value: "2"
@@ -36,4 +36,6 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: CORS_ORIGIN
+        sync: false
+      - key: GEMINI_API_KEY
         sync: false

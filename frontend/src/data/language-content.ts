@@ -1,7 +1,7 @@
 // Small, verified demo content for each language: first vowels/consonant, five common
 // words and one simple sentence ("My name is Asha.").
 // Romanization is kept simple (no diacritics) so beginners can read it easily.
-// The real course content is created in Phase 3 and managed by admins in Phase 8.
+// The real course content lives in the database and is managed from the admin dashboard.
 import type {
   LanguageCode,
   LanguageContent,
@@ -9,6 +9,7 @@ import type {
   VocabularyWord,
 } from "@/types/learning";
 
+/** One vocabulary word with a stable id like "hi-hello". */
 function word(
   languageCode: LanguageCode,
   key: string,
@@ -20,6 +21,7 @@ function word(
   return { id: `${languageCode}-${key}`, script, romanization, meaning, topic };
 }
 
+/** The words of a sentence as tokens, each with its own id. */
 function tokens(languageCode: LanguageCode, parts: Array<[string, string]>): SentenceToken[] {
   return parts.map(([text, romanization], index) => ({
     id: `${languageCode}-token-${index}`,

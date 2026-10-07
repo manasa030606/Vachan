@@ -1,8 +1,9 @@
-// "Sources" under a tutor answer: the notes the answer is based on (and the others that were
-// looked at). Every answer can be traced back to Vachan's knowledge base.
+// "Sources" under a tutor answer: the notes the answer is based on, and the others that were
+// looked at, so every answer can be traced back to Vachan's knowledge base.
 import { BookOpen, ChevronDown } from "lucide-react";
 import type { TutorReferenceDto } from "@/lib/api/types";
 
+/** One knowledge-base note. */
 function Reference({ item }: { item: TutorReferenceDto }) {
   return (
     <li className="rounded-xl bg-slate-50 p-3">
@@ -15,6 +16,10 @@ function Reference({ item }: { item: TutorReferenceDto }) {
   );
 }
 
+/**
+ * Collapsible list of notes. For an answered question it shows the notes used; when the tutor
+ * could not answer, it shows the closest notes instead.
+ */
 export function ReferencesList({
   references,
   answered,
@@ -22,8 +27,8 @@ export function ReferencesList({
   references: TutorReferenceDto[];
   answered: boolean;
 }) {
-  const used = references.filter((r) => r.used);
-  const others = references.filter((r) => !r.used);
+  const used = references.filter((reference) => reference.used);
+  const others = references.filter((reference) => !reference.used);
   if (references.length === 0) return null;
 
   return (

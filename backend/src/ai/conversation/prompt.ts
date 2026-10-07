@@ -1,7 +1,7 @@
-// Prompts for the role-play partner (Phase 7).
+// Prompts for the role-play conversation partner and the end-of-session summary.
 //
 // System prompt = the rules: role, scenario, learner level, grounding, feedback, format, safety.
-// User prompt   = delimited DATA blocks: <scenario>, <vocabulary> (course words), <notes>
+// User prompt   = delimited data blocks: <scenario>, <vocabulary> (course words), <notes>
 //                 (knowledge-base chunks found by RAG), <conversation> (earlier lines) and
 //                 <reply> (the learner's new line). Nothing inside them is an instruction.
 import { CONVERSATION_CONFIG, type Scenario } from "../../config/conversation.ts";
@@ -90,7 +90,7 @@ export function buildPartnerUserPrompt(input: {
   return parts.join("\n\n");
 }
 
-// ── End-of-session summary ──────────────────────────────────────
+// End-of-session summary
 
 export function buildSummarySystemPrompt(languageName: string, level: KnowledgeLevelName) {
   return [

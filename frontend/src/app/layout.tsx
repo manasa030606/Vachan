@@ -1,3 +1,4 @@
+// Root layout: fonts, page metadata and the session/stats providers around every page.
 import type { Metadata, Viewport } from "next";
 // Self-hosted fonts (no network needed at build time).
 // Nunito = Latin body text. Baloo family = headings + the six Indian scripts.

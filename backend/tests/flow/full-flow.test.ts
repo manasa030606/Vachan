@@ -1,9 +1,7 @@
-// INTEGRATION TEST — one learner's complete journey through the API (Phase 8):
-//   register → language → self-assessment → placement → lesson → exercises → progress → XP/streak
-//   → review → AI tutor → speaking → conversation → logout → login again → everything persisted
-// Uses the offline test doubles for the AI and speech (no key, no internet):
-//   npm run test:flow -w backend
-// Needs: migrated + seeded database and `npm run rag:index -w backend`.
+// Integration test: one learner's whole journey through the API, from registration and
+// placement through lessons, review, AI tutor, speaking and role-play, to logging in again.
+// Uses the offline AI and speech doubles. Needs a migrated + seeded database and rag:index.
+// Run with:  npm run test:flow -w backend
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import type { Server } from "node:http";
@@ -33,40 +31,52 @@ async function call(method: string, path: string, body?: unknown, auth = true) {
   return { status: response.status, body: (await response.json()) as Json };
 }
 
+/** Builds a right (or deliberately wrong) answer for an exercise from the database. */
 async function answerFor(exerciseId: string, correct = true) {
   const exercise = await prisma.exercise.findUniqueOrThrow({
     where: { id: exerciseId },
     include: { options: true },
   });
   const options = exercise.options;
-  if (!correct) {
-    return exercise.type === "TRANSLATION"
-      ? { text: "definitely wrong" }
-      : exercise.type === "WORD_ORDER"
-        ? { optionIds: [...options].reverse().map((o) => o.id) }
-        : exercise.type === "MATCHING"
-          ? {
-              pairs: options.map((o, i) => ({
-                leftId: o.id,
-                rightId: options[(i + 1) % options.length]!.id,
-              })),
-            }
-          : { optionId: options.find((o) => !o.isCorrect)!.id };
-  }
-  switch (exercise.type) {
+  return correct ? rightAnswer(exercise.type, options) : wrongAnswer(exercise.type, options);
+}
+
+type Option = { id: string; text: string; isCorrect: boolean; correctPosition: number | null };
+
+function rightAnswer(type: string, options: Option[]) {
+  switch (type) {
     case "TRANSLATION":
-      return { text: options.find((o) => o.isCorrect)!.text };
+      return { text: options.find((option) => option.isCorrect)!.text };
     case "WORD_ORDER":
       return {
         optionIds: options
-          .filter((o) => o.correctPosition !== null)
+          .filter((option) => option.correctPosition !== null)
           .sort((a, b) => a.correctPosition! - b.correctPosition!)
-          .map((o) => o.id),
+          .map((option) => option.id),
       };
     case "MATCHING":
-      return { pairs: options.map((o) => ({ leftId: o.id, rightId: o.id })) };
+      return { pairs: options.map((option) => ({ leftId: option.id, rightId: option.id })) };
     default:
-      return { optionId: options.find((o) => o.isCorrect)!.id };
+      return { optionId: options.find((option) => option.isCorrect)!.id };
+  }
+}
+
+function wrongAnswer(type: string, options: Option[]) {
+  switch (type) {
+    case "TRANSLATION":
+      return { text: "definitely wrong" };
+    case "WORD_ORDER":
+      return { optionIds: [...options].reverse().map((option) => option.id) };
+    case "MATCHING":
+      // Pair every left item with the next item's right side, so no pair matches.
+      return {
+        pairs: options.map((option, i) => ({
+          leftId: option.id,
+          rightId: options[(i + 1) % options.length]!.id,
+        })),
+      };
+    default:
+      return { optionId: options.find((option) => !option.isCorrect)!.id };
   }
 }
 
@@ -84,7 +94,7 @@ after(async () => {
 });
 
 describe("a learner's complete journey", () => {
-  const remember: Json = {};
+  const remember: Json = {}; // values saved in one step and checked again after re-login
 
   it("1. registers", async () => {
     const res = await call(

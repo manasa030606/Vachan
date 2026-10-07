@@ -6,8 +6,8 @@
 //                    out-of-hearts ◀── hearts reach 0                          └─▶ complete
 //
 // A wrong answer costs one heart and puts that exercise again at the end of the
-// queue ("mini review of mistakes", spec section 5). Hearts can be switched off
-// (the mistake review does not cost hearts).
+// queue, so every lesson ends with a mini review of its mistakes. Hearts can be
+// switched off (the review mode does not cost hearts). See docs/LEARNING.md.
 //
 // Resuming: exercises the learner already answered correctly in this run
 // (`alreadyCompletedIds`, from the server) are skipped and counted as done.

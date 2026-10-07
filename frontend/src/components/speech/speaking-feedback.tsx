@@ -1,7 +1,7 @@
-// Feedback for one speaking attempt, in three SEPARATE parts (they measure different things):
-//   1. Content match   — the transcript compared with the expected phrase (text, no AI)
-//   2. Pronunciation   — AI listening notes, experimental (or "not supported here")
-//   3. Fluency         — timing of sound and silence in the recording (no AI)
+// Feedback for one speaking attempt, kept in three separate parts because they measure
+// different things: (1) content match compares the transcript with the expected phrase (no AI),
+// (2) pronunciation shows experimental AI listening notes when supported, and
+// (3) fluency looks at the timing of sound and silence in the recording (no AI).
 import {
   AlertTriangle,
   CheckCircle2,
@@ -17,6 +17,7 @@ import {
 import type { SpeakingEvaluationDto, WordResultDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
+// Label, icon and colours for each content-match verdict from the server.
 const VERDICT = {
   match: {
     label: "Matches the phrase",
@@ -45,6 +46,7 @@ const VERDICT = {
   },
 } as const;
 
+// Label, icon and colours for each word in the word-by-word comparison.
 const WORD = {
   correct: {
     label: "right",
@@ -66,8 +68,10 @@ const FLUENCY = {
   hesitant: "Hesitant",
 } as const;
 
-const s = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
+/** Milliseconds as seconds with one decimal, e.g. "2.4 s". */
+const formatSeconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
 
+/** One expected word and how it was heard. */
 function WordChip({ word }: { word: WordResultDto }) {
   const style = WORD[word.status];
   const Icon = style.icon;
@@ -88,6 +92,7 @@ function WordChip({ word }: { word: WordResultDto }) {
   );
 }
 
+/** A numbered feedback card with a small badge saying how it was measured. */
 function Section({
   step,
   title,
@@ -125,6 +130,7 @@ function Section({
   );
 }
 
+/** All feedback for one recording. */
 export function SpeakingFeedback({ result }: { result: SpeakingEvaluationDto }) {
   const verdict = VERDICT[result.content.verdict];
   const VerdictIcon = verdict.icon;
@@ -143,7 +149,7 @@ export function SpeakingFeedback({ result }: { result: SpeakingEvaluationDto }) 
           {result.content.comparedWith === "romanization"
             ? "The transcript came back in Latin letters, so it was compared with the romanization. "
             : ""}
-          Model: {result.model} · recording {s(result.audio.durationMs)}
+          Model: {result.model} · recording {formatSeconds(result.audio.durationMs)}
         </p>
       </div>
 
@@ -243,16 +249,16 @@ export function SpeakingFeedback({ result }: { result: SpeakingEvaluationDto }) 
           <p className="text-xl font-extrabold text-ink">{FLUENCY[fluency.rating]}</p>
           <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
             <dt className="text-slate-500">Speaking time</dt>
-            <dd className="font-bold">{s(fluency.speakingMs)}</dd>
+            <dd className="font-bold">{formatSeconds(fluency.speakingMs)}</dd>
             <dt className="text-slate-500">Pauses</dt>
             <dd className="font-bold">
               {fluency.pauses}
-              {fluency.pauses > 0 && ` (longest ${s(fluency.longestPauseMs)})`}
+              {fluency.pauses > 0 && ` (longest ${formatSeconds(fluency.longestPauseMs)})`}
             </dd>
             {fluency.startDelayMs !== null && (
               <>
                 <dt className="text-slate-500">Started after</dt>
-                <dd className="font-bold">{s(fluency.startDelayMs)}</dd>
+                <dd className="font-bold">{formatSeconds(fluency.startDelayMs)}</dd>
               </>
             )}
             {fluency.lettersPerSecond !== null && (

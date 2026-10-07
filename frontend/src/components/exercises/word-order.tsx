@@ -1,6 +1,7 @@
 "use client";
 
-// Build a sentence by tapping words from the word bank. Tap a placed word to remove it.
+// Word-order exercise: build a sentence by tapping words from the word bank.
+// Tapping a word that is already placed removes it again.
 import type { ExerciseComponentProps, WordOrderExercise } from "@/types/exercise";
 import { cn } from "@/lib/cn";
 import { ExerciseHeading } from "./exercise-heading";

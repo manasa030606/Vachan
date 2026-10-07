@@ -1,5 +1,6 @@
 "use client";
 
+// Small data-loading hook shared by the admin pages.
 import { useCallback, useEffect, useState } from "react";
 import { errorText } from "./admin-ui";
 

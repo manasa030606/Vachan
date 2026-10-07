@@ -13,6 +13,7 @@ type StepLanguageProps = {
   onChange: (code: LanguageCode) => void;
 };
 
+/** Onboarding step: choose the language to learn. */
 export function StepLanguage({ languages, isLoading, error, value, onChange }: StepLanguageProps) {
   return (
     <fieldset>

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Vachan API",
-    "description": "Phases 2–8 API (placement & gamification). Run the requests from top to bottom (folders 0 → 12) — each folder builds on the one before.\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
+    "description": "The complete Vachan REST API. Run the requests from top to bottom (folders 0 → 16) — each folder builds on the one before.\n\nLogin/Register automatically save the token into the collection variable `token`; every other request sends it as `Authorization: Bearer {{token}}` (collection-level auth).\n\nBefore you start: backend running (`npm run dev`), database migrated and seeded (`npm run db:migrate && npm run db:seed`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -3445,7 +3445,7 @@
       ]
     },
     {
-      "name": "12. RAG knowledge base (Phase 5)",
+      "name": "12. RAG knowledge base",
       "description": "Retrieval only — no chatbot, no LLM. Needs `npm run rag:index -w backend` first. Requires login (run 1. Auth → Login or Register first). The first search after the server starts loads the embedding model (a few seconds).",
       "item": [
         {
@@ -3845,7 +3845,7 @@
       ]
     },
     {
-      "name": "13. AI tutor (Phase 6)",
+      "name": "13. AI tutor",
       "description": "RAG-grounded tutor. Needs: `npm run rag:index -w backend` and an LLM key in backend/.env (GEMINI_API_KEY, or LLM_PROVIDER=groq + GROQ_API_KEY) — check with `npm run ai:check -w backend`. Log in first (folder 1). Rate limit: 6 tutor questions per learner per minute — if you get 429, wait a minute.",
       "item": [
         {
@@ -4381,7 +4381,7 @@
       ]
     },
     {
-      "name": "14. Speech — listening & speaking (Phase 7)",
+      "name": "14. Speech — listening & speaking",
       "description": "Text-to-speech, speech-to-text and the speaking exercise. **Audio uploads are multipart/form-data** with the file in the field `audio` (WAV). The sample files are in `postman/audio/`; in the Postman app either set *Settings → General → Working directory* to the `postman` folder, or click each `audio` field and choose the file again. Postman cannot record from a microphone — use the app for real speech, or save the TTS audio (Send and Download) and upload it. Needs GEMINI_API_KEY (check: `npm run speech:check -w backend`). Rate limit: 10 transcribe/evaluate requests per minute.",
       "item": [
         {
@@ -5078,7 +5078,7 @@
       ]
     },
     {
-      "name": "15. Conversation role-play (Phase 7)",
+      "name": "15. Conversation role-play",
       "description": "Scenario role-play with an AI partner grounded in course vocabulary + RAG notes (needs `npm run rag:index -w backend` and GEMINI_API_KEY). Rate limit: 8 starts/replies per minute.",
       "item": [
         {
@@ -5552,7 +5552,7 @@
       ]
     },
     {
-      "name": "16. Admin dashboard & analytics (Phase 8)",
+      "name": "16. Admin dashboard & analytics",
       "description": "Needs an ADMIN account: run `npm run admin:grant -w backend -- you@example.com`, then set the collection variables adminEmail and adminPassword. Without them every request here is skipped (the rest of the collection still passes).",
       "item": [
         {

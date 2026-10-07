@@ -1,13 +1,10 @@
 "use client";
 
-// Runs a lesson (or a mistake review): intro → exercises (check / feedback / continue) → complete.
-//
-//  - "Start" calls POST /api/lessons/:id/start. The server answers with the exercises already
-//    done in this run, so a lesson left half-way resumes where the learner stopped.
-//  - "Check" sends the answer to POST /api/exercises/:id/attempt; the server decides if it is
-//    right, saves the attempt and returns feedback (correct answer + explanation).
-//  - Review mode sends answers with mode "review" and costs no hearts.
-// The lesson rules live in lessonReducer.
+// Runs a lesson (or a mistake review): intro, then the exercises, then the complete screen.
+// "Start" calls POST /api/lessons/:id/start, which returns the exercises already done, so a
+// half-finished lesson resumes where the learner stopped. "Check" sends the answer to
+// POST /api/exercises/:id/attempt; the server marks it, saves it and returns feedback.
+// Review mode costs no hearts. The step-by-step lesson rules live in lessonReducer.
 import { useCallback, useEffect, useReducer, useState } from "react";
 import type { ExerciseAnswer, Lesson } from "@/types/exercise";
 import { ExerciseRenderer } from "@/components/exercises/exercise-renderer";
@@ -44,6 +41,7 @@ export type RunRewards = {
   goalJustCompleted: boolean;
 };
 
+/** Rewards at the start of a run, before any answer is checked. */
 const NO_REWARDS: RunRewards = {
   xpEarned: 0,
   badges: [],
@@ -52,6 +50,7 @@ const NO_REWARDS: RunRewards = {
   goalJustCompleted: false,
 };
 
+/** Plays one lesson or review from start to finish. */
 export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   const isReview = lesson.mode === "review";
   const [state, dispatch] = useReducer(
@@ -66,7 +65,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   const [startError, setStartError] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [checkError, setCheckError] = useState<string | null>(null);
-  /** Latest lesson progress from the server — shown on the complete screen. */
+  /** Latest lesson progress from the server, shown on the complete screen. */
   const [serverProgress, setServerProgress] = useState<AttemptResultDto["lessonProgress"] | null>(
     null,
   );
@@ -74,7 +73,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
   const [resumed, setResumed] = useState(false);
   const [runRewards, setRunRewards] = useState<RunRewards>(NO_REWARDS);
   const [nextHeartAt, setNextHeartAt] = useState<string | null>(null);
-  /** Exercise the learner opened the AI tutor for (Phase 6), or null. */
+  /** Exercise the learner opened the AI tutor for, or null. */
   const [tutorExerciseId, setTutorExerciseId] = useState<string | null>(null);
 
   const exercise = state.queue[state.position];
@@ -133,6 +132,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
         setFirstCompletion(true);
       }
       setNextHeartAt(rewards.hearts.nextHeartAt);
+      // Add this answer's rewards to the running totals for the complete screen.
       setRunRewards((previous) => ({
         xpEarned: previous.xpEarned + rewards.xpEarned,
         badges: [...previous.badges, ...rewards.newAchievements],
@@ -150,6 +150,7 @@ export function LessonPlayer({ lesson, showRomanization }: LessonPlayerProps) {
       });
     } catch (error) {
       if (error instanceof ApiError && error.code === "OUT_OF_HEARTS") {
+        // The server sends when the next heart comes back in the error details.
         const details = error.details as unknown as { nextHeartAt?: string | null } | undefined;
         setNextHeartAt(details?.nextHeartAt ?? null);
         dispatch({ type: "OUT_OF_HEARTS" });

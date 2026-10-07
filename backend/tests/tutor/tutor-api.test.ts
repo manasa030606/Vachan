@@ -1,9 +1,7 @@
-// API test for the AI tutor (Phase 6).
-// Runs the REAL pipeline (validation → context → RAG retrieval → prompt → provider → grounding
-// checks → database) with the offline test double instead of a paid/free AI, so it needs no key:
-//   npm run test:tutor -w backend      (sets LLM_PROVIDER=mock)
-// Needs: migrated + seeded database and `npm run rag:index -w backend`.
-// The answers of the real model are checked by `npm run tutor:eval` (needs the API key).
+// API tests for the AI tutor. Runs the real pipeline (retrieval, prompt, grounding checks,
+// database) with the offline mock model, so no API key is needed.
+// Needs a migrated + seeded database and rag:index. The real model is checked by tutor:eval.
+// Run with:  npm run test:tutor -w backend   (sets LLM_PROVIDER=mock)
 import assert from "node:assert/strict";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -13,7 +11,7 @@ import { prisma } from "../../src/lib/prisma.ts";
 
 let server: Server;
 let base = "";
-const tokens: Record<string, string> = {};
+const tokens: Record<string, string> = {}; // learner name ("asha" / "ravi") → login token
 const stamp = Date.now();
 
 type Json = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -33,9 +31,12 @@ async function call(method: string, path: string, body?: unknown, who: string | 
     body: (await response.json()) as Json,
   };
 }
+/** Asks the tutor a question as the given learner. */
 const ask = (body: Json, who = "asha") => call("POST", "/api/ai/tutor", body, who);
+// The response holds [learner question, tutor answer]; this returns the answer.
 const answerOf = (body: Json) => body.messages[1] as Json;
 
+/** Registers a Telugu learner with the given self-assessed level. */
 async function register(who: string, selfAssessment: string) {
   const res = await call(
     "POST",

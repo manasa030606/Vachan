@@ -1,4 +1,4 @@
-// Bottom bar of the lesson: "Check" button, then correct/incorrect feedback + "Continue".
+// Bottom bar of the lesson: the "Check" button, then correct/incorrect feedback and "Continue".
 import { CircleCheck, CircleX, MessageCircleQuestion } from "lucide-react";
 import type { AnswerResult } from "@/types/exercise";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ type LessonFooterProps = {
 
   onCheck: () => void;
   onContinue: () => void;
-  /** Phase 6: opens the AI tutor for this exercise (shown after a wrong answer). */
+  /** Opens the AI tutor for this exercise (shown after a wrong answer). */
   onAskTutor?: () => void;
 };
 
@@ -34,7 +34,7 @@ export function LessonFooter({
   onContinue,
   onAskTutor,
 }: LessonFooterProps) {
-  // Pick an encouraging message based on the answer length (stable, not random).
+  // Pick the praise from the answer length, so it does not change on every re-render.
   const praise = CORRECT_MESSAGES[correctAnswerText.length % CORRECT_MESSAGES.length];
 
   return (

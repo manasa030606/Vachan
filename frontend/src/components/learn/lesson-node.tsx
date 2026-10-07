@@ -1,6 +1,6 @@
 // One lesson on the learning path, drawn as a kolam-style diamond tile.
-// States: completed (filled + check) · current (started: bigger, glowing, "Continue")
-//         available (unlocked, not started: bigger, glowing, "Start") · locked (grey + lock).
+// Completed lessons show a check, locked ones a grey lock. The lesson to do next
+// ("current" if started, "available" if not) is bigger and has a Continue/Start bubble.
 import Link from "next/link";
 import {
   BookOpenText,
@@ -48,6 +48,14 @@ export const UNIT_COLORS: Record<
   },
 };
 
+/** Read out by screen readers after the lesson title. */
+const STATUS_TEXT: Record<LessonSummary["status"], string> = {
+  completed: "completed, practise again",
+  current: "in progress, continue",
+  available: "unlocked, start now",
+  locked: "locked",
+};
+
 type LessonNodeProps = {
   lesson: LessonSummary;
   lessonNumber: number;
@@ -56,21 +64,20 @@ type LessonNodeProps = {
   offsetX: number;
 };
 
+/** A single lesson tile; locked lessons are not links. */
 export function LessonNode({ lesson, lessonNumber, color, offsetX }: LessonNodeProps) {
   const colors = UNIT_COLORS[color];
   // "Open" lessons (started or ready to start) are highlighted on the path.
   const isCurrent = lesson.status === "current" || lesson.status === "available";
   const isLocked = lesson.status === "locked";
-  const Icon = lesson.status === "completed" ? Check : isLocked ? Lock : ICONS[lesson.icon];
-  const statusText = {
-    completed: "completed, practise again",
-    current: "in progress, continue",
-    available: "unlocked, start now",
-    locked: "locked",
-  }[lesson.status];
+  let Icon = ICONS[lesson.icon];
+  if (lesson.status === "completed") Icon = Check;
+  else if (isLocked) Icon = Lock;
+  const statusText = STATUS_TEXT[lesson.status];
   const bubble = lesson.status === "current" ? "Continue" : "Start";
   const placedOutText = lesson.placedOut ? " (unlocked by the placement test)" : "";
 
+  // The same tile is wrapped in a Link, or in a plain span when the lesson is locked.
   const tile = (
     <span className="relative flex flex-col items-center">
       {isCurrent && (

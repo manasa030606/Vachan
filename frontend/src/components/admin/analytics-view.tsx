@@ -1,7 +1,7 @@
 "use client";
 
 // /admin — learning analytics. Everything is an aggregate count or percentage: no names,
-// e-mails or per-learner rows are sent to the browser (see analytics.service.ts).
+// e-mails or per-learner rows are sent to the browser (see backend/src/services/admin/analytics.service.ts).
 import { Loader2, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -9,8 +9,13 @@ import { admin } from "@/lib/api/admin";
 import { BarList, Field, Notice, Select, StatTile } from "./admin-ui";
 import { useLoad } from "./use-load";
 
+/** 42 → "42%", missing → "–" */
 const pct = (value: number | null) => (value === null ? "–" : `${value}%`);
-const nice = (value: string) => value.toLowerCase().replace(/_/g, " ");
+/** 1500 ms → "1.5 s", missing → "–" */
+const seconds = (ms: number | null) => (ms === null ? "–" : `${(ms / 1000).toFixed(1)} s`);
+/** "MULTIPLE_CHOICE" → "multiple choice" */
+const readable = (value: string) => value.toLowerCase().replace(/_/g, " ");
+/** "2026-10-07" → "7 Oct" in the admin's locale */
 const shortDate = (iso: string) =>
   new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
@@ -126,7 +131,7 @@ export function AnalyticsView() {
                 max={100}
                 format={(v) => `${v}%`}
                 rows={data.accuracy.byExerciseType.map((t) => ({
-                  label: nice(t.type),
+                  label: readable(t.type),
                   value: t.percentCorrect,
                   note: `${t.answers} answers`,
                 }))}
@@ -225,7 +230,7 @@ export function AnalyticsView() {
                         <td className="py-2 pr-3">
                           <span className="font-bold text-ink">{m.prompt || "(no prompt)"}</span>
                           <span className="block text-xs text-slate-500">
-                            {nice(m.type)} · {m.language}
+                            {readable(m.type)} · {m.language}
                           </span>
                         </td>
                         <td className="py-2 pr-3 text-slate-700">{m.lesson}</td>
@@ -250,18 +255,14 @@ export function AnalyticsView() {
               />
               <div className="grid grid-cols-2 gap-3">
                 <StatTile label="Questions" value={data.tutor.questions} />
-                <StatTile
-                  label="Average answer time"
-                  value={
-                    data.tutor.averageAnswerMs === null
-                      ? "–"
-                      : `${(data.tutor.averageAnswerMs / 1000).toFixed(1)} s`
-                  }
-                />
+                <StatTile label="Average answer time" value={seconds(data.tutor.averageAnswerMs)} />
               </div>
               <BarList
                 title="Answers by outcome"
-                rows={data.tutor.byStatus.map((s) => ({ label: nice(s.status), value: s.answers }))}
+                rows={data.tutor.byStatus.map((s) => ({
+                  label: readable(s.status),
+                  value: s.answers,
+                }))}
               />
             </Card>
             <Card className="space-y-4">
@@ -274,17 +275,13 @@ export function AnalyticsView() {
                 <StatTile label="Recordings" value={data.speaking.attempts} />
                 <StatTile
                   label="Average content score"
-                  value={
-                    data.speaking.averageContentScore === null
-                      ? "–"
-                      : `${data.speaking.averageContentScore}%`
-                  }
+                  value={pct(data.speaking.averageContentScore)}
                 />
               </div>
               <BarList
                 title="Recordings by result"
                 rows={data.speaking.byVerdict.map((v) => ({
-                  label: nice(v.verdict),
+                  label: readable(v.verdict),
                   value: v.attempts,
                 }))}
               />

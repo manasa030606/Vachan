@@ -44,22 +44,21 @@ export function errorHandler(
 
   // 2b. Upload problems (multer): file too large, wrong field name …
   if (error instanceof multer.MulterError) {
-    const tooLarge = error.code === "LIMIT_FILE_SIZE";
-    res.status(tooLarge ? 413 : 400).json({
-      error: tooLarge
-        ? {
-            code: "AUDIO_TOO_LARGE",
-            message:
-              "The recording is too large (max 2 MB ≈ 60 seconds of WAV). Record a shorter phrase.",
-          }
-        : {
-            code: "BAD_UPLOAD",
-            message:
-              error.code === "LIMIT_UNEXPECTED_FILE"
-                ? 'Send exactly one file, in the form field named "audio".'
-                : `Upload problem: ${error.message}`,
-          },
-    });
+    if (error.code === "LIMIT_FILE_SIZE") {
+      res.status(413).json({
+        error: {
+          code: "AUDIO_TOO_LARGE",
+          message:
+            "The recording is too large (max 2 MB ≈ 60 seconds of WAV). Record a shorter phrase.",
+        },
+      });
+      return;
+    }
+    const message =
+      error.code === "LIMIT_UNEXPECTED_FILE"
+        ? 'Send exactly one file, in the form field named "audio".'
+        : `Upload problem: ${error.message}`;
+    res.status(400).json({ error: { code: "BAD_UPLOAD", message } });
     return;
   }
 
@@ -86,17 +85,11 @@ export function errorHandler(
     return;
   }
 
-  // 5. Anything else is a bug or an outage → 500
+  // 5. Anything else is a bug or an outage → 500. Error details are hidden in production.
   console.error(error);
-  res.status(500).json({
-    error: {
-      code: "INTERNAL_SERVER_ERROR",
-      message:
-        env.NODE_ENV === "production"
-          ? "Something went wrong"
-          : error instanceof Error
-            ? error.message
-            : "Unknown error",
-    },
-  });
+  let message = "Something went wrong";
+  if (env.NODE_ENV !== "production") {
+    message = error instanceof Error ? error.message : "Unknown error";
+  }
+  res.status(500).json({ error: { code: "INTERNAL_SERVER_ERROR", message } });
 }

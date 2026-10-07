@@ -1,7 +1,8 @@
 "use client";
 
-// /speak — Phase 7: Listen (listening comprehension), Speak (speaking exercise) and
-// Conversation (role-play) for the learner's current language. ?tab=listen|speak|conversation
+// The /speak page with three tabs: Listen (listening comprehension), Speak (say a phrase)
+// and Conversation (role-play), for the learner's current language.
+// The open tab is kept in the URL (?tab=listen|speak|conversation) so it survives a reload.
 import { Headphones, Info, MessagesSquare, Mic } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -36,13 +37,15 @@ const TABS = [
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
+/** The Listen & speak page. */
 export function SpeakView() {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const { languageCode, showRomanization } = useLearnerPreferences();
   const requested = params.get("tab");
-  const tab: TabId = TABS.some((t) => t.id === requested) ? (requested as TabId) : "listen";
+  const tab: TabId = TABS.some((item) => item.id === requested) ? (requested as TabId) : "listen";
+  // Which speech providers the server has set up (real, mock or missing).
   const status = useApi(async () => (await getSpeechStatus()).status, "speech-status");
 
   const select = (id: TabId) => router.replace(`${pathname}?tab=${id}`, { scroll: false });
@@ -52,7 +55,7 @@ export function SpeakView() {
     <div className="space-y-5">
       <div>
         <h1 className="text-3xl font-extrabold text-ink">Listen &amp; speak</h1>
-        <p className="mt-1 text-slate-600">{TABS.find((t) => t.id === tab)?.hint}</p>
+        <p className="mt-1 text-slate-600">{TABS.find((item) => item.id === tab)?.hint}</p>
       </div>
 
       <div
@@ -99,8 +102,8 @@ export function SpeakView() {
         <Card role="alert" className="flex gap-3 border-marigold-200 bg-marigold-50">
           <Info aria-hidden="true" className="size-6 shrink-0 text-marigold-700" />
           <p className="text-sm text-slate-700">
-            Speech-to-text isn&apos;t set up on this server yet (missing API key — see
-            docs/SPEECH.md). You can still type in conversations.
+            Speech-to-text isn&apos;t set up on this server yet (missing API key — see docs/AI.md).
+            You can still type in conversations.
           </p>
         </Card>
       )}

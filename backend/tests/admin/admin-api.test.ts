@@ -1,9 +1,7 @@
-// API tests for the admin dashboard (Phase 8): authorization, content CRUD + publish, exercise
-// validation, delete guards, vocabulary, knowledge-base management + safe re-indexing,
-// analytics (aggregates only) and the audit log.
-//   npm run test:admin -w backend
-// Needs: migrated + seeded database and `npm run rag:index -w backend` (the embedding model is
-// used to index a test note, like the RAG tests).
+// API tests for the admin dashboard: access control, content editing and publishing,
+// vocabulary, knowledge-base notes and re-indexing, analytics and the audit log.
+// Needs a migrated + seeded database and rag:index (a test note is embedded and indexed).
+// Run with:  npm run test:admin -w backend
 import assert from "node:assert/strict";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -14,11 +12,13 @@ import { prisma } from "../../src/lib/prisma.ts";
 let server: Server;
 let base = "";
 const stamp = Date.now();
-const tokens: Record<string, string> = {};
+const tokens: Record<string, string> = {}; // "admin" / "learner" → login token
+// Content created by the tests, removed again in after().
 const created: { lessonId?: string; vocabularyId?: string; knowledgeId?: string } = {};
 
 type Json = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
+/** Calls the API as "admin", "learner", or anonymously (who = null). */
 async function call(method: string, path: string, body?: unknown, who: string | null = "admin") {
   const response = await fetch(`${base}${path}`, {
     method,
@@ -31,6 +31,7 @@ async function call(method: string, path: string, body?: unknown, who: string | 
   return { status: response.status, body: (await response.json()) as Json };
 }
 
+/** Registers a user, finishes onboarding and stores their token under `who`. */
 async function register(who: string) {
   const res = await call(
     "POST",
@@ -183,8 +184,8 @@ describe("content management", () => {
     const refused = await call("DELETE", "/admin/lessons/te-u1-l1");
     assert.equal(refused.status, 409);
     assert.equal(refused.body.error.code, "HAS_LEARNER_DATA");
-    const placement = await call("DELETE", "/admin/exercises/te-u1-l1-e1");
-    assert.equal(placement.status, 409);
+    const exercise = await call("DELETE", "/admin/exercises/te-u1-l1-e1");
+    assert.equal(exercise.status, 409);
   });
 
   it("vocabulary: create, duplicate → 409, edit, delete", async () => {
@@ -236,7 +237,8 @@ describe("content management", () => {
 describe("knowledge-base management (RAG)", () => {
   const body =
     "## Platform — ప్లాట్‌ఫాం (platform)\n\nTo ask which platform a train leaves from in Telugu, say ఈ రైలు ఏ ప్లాట్‌ఫాం? (ee railu e platform? — which platform is this train?).\n\n## Waiting room\n\n<!-- level: beginner -->\n\nThe waiting room at a Telugu railway station is simply called వెయిటింగ్ రూమ్ (waiting room).";
-  const enc = () => encodeURIComponent(created.knowledgeId!);
+  const noteId = () => encodeURIComponent(created.knowledgeId!);
+  // Ids of the chunks a learner's search for the note's topic returns.
   const search = async () =>
     (
       await call(
@@ -282,26 +284,28 @@ describe("knowledge-base management (RAG)", () => {
   });
 
   it("publish → indexed and found by search; unpublish → gone immediately", async () => {
-    const publish = await call("POST", `/admin/knowledge/${enc()}/publish`, { published: true });
+    const publish = await call("POST", `/admin/knowledge/${noteId()}/publish`, { published: true });
     assert.equal(publish.status, 200, JSON.stringify(publish.body));
     assert.equal(publish.body.chunks, 2);
     assert.ok((await search())[0]!.startsWith(created.knowledgeId!));
 
-    const unpublish = await call("POST", `/admin/knowledge/${enc()}/publish`, { published: false });
+    const unpublish = await call("POST", `/admin/knowledge/${noteId()}/publish`, {
+      published: false,
+    });
     assert.equal(unpublish.body.status, "DRAFT");
     assert.ok(!(await search()).some((id: string) => id.startsWith(created.knowledgeId!)));
   });
 
   it("editing a published note keeps the old chunks until re-index", async () => {
-    await call("POST", `/admin/knowledge/${enc()}/publish`, { published: true });
-    const edit = await call("PATCH", `/admin/knowledge/${enc()}`, {
+    await call("POST", `/admin/knowledge/${noteId()}/publish`, { published: true });
+    const edit = await call("PATCH", `/admin/knowledge/${noteId()}`, {
       body: `${body}\n\n## Ticket counter\n\nThe ticket counter is the టికెట్ కౌంటర్ (ticket counter).`,
     });
     assert.equal(edit.body.document.needsReindex, true);
     assert.equal(edit.body.document.chunkCount, 2);
-    const reindex = await call("POST", `/admin/knowledge/${enc()}/reindex`);
+    const reindex = await call("POST", `/admin/knowledge/${noteId()}/reindex`);
     assert.equal(reindex.body.chunks, 3);
-    const doc = await call("GET", `/admin/knowledge/${enc()}`);
+    const doc = await call("GET", `/admin/knowledge/${noteId()}`);
     assert.equal(doc.body.document.needsReindex, false);
     assert.equal(doc.body.document.chunks.length, 3);
   });
@@ -320,7 +324,7 @@ describe("knowledge-base management (RAG)", () => {
   });
 
   it("deletes an admin note", async () => {
-    assert.equal((await call("DELETE", `/admin/knowledge/${enc()}`)).status, 200);
+    assert.equal((await call("DELETE", `/admin/knowledge/${noteId()}`)).status, 200);
     created.knowledgeId = undefined;
   });
 });

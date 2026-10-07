@@ -1,18 +1,12 @@
-// Phase 8 — managing the RAG knowledge base from the admin dashboard.
+// Managing the RAG knowledge base from the admin dashboard. Documents come from three places:
+//   FILE   backend/knowledge-base/*.md (text edited in git; only publish/unpublish here)
+//   COURSE built from the course vocabulary (updated by re-indexing)
+//   ADMIN  written in the dashboard (markdown sections + metadata)
 //
-//   origin FILE   backend/knowledge-base/*.md → text edited in git; publish/unpublish here
-//   origin COURSE built from the course vocabulary → updated by re-indexing
-//   origin ADMIN  written here: language, level, topic, type, skill, source + markdown sections
-//
-// SAFE RE-INDEXING
-//   1. validate: the text is parsed with the same rules as the files (no "## " section → 400)
-//   2. preview: see the chunks it will produce, without embedding anything
-//   3. index ONE document; the old chunks stay searchable until the new ones are saved in one
-//      transaction; failures are stored in lastIndexError and the old chunks are kept
-//   4. one indexing job at a time (409 INDEX_BUSY)
-//   5. unpublish = chunks removed immediately (works even where the embedding model is off)
-// On servers with RAG search off (Render free), publishing marks the document "needs re-index"
-// and you run `npm run rag:index -w backend` against that database from your computer.
+// Admin text is validated with the same parser as the files, and can be previewed as chunks
+// before anything is embedded. Re-indexing one document keeps its old chunks searchable until
+// the new ones are saved. Unpublishing removes the chunks immediately. On a server with RAG
+// turned off, publishing only marks the document "needs re-index" (run rag:index locally).
 import { ragEnabled } from "../../config/env.ts";
 import { KnowledgeFormatError } from "../../rag/document-parser.ts";
 import {
@@ -48,6 +42,7 @@ export type KnowledgeInput = {
   body: string;
 };
 
+/** Turns RAG errors into API errors (400 bad text, 409 busy, 503 model unavailable). */
 function toHttp(error: unknown): never {
   if (error instanceof KnowledgeFormatError) {
     throw new HttpError(400, "INVALID_KNOWLEDGE_FORMAT", error.message.replace(/^[^:]+: /, ""));

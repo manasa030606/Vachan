@@ -1,3 +1,4 @@
+// /register — create a new learner account.
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";

@@ -108,7 +108,7 @@ describe("text helpers", () => {
   });
 });
 
-describe("Phase 3 checking", () => {
+describe("letters, Unicode and answer text", () => {
   const letterChoice = {
     type: "CHARACTER_SOUND" as const,
     options: [

@@ -1,12 +1,10 @@
-// ROLE-PLAY CONVERSATION (Phase 7):
-//
-//   start:  scenario + learner (language, level) ─► course vocabulary for the scenario
-//           ─► RAG notes for the scenario ─► prompt ─► LLM ─► partner's first line
-//   reply:  learner line (typed, or spoken → transcript) ─► safety check ─► RAG notes for the
-//           scenario + the line ─► prompt with the conversation so far ─► LLM ─► checks
-//           ─► partner's answer + feedback on the learner's line + reply suggestions
-//   end:    statistics (counted, no AI) + AI review (grounded in the conversation and notes)
-//
+// Role-play conversation practice with an AI partner.
+//   1. Start: load the course vocabulary and RAG notes for the scenario, and the LLM writes
+//      the partner's first line.
+//   2. Reply: the learner's line (typed, or a voice transcript) gets a safety check, then the
+//      LLM answers in character using the notes + conversation so far, with feedback on the
+//      learner's line and suggested replies.
+//   3. End: statistics (counted, no AI) + a short AI review grounded in the conversation and notes.
 // Each line is saved (ConversationSession / ConversationTurn) with the notes it was based on.
 import {
   CONVERSATION_CONFIG,
@@ -55,7 +53,7 @@ const toScenarioId = (value: ConversationScenario) => value.toLowerCase() as Sce
 const toLevelEnum = (level: KnowledgeLevelName) =>
   level.toUpperCase() as "BEGINNER" | "ELEMENTARY" | "INTERMEDIATE";
 
-// ── Availability & scenarios ────────────────────────────────────
+// Availability and scenarios
 
 export function getConversationAvailability() {
   const llm = getLlmStatus();
@@ -63,7 +61,7 @@ export function getConversationAvailability() {
     available: llm.configured,
     reason: llm.configured
       ? null
-      : `Conversation practice needs ${llm.keyVariable} in backend/.env (see docs/SPEECH.md).`,
+      : `Conversation practice needs ${llm.keyVariable} in backend/.env (see docs/AI.md).`,
     /** false on servers with RAG off: the partner then uses only the course vocabulary */
     notesAvailable: ragEnabled,
     provider: llm.provider,
@@ -109,7 +107,7 @@ export async function listScenarios(userId: string, language?: LanguageCode) {
   };
 }
 
-// ── RAG notes ───────────────────────────────────────────────────
+// RAG notes
 
 type Notes = {
   chunks: NoteChunk[];
@@ -177,8 +175,9 @@ async function retrieveNotes(
   }
 }
 
-// ── LLM call with checks ────────────────────────────────────────
+// LLM call with checks
 
+/** The configured LLM, or a clear HTTP error when it isn't set up. */
 function provider(): LlmProvider {
   try {
     return getLlmProvider();
@@ -194,6 +193,7 @@ async function askPartner(input: {
   noteCount: number;
   expectFeedback: boolean;
 }): Promise<{ parsed: PartnerReply; model: string }> {
+  // An unreadable reply (bad JSON, wrong script) gets one retry before we give up.
   let lastError: unknown = null;
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
@@ -226,7 +226,7 @@ async function askPartner(input: {
   );
 }
 
-// ── DTOs ────────────────────────────────────────────────────────
+// DTOs and helpers
 
 type SessionRow = Prisma.ConversationSessionGetPayload<{ include: { language: true } }>;
 type TurnRow = Prisma.ConversationTurnGetPayload<object>;
@@ -305,7 +305,7 @@ const groundingText = (
     ...turns.map((t) => t.text),
   ].join("\n");
 
-// ── Start ───────────────────────────────────────────────────────
+// Start
 
 export async function startConversation(
   userId: string,
@@ -367,7 +367,7 @@ export async function startConversation(
   return { session: toSessionDto(session), turns: session.turns.map(toTurnDto) };
 }
 
-// ── Reply ───────────────────────────────────────────────────────
+// Reply
 
 export async function replyToConversation(
   userId: string,
@@ -406,7 +406,7 @@ export async function replyToConversation(
     audio: input.inputMode === "voice" && input.audio ? input.audio : undefined,
   };
 
-  // 1. Prompt-injection attempt → no LLM call; the partner repeats the last line.
+  // Prompt-injection attempt: no LLM call, the partner just repeats its last line.
   const injection = detectInjection(text);
   if (injection) {
     console.warn(`[conversation] refused (${injection}) user=${userId}`);
@@ -431,7 +431,7 @@ export async function replyToConversation(
     });
   }
 
-  // 2. Notes + vocabulary + conversation so far → partner's answer.
+  // Normal reply: notes + vocabulary + conversation so far go to the LLM.
   const llm = provider();
   const [vocabulary, notes] = await Promise.all([
     loadVocabulary(context.languageCode, scenario),
@@ -499,7 +499,7 @@ async function saveExchange(
     const learnerRow = await tx.conversationTurn.create({
       data: { ...learner, feedback: result.learnerFeedback },
     });
-    // 1 ms later, so the order by createdAt is always learner → partner.
+    // 1 ms later, so sorting by createdAt always gives learner, then partner.
     const partnerRow = await tx.conversationTurn.create({
       data: {
         sessionId,
@@ -521,7 +521,7 @@ async function saveExchange(
   };
 }
 
-// ── End & summary ───────────────────────────────────────────────
+// End and summary
 
 type Feedback = { understood?: boolean; correction?: { text: string } | null };
 
@@ -539,7 +539,7 @@ export async function endConversation(userId: string, sessionId: string) {
   });
   const vocabulary = await loadVocabulary(context.languageCode, scenario);
 
-  // Statistics — counted, no AI.
+  // Statistics: counted, no AI.
   const learnerText = normalizeText(learnerTurns.map((t) => t.text).join(" "));
   const feedback = learnerTurns.map((t) => (t.feedback ?? {}) as Feedback);
   const endedAt = new Date();
@@ -558,7 +558,7 @@ export async function endConversation(userId: string, sessionId: string) {
     durationSeconds: Math.round((endedAt.getTime() - session.startedAt.getTime()) / 1000),
   };
 
-  // AI review — only when the learner said something; never blocks ending the session.
+  // AI review: only when the learner said something, and a failure never blocks ending the session.
   let review: SessionSummaryAi | null = null;
   let reviewNote: string | null = null;
   if (learnerTurns.length === 0) {
@@ -603,7 +603,7 @@ export async function endConversation(userId: string, sessionId: string) {
   return { session: toSessionDto(updated), turns: updated.turns.map(toTurnDto) };
 }
 
-// ── History ─────────────────────────────────────────────────────
+// History
 
 export async function listConversationSessions(userId: string, language?: LanguageCode) {
   const sessions = await prisma.conversationSession.findMany({

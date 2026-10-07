@@ -1,8 +1,7 @@
-// npm run speech:prefetch -w backend -- --language te   [--delay 3000]
-//
 // Generates (and caches in the AudioClip table) the audio for every course word and phrase of a
 // language, so the demo plays instantly and doesn't depend on the TTS quota at that moment.
-// Already-cached phrases are skipped for free. Stops politely when the free quota runs out.
+// Already-cached phrases cost nothing. Stops politely when the free quota runs out.
+// Run: npm run speech:prefetch -w backend -- --language te   [--delay 3000]
 import { parseArgs } from "node:util";
 import { HttpError } from "../../lib/http-error.ts";
 import { prisma } from "../../lib/prisma.ts";

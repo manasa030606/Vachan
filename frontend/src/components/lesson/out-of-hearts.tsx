@@ -2,7 +2,7 @@ import { HeartCrack } from "lucide-react";
 import { nextHeartLabel } from "@/components/gamification/hearts-card";
 import { ButtonLink } from "@/components/ui/button";
 
-/** Shown when the learner runs out of hearts during a lesson (rules: config/gamification.ts). */
+/** Shown when the learner runs out of hearts during a lesson (the heart rules are in backend/src/config/gamification.ts). */
 export function OutOfHearts({ nextHeartAt }: { nextHeartAt: string | null }) {
   const next = nextHeartLabel(nextHeartAt);
   return (

@@ -1,4 +1,5 @@
-// Admin API (Phase 8) — only works for accounts with the ADMIN role (checked by the server).
+// Types and calls for the admin dashboard API (/api/admin/...).
+// Only works for accounts with the ADMIN role; the server checks this on every request.
 import { apiFetch } from "./client";
 
 export type AdminLanguage = {
@@ -13,6 +14,7 @@ export type AdminLanguage = {
   counts: { courses: number; vocabulary: number; learners: number; knowledgeDocuments: number };
 };
 
+// The course → unit → lesson tree shown on the Content page.
 export type TreeLesson = {
   id: string;
   title: string;
@@ -45,6 +47,7 @@ export type ContentTree = {
   courses: TreeCourse[];
 };
 
+// Allowed values for dropdowns (they match the enums in the Prisma schema).
 export const LESSON_KINDS = ["SCRIPT", "VOCABULARY", "PHRASES", "CHECKPOINT"] as const;
 export type LessonKind = (typeof LESSON_KINDS)[number];
 export const LEARNING_STAGES = [
@@ -69,6 +72,7 @@ export const EXERCISE_TYPES = [
 ] as const;
 export type ExerciseType = (typeof EXERCISE_TYPES)[number];
 
+/** One answer row of an exercise. Which fields matter depends on the exercise type. */
 export type AdminOption = {
   id?: string;
   text: string;
@@ -92,6 +96,7 @@ export type AdminExercise = {
   attempts: number;
   usedInPlacement: boolean;
 };
+/** What the exercise form sends: the exercise without server-managed fields. */
 export type ExerciseBody = Omit<AdminExercise, "id" | "sortOrder" | "attempts" | "usedInPlacement">;
 
 export type AdminVocabulary = {
@@ -118,6 +123,7 @@ export type AdminLesson = {
   exercises: AdminExercise[];
 };
 
+// Tag values for knowledge-base notes (used by the AI tutor's search).
 export const KNOWLEDGE_LEVELS = ["beginner", "elementary", "intermediate"] as const;
 export const KNOWLEDGE_TYPES = [
   "alphabet",
@@ -184,6 +190,7 @@ export type KnowledgeInput = {
   body: string;
 };
 
+/** Response of GET /admin/analytics (all numbers are aggregated, no personal data). */
 export type Analytics = {
   window: { days: number; since: string; language: string | null };
   privacy: string;
@@ -262,10 +269,13 @@ export type AuditEntry = {
   admin: string;
 };
 
+// Small helpers that keep the calls below on one line each.
 const json = (method: "POST" | "PATCH" | "PUT" | "DELETE", body?: unknown) => ({ method, body });
 const enc = encodeURIComponent;
+/** `?force=true` tells the server to delete even when learners have progress on the item. */
 const forceQuery = (force?: boolean) => (force ? "?force=true" : "");
 
+/** Every admin endpoint, grouped by dashboard page. */
 export const admin = {
   languages: () => apiFetch<{ languages: AdminLanguage[] }>("/admin/languages"),
   createLanguage: (body: Omit<AdminLanguage, "id" | "isActive" | "counts" | "sortOrder">) =>

@@ -1,6 +1,6 @@
-// npm run ai:check -w backend
-// Verifies the AI configuration WITHOUT printing the key: provider, model, key present, one tiny
-// test call. Exit code 1 if something is wrong (with the fix).
+// Checks the AI tutor setup without printing the key: provider, model, key present, and one tiny
+// test call. Exits with code 1 (and a hint on how to fix it) if something is wrong.
+// Run: npm run ai:check -w backend   (add -- --models to list the Gemini models your key can use)
 import { env, ragEnabled } from "../../config/env.ts";
 import { TUTOR_CONFIG } from "../../config/tutor.ts";
 import { getLlmProvider, getLlmStatus } from "../llm/index.ts";
@@ -8,12 +8,26 @@ import { LlmError } from "../llm/types.ts";
 
 const status = getLlmStatus();
 const info = TUTOR_CONFIG.providers[status.provider];
-const key =
-  status.provider === "gemini"
-    ? env.GEMINI_API_KEY
-    : status.provider === "groq"
-      ? env.GROQ_API_KEY
-      : undefined;
+let key: string | undefined;
+if (status.provider === "gemini") key = env.GEMINI_API_KEY;
+else if (status.provider === "groq") key = env.GROQ_API_KEY;
+
+/** What to do for each kind of failure. */
+const FIX_HINTS: Record<LlmError["code"], string> = {
+  LLM_NOT_CONFIGURED: "Add the key to backend/.env (see docs/SETUP.md).",
+  LLM_AUTH_FAILED:
+    "The key is wrong or revoked. Create a new one and paste it again (no quotes or spaces).",
+  LLM_RATE_LIMITED: "Free quota reached — wait a minute (or until tomorrow for the daily quota).",
+  LLM_MODEL_NOT_FOUND:
+    "The model name is not available for your key. Remove LLM_MODEL or set a current model name.",
+  LLM_TIMEOUT:
+    "No answer in time. Usually the free model is overloaded (it hangs instead of saying 503), rarely your internet. Try again in a few minutes, try another model for one run (LLM_MODEL=<name> npm run ai:check -w backend), or set LLM_FALLBACK_MODEL. List models: npm run ai:check -w backend -- --models",
+  LLM_BLOCKED: "The provider blocked the test prompt — try again.",
+  LLM_UNAVAILABLE:
+    "The provider is overloaded right now (free tier). Try again in a few minutes, or set LLM_FALLBACK_MODEL (see: npm run ai:check -w backend -- --models).",
+  LLM_BAD_REQUEST: "The provider rejected the request — check LLM_MODEL.",
+  LLM_FAILED: "See the message above.",
+};
 
 /** Lists the Gemini models this key can use (npm run ai:check -w backend -- --models). */
 async function listModels() {
@@ -105,25 +119,7 @@ try {
   console.log(`   Test call       ❌ ${message}`);
   if (error instanceof LlmError && error.code === "LLM_MODEL_NOT_FOUND" && !wantsModels)
     await listModels();
-  const hint =
-    error instanceof LlmError
-      ? {
-          LLM_NOT_CONFIGURED: "Add the key to backend/.env (see docs/AI_TUTOR.md → Setup).",
-          LLM_AUTH_FAILED:
-            "The key is wrong or revoked. Create a new one and paste it again (no quotes or spaces).",
-          LLM_RATE_LIMITED:
-            "Free quota reached — wait a minute (or until tomorrow for the daily quota).",
-          LLM_MODEL_NOT_FOUND:
-            "The model name is not available for your key. Remove LLM_MODEL or set a current model name.",
-          LLM_TIMEOUT:
-            "No answer in time. Usually the free model is overloaded (it hangs instead of saying 503), rarely your internet. Try again in a few minutes, try another model for one run (LLM_MODEL=<name> npm run ai:check -w backend), or set LLM_FALLBACK_MODEL. List models: npm run ai:check -w backend -- --models",
-          LLM_BLOCKED: "The provider blocked the test prompt — try again.",
-          LLM_UNAVAILABLE:
-            "The provider is overloaded right now (free tier). Try again in a few minutes, or set LLM_FALLBACK_MODEL (see: npm run ai:check -w backend -- --models).",
-          LLM_BAD_REQUEST: "The provider rejected the request — check LLM_MODEL.",
-          LLM_FAILED: "See the message above.",
-        }[error.code]
-      : "See the message above.";
+  const hint = error instanceof LlmError ? FIX_HINTS[error.code] : "See the message above.";
   console.log(`\n❌ Not ready: ${hint}\n`);
   process.exitCode = 1;
 }

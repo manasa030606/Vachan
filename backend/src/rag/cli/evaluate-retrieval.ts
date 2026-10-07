@@ -2,9 +2,10 @@
 //
 // Measures retrieval quality on backend/evaluation/retrieval-dataset.json and compares
 // "vector search only" with "vector search + metadata filtering/re-ranking".
-// Writes backend/evaluation/latest-results.json and docs/RAG_EVALUATION.md.
+// Writes backend/evaluation/latest-results.json and docs/evaluation/RAG.md.
 // Exit code 1 when a threshold in the dataset is not met — retrieval is never assumed to work.
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { prisma } from "../../lib/prisma.ts";
 import { RAG_CONFIG, RAG_PATHS, type KnowledgeLevelName } from "../config.ts";
@@ -32,7 +33,7 @@ type Dataset = {
 
 const K = 5;
 const datasetPath = `${RAG_PATHS.evaluation}retrieval-dataset.json`;
-const docsPath = fileURLToPath(new URL("../../../../docs/RAG_EVALUATION.md", import.meta.url));
+const docsPath = fileURLToPath(new URL("../../../../docs/evaluation/RAG.md", import.meta.url));
 
 /** Scores one run of one case. */
 function scoreCase(testCase: EvalCase, response: SearchResponse) {
@@ -203,8 +204,9 @@ async function main() {
     `${RAG_PATHS.evaluation}latest-results.json`,
     `${JSON.stringify(result, null, 2)}\n`,
   );
+  await mkdir(dirname(docsPath), { recursive: true });
   await writeFile(docsPath, renderMarkdown(result, rows, oos, failures));
-  console.log(`\n  Saved backend/evaluation/latest-results.json and docs/RAG_EVALUATION.md\n`);
+  console.log(`\n  Saved backend/evaluation/latest-results.json and docs/evaluation/RAG.md\n`);
 
   if (checks.some((check) => !check.passed)) process.exitCode = 1;
 }

@@ -1,11 +1,10 @@
-// npm run speech:check -w backend          (add -- --models to list the key's audio models)
-//
-// Checks the speech setup WITHOUT printing the key, using real calls:
+// Checks the speech setup with real calls, without printing the key:
 //   1. text-to-speech: "నమస్కారం" → WAV
 //   2. speech-to-text: that WAV → transcript (a full round trip, so no microphone is needed)
 //   3. content match of the transcript with the original text
 //   4. AI pronunciation notes (when supported)
-// Exit code 1 if something is wrong, with a hint how to fix it.
+// Exits with code 1 if something is wrong, with a hint on how to fix it.
+// Run: npm run speech:check -w backend   (add -- --models to list the key's audio models)
 import { env } from "../../config/env.ts";
 import { TUTOR_CONFIG } from "../../config/tutor.ts";
 import { LlmError } from "../../ai/llm/types.ts";
@@ -18,6 +17,7 @@ import { getTextToSpeech, getTtsStatus } from "../tts.ts";
 import { parseWav } from "../wav.ts";
 
 const TEST = { text: "నమస్కారం", romanization: "namaskaaram", meaning: "Hello" };
+
 /** How to fix each provider error; `step` tells which model/setting is involved. */
 function hint(error: LlmError, step: "tts" | "stt"): string | null {
   const model = step === "tts" ? "TTS_MODEL" : "STT_MODEL (or LLM_FALLBACK_MODEL)";
@@ -27,11 +27,13 @@ function hint(error: LlmError, step: "tts" | "stt"): string | null {
     case "LLM_AUTH_FAILED":
       return "The key is wrong or revoked — create a new one at https://aistudio.google.com/apikey.";
     case "LLM_RATE_LIMITED":
-      return error.quotaWindow === "minute"
-        ? "Per-minute free limit — wait one minute and run this again."
-        : step === "tts"
-          ? "The free text-to-speech quota for today is used up. It resets at midnight Pacific time (≈ 12:30 pm in India). Already cached phrases keep working; or set TTS_MODEL to another TTS model from -- --models (each model has its own quota), or TTS_PROVIDER=browser."
-          : "Today's free quota of this model is used up (resets at midnight Pacific time ≈ 12:30 pm in India). Every model has its OWN quota: set LLM_FALLBACK_MODEL=gemini-3.5-flash-lite (or STT_MODEL=…) in backend/.env.";
+      if (error.quotaWindow === "minute") {
+        return "Per-minute free limit — wait one minute and run this again.";
+      }
+      if (step === "tts") {
+        return "The free text-to-speech quota for today is used up. It resets at midnight Pacific time (≈ 12:30 pm in India). Already cached phrases keep working; or set TTS_MODEL to another TTS model from -- --models (each model has its own quota), or TTS_PROVIDER=browser.";
+      }
+      return "Today's free quota of this model is used up (resets at midnight Pacific time ≈ 12:30 pm in India). Every model has its OWN quota: set LLM_FALLBACK_MODEL=gemini-3.5-flash-lite (or STT_MODEL=…) in backend/.env.";
     case "LLM_MODEL_NOT_FOUND":
       return `The model isn't available for your key. Run with -- --models and set ${model}.`;
     case "LLM_TIMEOUT":
@@ -47,6 +49,7 @@ function hint(error: LlmError, step: "tts" | "stt"): string | null {
 
 const line = (label: string, value: string) => console.log(`   ${label.padEnd(16)}${value}`);
 let failed = false;
+/** Prints a failed step (and the fix); `fatal = false` is only a warning. */
 const fail = (label: string, error: unknown, step: "tts" | "stt", fatal = true) => {
   if (fatal) failed = true;
   const message = error instanceof Error ? error.message : String(error);
@@ -136,7 +139,7 @@ async function main() {
     fail("1. TTS", error, "tts");
   }
 
-  // 2–4. Speech-to-text round trip
+  // 2–4. Speech-to-text round trip with the TTS audio
   if (!audio) {
     line(
       "2. STT",
@@ -167,7 +170,7 @@ async function main() {
         "3. Match",
         `${match.verdict === "match" || match.verdict === "close" ? "✅" : "⚠️ "} ${match.verdict} (${match.score}/100) · speech ${analysis.speechMs} ms of ${analysis.durationMs} ms`,
       );
-      // 4. Pronunciation notes — optional: a failure here is a warning, not "not ready".
+      // 4. Pronunciation notes are optional: a failure here is a warning, not "not ready".
       if (recognizer.canListenForPronunciation && env.PRONUNCIATION_NOTES === "true") {
         try {
           const notes = await getPronunciationNotes({
@@ -198,7 +201,7 @@ async function main() {
 
   console.log(
     failed
-      ? "\n❌ Not ready — see the hints above (docs/SPEECH.md → Troubleshooting).\n"
+      ? "\n❌ Not ready — see the hints above (docs/AI.md).\n"
       : "\n✅ Speech is ready. Start the app and open /speak (Chrome/Edge/Safari, allow the microphone).\n",
   );
   process.exitCode = failed ? 1 : 0;

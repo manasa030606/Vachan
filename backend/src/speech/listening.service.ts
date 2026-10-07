@@ -1,6 +1,6 @@
-// LISTENING COMPREHENSION: hear a word/phrase (text-to-speech), then choose
-//   • what it means          ("meaning" — English options), or
-//   • how it is written      ("script"  — native-script options, a light dictation exercise).
+// Listening comprehension: hear a word/phrase (text-to-speech), then choose
+//   - what it means       ("meaning": English options), or
+//   - how it is written   ("script": native-script options, a light dictation exercise).
 // The question never contains the answer: options are labelled a–d, and the question carries an
 // encrypted token (question-token.ts) used to fetch its audio and to check the answer.
 import { randomInt } from "node:crypto";

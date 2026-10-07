@@ -1,3 +1,4 @@
+// /admin — the admin dashboard's start page: learning analytics.
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AnalyticsView } from "@/components/admin/analytics-view";

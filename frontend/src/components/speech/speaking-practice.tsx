@@ -1,7 +1,8 @@
 "use client";
 
-// SPEAKING EXERCISE: expected phrase → learner records → speech-to-text → transcript →
-// comparison with the expected phrase → feedback (content / pronunciation / fluency).
+// Speaking exercise: the learner sees a phrase, records themselves, the server turns the audio
+// into text and compares it with the expected phrase, and we show feedback
+// on content, pronunciation and fluency.
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import { SpeakingFeedback } from "./speaking-feedback";
 import { UploadAudio } from "./upload-audio";
 import { useRecorder, type Recording } from "./use-recorder";
 
-/** Errors worth sending the SAME recording again (the problem was not the audio). */
+/** Errors where it makes sense to send the same recording again (the audio was not the problem). */
 const RETRYABLE = new Set([
   "NETWORK_ERROR",
   "TIMEOUT",
@@ -31,6 +32,7 @@ const RETRYABLE = new Set([
 
 type Props = { language: string; status: SpeechStatusDto };
 
+/** The Speak tab: pick a phrase, record it and get feedback. */
 export function SpeakingPractice({ language, status }: Props) {
   const phrases = useApi(() => getSpeakingPhrases(language), `speak-phrases:${language}`);
   const recorder = useRecorder({ maxDurationMs: Math.min(15_000, status.limits.maxDurationMs) });
@@ -38,10 +40,12 @@ export function SpeakingPractice({ language, status }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SpeakingEvaluationDto | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
+  // The last recording sent, so it can be re-sent after a network or server error.
   const [last, setLast] = useState<{
     recording: Recording;
     source: "recorded" | "uploaded";
   } | null>(null);
+  // Best score per phrase in this visit (phrase id to score).
   const [scores, setScores] = useState<Record<string, number>>({});
 
   const list = useMemo(() => phrases.data?.phrases ?? [], [phrases.data]);
@@ -104,6 +108,7 @@ export function SpeakingPractice({ language, status }: Props) {
     );
   }
 
+  // Prefer this visit's best score; otherwise use the best score saved on the server.
   const best = (id: string, fromServer: number | null) => scores[id] ?? fromServer;
 
   return (
@@ -114,17 +119,17 @@ export function SpeakingPractice({ language, status }: Props) {
           Choose a word or phrase
         </h2>
         <ul className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2" aria-label="Phrases to practise">
-          {list.map((item, i) => {
+          {list.map((item, itemIndex) => {
             const score = best(item.id, item.bestScore);
             return (
               <li key={item.id} className="shrink-0">
                 <button
                   type="button"
-                  aria-current={i === index ? "true" : undefined}
-                  onClick={() => goTo(i)}
+                  aria-current={itemIndex === index ? "true" : undefined}
+                  onClick={() => goTo(itemIndex)}
                   className={cn(
                     "rounded-2xl border-2 px-3 py-2 text-left transition",
-                    i === index
+                    itemIndex === index
                       ? "border-brand-500 bg-brand-50"
                       : "border-slate-200 bg-white hover:border-brand-200",
                   )}

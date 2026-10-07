@@ -24,7 +24,7 @@ export class EmbeddingModelError extends Error {
     super(
       `The embedding model "${RAG_CONFIG.embedding.model}" could not be loaded: ${
         cause instanceof Error ? cause.message : String(cause)
-      }. The first run needs internet access to download it (see docs/RAG.md → Troubleshooting).`,
+      }. The first run needs internet access to download it (see docs/AI.md).`,
     );
     this.name = "EmbeddingModelError";
   }

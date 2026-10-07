@@ -1,7 +1,7 @@
 "use client";
 
-// /tutor — the AI tutor page: learner context, earlier chats, and the chat.
-// Optional URL parameters: ?lessonId=te-u1-l1 (lesson context) · ?q=… (ask this straight away)
+// The /tutor page: the learner's context, earlier chats and the chat itself.
+// Optional URL parameters: ?lessonId=te-u1-l1 adds lesson context, ?q=... asks that question straight away.
 import { GraduationCap, History, Info } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -25,6 +25,7 @@ const LEVEL_LABEL = {
   intermediate: "Intermediate",
 } as const;
 
+/** The AI tutor page. */
 export function TutorView() {
   const params = useSearchParams();
   const lessonId = params.get("lessonId") ?? undefined;
@@ -49,10 +50,10 @@ export function TutorView() {
   });
   const { reset } = chat;
 
-  // A new language = a new chat.
+  // Switching language starts a new chat.
   useEffect(() => reset(), [languageCode, reset]);
 
-  // ?q=… asks once, as soon as the tutor is ready.
+  // Ask the ?q= question once, as soon as the tutor is ready.
   const askedInitial = useRef(false);
   useEffect(() => {
     if (initialQuestion && context.data?.status.available && !askedInitial.current) {
@@ -77,7 +78,7 @@ export function TutorView() {
           variant="secondary"
           size="sm"
           className="lg:hidden"
-          onClick={() => setShowHistory((v) => !v)}
+          onClick={() => setShowHistory((shown) => !shown)}
           aria-expanded={showHistory}
         >
           <History aria-hidden="true" className="size-4" /> Chats

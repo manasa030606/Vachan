@@ -5,16 +5,16 @@ import { useStats } from "@/components/session/stats-provider";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
 
-/** "in 12 min" / "at 14:05" for the next heart. */
+/** When the next heart comes back: "in 12 min" if under an hour, otherwise "at 14:05". */
 export function nextHeartLabel(nextHeartAt: string | null): string | null {
   if (!nextHeartAt) return null;
-  const minutes = Math.max(1, Math.ceil((new Date(nextHeartAt).getTime() - Date.now()) / 60_000));
-  return minutes < 60
-    ? `in ${minutes} min`
-    : `at ${new Date(nextHeartAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  const nextHeart = new Date(nextHeartAt);
+  const minutes = Math.max(1, Math.ceil((nextHeart.getTime() - Date.now()) / 60_000));
+  if (minutes < 60) return `in ${minutes} min`;
+  return `at ${nextHeart.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
 
-/** Hearts = lives (GET /api/stats → hearts). */
+/** Hearts are the learner's lives in lessons (from GET /api/stats). */
 export function HeartsCard() {
   const { stats } = useStats();
   const hearts = stats?.hearts.current ?? 0;

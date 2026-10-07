@@ -1,4 +1,4 @@
-/** Title + subtitle of an onboarding step. Uses <legend> because each step is a <fieldset>. */
+/** Title and subtitle of an onboarding step. Uses <legend> because each step is a <fieldset>. */
 export function StepHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-6">

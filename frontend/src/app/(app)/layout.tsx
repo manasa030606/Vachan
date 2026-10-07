@@ -1,4 +1,4 @@
-// Layout for the signed-in part of the app (Learn, Practice, Profile):
+// Layout for the signed-in part of the app (Learn, Practice, Tutor, Speak, Profile, Admin):
 // sidebar on tablet/desktop, top stats bar, bottom tab bar on mobile.
 import type { ReactNode } from "react";
 import { RequireAuth } from "@/components/session/require-auth";

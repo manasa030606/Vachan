@@ -1,3 +1,4 @@
+// Request validation for courses, lessons, exercise answers and the mistake review.
 import { z } from "zod";
 
 /** Route parameter ids, e.g. /api/lessons/:id */
@@ -37,7 +38,9 @@ export const attemptBodySchema = z.object({
         })
         .strict(),
     ],
-    { error: "answer must be { optionId }, { text }, { optionIds } or { pairs } (see README)" },
+    {
+      error: "answer must be { optionId }, { text }, { optionIds } or { pairs } (see docs/API.md)",
+    },
   ),
   /** "lesson" (default) or "review" — answers given on the Practice → Review screen. */
   mode: z.enum(["lesson", "review"]).default("lesson"),

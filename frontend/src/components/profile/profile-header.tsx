@@ -9,6 +9,7 @@ type ProfileHeaderProps = {
   language: Language;
 };
 
+/** Up to two initials for the avatar, e.g. "Asha Rao" gives "AR". */
 function initials(name: string): string {
   return name
     .split(/\s+/)
@@ -18,6 +19,7 @@ function initials(name: string): string {
     .join("");
 }
 
+/** Top of the profile page: avatar, name, email, join date and current language. */
 export function ProfileHeader({ displayName, email, joinedLabel, language }: ProfileHeaderProps) {
   return (
     <section className="flex flex-col items-center gap-5 rounded-card border border-slate-200 bg-white p-6 text-center sm:flex-row sm:text-left">

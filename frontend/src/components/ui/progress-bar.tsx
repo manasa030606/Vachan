@@ -15,6 +15,7 @@ type ProgressBarProps = {
 
 const heights = { sm: "h-2", md: "h-3", lg: "h-4" };
 
+/** Accessible progress bar; the fill is clamped between 0% and 100%. */
 export function ProgressBar({
   value,
   max,

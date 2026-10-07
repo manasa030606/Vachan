@@ -64,6 +64,13 @@ export async function assertHasHearts(db: Db, userId: string, now = new Date()) 
   }
 }
 
+/** Hearts lost or won by one answer: a wrong lesson answer costs, a right review answer restores. */
+function heartChangeFor(outcome: AnswerOutcome, isCorrect: boolean): number {
+  if (outcome.mode === "lesson" && !isCorrect) return -GAMIFICATION.hearts.lossPerMistake;
+  if (outcome.mode === "review" && isCorrect) return GAMIFICATION.hearts.reviewRestore;
+  return 0;
+}
+
 /** The numbers badges are checked against. */
 async function achievementMetrics(
   db: Db,
@@ -150,15 +157,9 @@ export async function applyAnswerRewards(db: Db, input: AnswerRewardInput) {
   const today = localDate(now, settings.timeZone);
 
   // 1. Hearts
-  const heartDelta =
-    outcome.mode === "lesson" && !input.isCorrect
-      ? -GAMIFICATION.hearts.lossPerMistake
-      : outcome.mode === "review" && input.isCorrect
-        ? GAMIFICATION.hearts.reviewRestore
-        : 0;
   const hearts = changeHearts(
     { hearts: stats.hearts, updatedAt: stats.heartsUpdatedAt },
-    heartDelta,
+    heartChangeFor(outcome, input.isCorrect),
     now,
     GAMIFICATION.hearts,
   );

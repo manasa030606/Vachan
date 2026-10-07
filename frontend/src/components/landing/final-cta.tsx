@@ -1,6 +1,7 @@
 import { LogoMark } from "@/components/brand/logo";
 import { ButtonLink } from "@/components/ui/button";
 
+/** Landing page: the last call-to-action block before the footer. */
 export function FinalCta() {
   return (
     <section className="px-4 py-20">

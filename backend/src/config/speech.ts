@@ -1,14 +1,14 @@
-// Every number and default the speech features (Phase 7) use, in one place.
+// Every number and default the speech features use, in one place.
 
 export const SPEECH_CONFIG = {
-  // ── Uploads ──────────────────────────────────────────────────
+  // Uploads
   /** Largest audio upload. 16 kHz mono 16-bit WAV = 32 KB per second → 2 MB ≈ 60 s. */
   maxUploadBytes: 2 * 1024 * 1024,
   /** Longest / shortest recording the server accepts. */
   maxDurationMs: 30_000,
   minDurationMs: 300,
 
-  // ── Audio analysis (audio-analysis.ts) ───────────────────────
+  // Audio analysis (audio-analysis.ts)
   analysis: {
     /** The audio is cut into 20 ms frames; each frame is "sound" or "silence". */
     frameMs: 20,
@@ -34,7 +34,7 @@ export const SPEECH_CONFIG = {
     noisySnrDb: 10,
   },
 
-  // ── Content match (text-compare.ts) ──────────────────────────
+  // Content match (text-compare.ts)
   match: {
     /** Character similarity (0–100) needed for each verdict. */
     verdicts: { match: 90, close: 70, partial: 40 },
@@ -42,7 +42,7 @@ export const SPEECH_CONFIG = {
     closeWord: 0.6,
   },
 
-  // ── Fluency (fluency.ts) — timing only ───────────────────────
+  // Fluency (fluency.ts) — timing only
   fluency: {
     /** Waiting longer than this before speaking is mentioned. */
     slowStartMs: 2000,
@@ -51,13 +51,13 @@ export const SPEECH_CONFIG = {
     fastRate: 7,
   },
 
-  // ── Text-to-speech cache (tts.service.ts) ────────────────────
+  // Text-to-speech cache (tts.service.ts)
   tts: {
     /** Longest text that can be turned into audio (a phrase or a short sentence). */
     maxTextLength: 200,
   },
 
-  // ── Listening practice ───────────────────────────────────────
+  // Listening practice
   listening: {
     questionsPerRound: 6,
     optionsPerQuestion: 4,

@@ -9,6 +9,7 @@ type ResultTileProps = {
   tone: "marigold" | "emerald" | "rose";
 };
 
+// Border and background colour for each tone.
 const tones = {
   marigold: "border-marigold-300 bg-marigold-50",
   emerald: "border-emerald-300 bg-emerald-50",
