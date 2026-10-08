@@ -1,6 +1,6 @@
 "use client";
 
-// Placement test: an intro, 12 questions (3 per unit), then the result and a choice of where to start.
+// Placement test: an intro, 18 questions (3 for each of six key units), then the result and a choice of where to start.
 // Uses the /api/placement start, answer, result and decide endpoints.
 // Answers are not marked right or wrong during the test; the result shows the score per unit
 // and the rules that picked the starting unit. No hearts, XP or mistakes are recorded.
@@ -128,8 +128,8 @@ export function PlacementFlow() {
         <div>
           <h1 className="text-3xl font-extrabold text-ink sm:text-4xl">Find your starting point</h1>
           <p className="mt-2 text-lg text-slate-600">
-            12 short questions — 3 for each unit — about letters and sounds, words, translation and
-            sentences. About 3 minutes.
+            18 short questions about letters and sounds, words, translation and sentences — from the
+            alphabet up to everyday conversation. About 4 minutes.
           </p>
         </div>
         {level && (

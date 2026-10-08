@@ -45,11 +45,14 @@ export const RAG_CONFIG = {
     /**
      * Below this cosine similarity the best match is treated as "not about this question":
      * the response says `sufficient: false` and the tutor must not answer from it.
-     * Calibrated on the evaluation set (docs/evaluation/RAG.md): the weakest on-topic question scored
-     * 0.813, most off-topic questions 0.74–0.80. e5 similarities sit in a narrow band, so this is
-     * only a first safety net — the tutor prompt must also refuse when the chunks don't answer.
+     * Calibrated on the evaluation set (docs/evaluation/RAG.md). It was 0.81 when the knowledge
+     * base had ~430 chunks; with ~3,300 chunks off-topic questions find closer near-misses
+     * (up to 0.829), while on-topic questions score 0.83–0.95 (one 0.817 outlier). 0.83 rejects
+     * every off-topic question in the set and keeps 99% of on-topic ones. e5 similarities sit in a
+     * narrow band, so this is only a first safety net — the tutor prompt must also refuse when the
+     * chunks don't answer.
      */
-    minSimilarity: 0.81,
+    minSimilarity: 0.83,
     /**
      * Re-ranking bonuses added to the similarity (priority: language → level → topic → similarity).
      * Language is not a bonus: it is a hard filter.
@@ -60,6 +63,7 @@ export const RAG_CONFIG = {
       levelAbove: -0.03, // harder than the learner's level
       topicMatch: 0.04, // the requested topic
       termMatch: 0.04, // the question contains a native-script word that appears in the chunk
+      curatedNotes: 0.015, // a written explanation, not a one-line generated course entry
     },
   },
 } as const;

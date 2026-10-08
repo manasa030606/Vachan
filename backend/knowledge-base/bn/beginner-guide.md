@@ -12,13 +12,13 @@ source: Vachan curated notes
 
 ## How to start learning Bengali
 
-A good order for a beginner in Bengali: first learn a few vowels and consonants (অ আ ই উ এ ও, then ক ম ন ব দ ল) and how vowel signs (কার) attach to consonants; then learn greetings such as নমস্কার (nomoshkar) and ধন্যবাদ (dhonnobad); then simple sentences like আমার নাম … (aamaar naam …, my name is …) and আমি ভালো আছি (aami bhaalo aachhi, I am fine). A few minutes every day works better than one long session. Reading the letters aloud helps you remember both shape and sound.
+A good order for a beginner in Bengali: first learn a few vowels and consonants (অ আ ই উ এ ও, then ক ম ন ব দ ল) and how vowel signs (কার) attach to consonants; then learn greetings such as নমস্কার (nomoshkaar) and ধন্যবাদ (dhonnobaad); then simple sentences like আমার নাম … (aamaar naam …, my name is …) and আমি ভালো আছি (aami bhaalo aachhi, I am fine). A few minutes every day works better than one long session. Reading the letters aloud helps you remember both shape and sound.
 
 ## Reading the romanization
 
 <!-- topic: romanization -->
 
-Vachan writes Bengali in English letters (romanization) so beginners can read it before they know the script. The inherent vowel অ is written "o" (ক = ko), and আ is written "aa" as in "father". Bengali ই/ঈ are both written "i" and উ/ঊ both "u", because they sound alike. শ, ষ and স are usually written "sh", following the pronunciation. Romanization follows the sound, not the spelling — ধন্যবাদ is "dhonnobad" — so always check the Bengali letters too: the script is the real spelling.
+Vachan writes Bengali in English letters (romanization) so beginners can read it before they know the script. The inherent vowel অ is written "o" (ক = ko), and আ is written "aa" as in "father". (In the alphabet lessons the letter অ itself is shown as "ô"; inside words Vachan writes the same sound as plain "o".) Bengali ই/ঈ are both written "i" and উ/ঊ both "u", because they sound alike. শ, ষ and স are usually written "sh", following the pronunciation. Romanization follows the sound, not the spelling — ধন্যবাদ is "dhonnobaad" — so always check the Bengali letters too: the script is the real spelling.
 
 ## Formal and informal "you"
 

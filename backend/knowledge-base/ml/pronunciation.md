@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## Short and long vowels change the meaning
 
-In Malayalam, vowel length matters: a long vowel is held about twice as long as a short one, and swapping them can change the word. മല (mala) means "mountain", but മാല (maala) means "garland / necklace". In romanization Vachan writes long vowels doubled: aa, ee, oo. Malayalam also has short e and o (എ, ഒ) as well as long ee and oo (ഏ, ഓ), which English speakers often merge, for example എന്റെ (ente, my) and പേര് (peru, name).
+In Malayalam, vowel length matters: a long vowel is held about twice as long as a short one, and swapping them can change the word. മല (mala) means "mountain", but മാല (maala) means "garland / necklace". In romanization Vachan writes long vowels doubled: aa, ee, oo. Malayalam also has short e and o (എ, ഒ) as well as long e and o (ഏ, ഓ), which English speakers often merge, for example the short e of എന്റെ (ente, my) and the long e of പേര് (peru, name). Vachan writes both lengths as "e" and "o", so the script shows which one is long.
 
 ## The zha sound — ഴ
 
@@ -49,3 +49,11 @@ Malayalam uses the nasal letter ഞ (nja) much more than most Indian languages, 
 <!-- topic: double-consonants; level: elementary -->
 
 Malayalam has many doubled consonants, and they must be held for a moment before release. അമ്മ (amma, mother), അച്ഛൻ (achchhan, father), വെള്ളം (vellam, water), ചേട്ടൻ (chettan, elder brother), ഒന്ന് (onnu, one) and മൂന്ന് (moonnu, three) all have a held middle consonant. Saying the double sound as a single one can make a word unclear or change it, so practise a short pause: am-ma, vel-lam, chet-tan.
+
+## Pronouncing common phrases
+
+<!-- topic: phrase-pronunciation; level: elementary -->
+
+Tips for saying common Malayalam phrases. നമസ്കാരം (namaskaaram): stress nothing, hold the long "kaa", end on a light "m". നന്ദി (nandi): soft dental "nd", tongue at the teeth. എനിക്ക് വിശക്കുന്നു (enikku vishakkunnu): hold both doubled sounds, "ik-ku", "shak-kun-nu". എന്റെ പേര് (ente peru): ന്റ is "nt", and പേര് has a long e with a light half-u. വെള്ളം (vellam): retroflex ള, tongue curled back, held long. മനസ്സിലായില്ല (manassilaayilla): long "aa", double "ss". മഴ (mazha): ഴ curled, no "z" buzz. ഭക്ഷണം (bhakshanam): puff of air on bh, retroflex ണ.
+
+Also asked as: how do I pronounce Malayalam phrases, how to say namaskaaram correctly, pronunciation tips for Malayalam, how to pronounce vellam

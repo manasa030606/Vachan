@@ -14,13 +14,24 @@ knowledge base, and must answer from those notes instead of from its general mem
 notes ─► clean ─► split into chunks ─► embed ─► store in PostgreSQL (pgvector)
 ```
 
-1. **Sources**: markdown notes in `backend/knowledge-base/<language>/`, the course vocabulary, and
-   notes written in the admin dashboard.
+1. **Sources**:
+   - curated markdown notes in `backend/knowledge-base/<language>/` — 23 files per language:
+     alphabet, pronunciation, beginner guide, vocabulary, phrases, examples, grammar, verbs,
+     conversation, idioms, culture, sentence patterns, questions, requests, emotions, food, travel,
+     shopping, college, numbers & time, everyday life, common mistakes, and the course dialogues
+     (`dialogues.md`, generated from the course with `npm run content:dialogues -w backend`);
+   - the course itself (from the database): every word and phrase as its own section with its usage
+     notes and the lesson that teaches it, plus word lists per topic;
+   - notes written in the admin dashboard.
+
+   Phrase sections end with an "Also asked as" line (other ways a learner might ask the same thing),
+   so "How can I tell someone I love them?" finds the "I love you" note.
+
 2. **Clean**: Unicode normalisation and metadata (language, level, topic, type, skill, source).
 3. **Chunk**: every `## ` section is one chunk — one concept per chunk. Long sections are split.
 4. **Embed**: each chunk becomes 384 numbers using `multilingual-e5-small`, a small model that runs
    inside Node. It is free, supports all six scripts, and the text never leaves the server.
-5. **Store**: `KnowledgeChunk.embedding` is a `vector(384)` column (pgvector). About 430 chunks.
+5. **Store**: `KnowledgeChunk.embedding` is a `vector(384)` column (pgvector). About 5,300 chunks (≈880 per language).
 
 Unchanged documents are skipped (content hash), so re-indexing is fast.
 
@@ -32,19 +43,28 @@ question ─► embed ─► cosine search, filtered by language ─► re-rank 
 
 - **Language is a hard filter** — a Telugu question never gets Hindi notes.
 - **Re-ranking** adds small bonuses: right level (+0.03), requested topic (+0.04), a native word from
-  the question that appears in the chunk (+0.04).
-- **"Good enough?"** — if the best similarity is below 0.81, the result is marked
-  `sufficient: false` and the tutor will not answer from it.
+  the question that appears in the chunk (+0.04), and a written explanation over a one-line course
+  entry (+0.015).
+- **"Good enough?"** — if the best similarity is below 0.83, the result is marked
+  `sufficient: false` and the tutor will not answer from it. The threshold was measured, not
+  guessed: with the larger knowledge base off-topic questions found closer near-misses (up to
+  0.829), while beginner questions score 0.83–0.95. 0.83 rejects every off-topic question in the
+  evaluation set and keeps all on-topic ones.
 
 ### Quality
 
-Measured with 55 questions in 6 languages plus 12 off-topic questions (`npm run rag:eval`):
+Measured with 151 questions in 6 languages (including 16 typical beginner questions per language:
+hello, I love you, I miss you, I am hungry / thirsty, where are you going, what are you doing,
+I don't understand, please repeat, how much, introducing yourself, a word's meaning, another
+example, formal vs casual, pronunciation, two words for "no") plus 20 off-topic questions
+(`npm run rag:eval`):
 
 | Metric                         | Result |
 | ------------------------------ | ------ |
-| Correct chunk in top 3 (hit@3) | 98.2 % |
-| Mean reciprocal rank (MRR@5)   | 96.4 % |
-| Off-topic questions rejected   | 91.7 % |
+| Correct chunk in top 3 (hit@3) | 100 %  |
+| Mean reciprocal rank (MRR@5)   | 94 %   |
+| On-topic questions answerable  | 100 %  |
+| Off-topic questions rejected   | 95 %   |
 
 Full report: [evaluation/RAG.md](evaluation/RAG.md).
 

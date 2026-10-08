@@ -164,22 +164,22 @@ describe("AI tutor API", () => {
   });
 
   it("'Why is my answer wrong?' needs a real attempt, then uses the exercise", async () => {
-    const before = await ask({ question: "Why is my answer wrong?", exerciseId: "te-u1-l1-e1" });
+    const before = await ask({ question: "Why is my answer wrong?", exerciseId: "te-u1-l1-e01" });
     assert.equal(before.status, 403);
     assert.equal(before.body.error.code, "EXERCISE_NOT_ANSWERED");
 
     await call("POST", "/api/lessons/te-u1-l1/start");
     const wrong = await prisma.exerciseOption.findFirstOrThrow({
-      where: { exerciseId: "te-u1-l1-e1", isCorrect: false },
+      where: { exerciseId: "te-u1-l1-e01", isCorrect: false },
     });
-    const attempt = await call("POST", "/api/exercises/te-u1-l1-e1/attempt", {
+    const attempt = await call("POST", "/api/exercises/te-u1-l1-e01/attempt", {
       answer: { optionId: wrong.id },
     });
     assert.equal(attempt.body.attempt.isCorrect, false);
 
     const { status, body } = await ask({
       question: "Why is my answer wrong?",
-      exerciseId: "te-u1-l1-e1",
+      exerciseId: "te-u1-l1-e01",
       lessonId: "te-u1-l1",
     });
     assert.equal(status, 200, JSON.stringify(body));
@@ -190,12 +190,12 @@ describe("AI tutor API", () => {
     assert.ok(
       answer.references.some(
         (r: Json) =>
-          r.id === "course/te/vocabulary#course-letters-and-sounds" ||
+          r.id.startsWith("course/te/vocabulary#course-letters-and-sounds") ||
           r.id.startsWith("te/alphabet") ||
           r.id.startsWith("te/pronunciation"),
       ),
     );
-    assert.equal(answer.context.exerciseId, "te-u1-l1-e1");
+    assert.equal(answer.context.exerciseId, "te-u1-l1-e01");
     assert.equal(
       answer.context.lesson,
       (await prisma.lesson.findUniqueOrThrow({ where: { id: "te-u1-l1" } })).title,

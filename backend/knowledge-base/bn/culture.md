@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## Showing respect: দাদা, দিদি and আপনি
 
-In Bengali, people are often addressed with family words. দাদা (daadaa, elder brother) and দিদি (didi, elder sister) are used for anyone a little older, and they are shortened to -দা (-daa) and -দি (-di) after a name: রবিদা (Robi-daa), মিতাদি (Mita-di). Older men are often called কাকু (kaaku, uncle) and older women মাসি (maasi, aunt). Use আপনি (aapni), not তুমি (tumi) or তুই (tui), with anyone older or unfamiliar.
+In Bengali, people are often addressed with family words. দাদা (daadaa, elder brother) and দিদি (didi, elder sister) are used for anyone a little older, and they are shortened to -দা (-daa) and -দি (-di) after a name: রবিদা (Robi-daa), মিতাদি (Mita-di). Older men are often called কাকু (kaaku, uncle) and older women মাসি (maashi, aunt). Use আপনি (aapni), not তুমি (tumi) or তুই (tui), with anyone older or unfamiliar.
 
 ## Where Bengali is spoken
 
@@ -36,4 +36,4 @@ Bengali, called বাংলা (baanglaa) by its speakers, is the official lang
 
 <!-- topic: etiquette -->
 
-Some useful Bengali etiquette: greet elders with নমস্কার (nomoshkar) or আসসালামু আলাইকুম (aassaalaamu aalaaikum), depending on the person; take your shoes off before entering a home or place of worship; offer and receive things with the right hand. Guests are usually offered tea and মিষ্টি (mishti, sweets), and it is polite to accept something. Use আপনি (aapni) with anyone older until they invite you to be less formal.
+Some useful Bengali etiquette: greet elders with নমস্কার (nomoshkaar) or আসসালামু আলাইকুম (aassaalaamu aalaaikum), depending on the person; take your shoes off before entering a home or place of worship; offer and receive things with the right hand. Guests are usually offered tea and মিষ্টি (mishti, sweets), and it is polite to accept something. Use আপনি (aapni) with anyone older until they invite you to be less formal.

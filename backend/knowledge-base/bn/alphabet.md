@@ -36,10 +36,10 @@ When a vowel follows a consonant, Bengali writes a vowel sign called a কার
 
 <!-- topic: script-overview -->
 
-Most Bengali letters hang from a horizontal line along the top called the মাত্রা (maatraa). When letters are joined into a word, their head-lines touch and form one continuous line, as in নমস্কার (nomoshkar, hello) and বাবা (baabaa, father). A few Bengali letters are written without a head-line, such as এ, ঐ, ও, ঔ, ঙ and ঞ. When writing by hand, many people write the letters of a word first and then draw the head-line across the top.
+Most Bengali letters hang from a horizontal line along the top called the মাত্রা (maatraa). When letters are joined into a word, their head-lines touch and form one continuous line, as in নমস্কার (nomoshkaar, hello) and বাবা (baabaa, father). A few Bengali letters are written without a head-line, such as এ, ঐ, ও, ঔ, ঙ and ঞ. When writing by hand, many people write the letters of a word first and then draw the head-line across the top.
 
 ## Hasanta and conjunct letters — যুক্তাক্ষর (juktaakkhor)
 
 <!-- topic: conjuncts; level: elementary -->
 
-A Bengali consonant with no vowel at all is shown with the হসন্ত (hosonto) mark ্, as in ক্ (k). When two or more consonants come together with no vowel between them, Bengali usually joins them into one combined letter called a যুক্তাক্ষর (juktaakkhor, conjunct). Examples: বন্ধু (bondhu, friend) has ন্ধ = ন + ধ; নমস্কার (nomoshkar) has স্ক = স + ক; ধন্যবাদ (dhonnobad, thank you) has ন্য = ন + য. Some second letters take a short form called a ফলা (pholaa), such as য-ফলা ্য and র-ফলা ্র. The letter ৎ (khondo to) is a "t" with no vowel, used at the end of words.
+A Bengali consonant with no vowel at all is shown with the হসন্ত (hosonto) mark ্, as in ক্ (k). When two or more consonants come together with no vowel between them, Bengali usually joins them into one combined letter called a যুক্তাক্ষর (juktaakkhor, conjunct). Examples: বন্ধু (bondhu, friend) has ন্ধ = ন + ধ; নমস্কার (nomoshkaar) has স্ক = স + ক; ধন্যবাদ (dhonnobaad, thank you) has ন্য = ন + য. Some second letters take a short form called a ফলা (pholaa), such as য-ফলা ্য and র-ফলা ্র. The letter ৎ (khondo to) is a "t" with no vowel, used at the end of words.

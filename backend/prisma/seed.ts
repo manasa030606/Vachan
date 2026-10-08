@@ -1,26 +1,27 @@
-// Development seed: run with `npm run db:seed` (from the project root).
+// Seeds the database: `npm run db:seed` (from the project root).
 //
-// Creates for each of the six languages (see course-builder.ts for the lesson plan):
-//   1 language · 1 course · 4 units · 16 lessons · 67 exercises · 34 vocabulary items
-//   · 12 placement questions
-// plus the badge definitions (src/config/achievements.ts) and one demo account.
+// For each of the six languages it writes the full course built by course-builder.ts from
+// content/curriculum.ts + content/languages/<code>.ts (16 units, 95 lessons, ~1,300 exercises
+// and ~600 words and phrases per language), plus the badges and a demo account.
 //
-// Safe to run again: languages, badges and the demo account are updated in place, and a
-// language's course content is only created when that language has NO course yet, so content
-// edited in the admin dashboard and learners' progress are never overwritten.
-//
-// `npm run db:seed:reset-content -w backend` deletes and re-creates ALL course content and
-// vocabulary (and therefore learners' lesson progress and answers). Development only.
+// Modes:
+//   npm run db:seed                         creates the course for languages that have none yet
+//                                           (an existing course is left alone)
+//   npm run db:seed:sync -w backend          updates existing courses to the latest content and
+//                                           KEEPS learners' accounts and progress (see content-sync.ts)
+//   npm run db:seed:reset-content -w backend development only: deletes all course content and
+//                                           learners' lesson progress, then creates it again
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
 import { ACHIEVEMENTS } from "../src/config/achievements.ts";
 import { hashPassword } from "../src/lib/password.ts";
-import { buildCourse } from "./course-builder.ts";
-import { DEMO_USER, SEED_LANGUAGES } from "./seed-data.ts";
+import { SEED_LANGUAGES } from "./content/index.ts";
+import { syncLanguage } from "./content-sync.ts";
+import { DEMO_USER } from "./seed-data.ts";
 
 if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL is missing. Create backend/.env first (see README).");
+  console.error("❌ DATABASE_URL is missing. Create backend/.env first (see docs/SETUP.md).");
   process.exit(1);
 }
 
@@ -29,116 +30,40 @@ const prisma = new PrismaClient({
 });
 
 const resetContent = process.argv.includes("--reset-content");
+const sync = process.argv.includes("--sync") || resetContent;
 
 async function seedLanguage(index: number) {
-  const data = SEED_LANGUAGES[index];
-  const course = buildCourse(data);
-
-  const language = await prisma.language.upsert({
-    where: { code: data.code },
-    // Names only — never isActive/sortOrder, which admins may have changed in the dashboard.
-    update: {
-      name: data.name,
-      nativeName: data.nativeName,
-      scriptName: data.scriptName,
-      description: data.description,
-    },
-    create: {
-      id: `lang-${data.code}`,
-      code: data.code,
-      name: data.name,
-      nativeName: data.nativeName,
-      scriptName: data.scriptName,
-      description: data.description,
-      sortOrder: index + 1,
-    },
+  const language = SEED_LANGUAGES[index]!;
+  const existing = await prisma.course.findFirst({
+    where: { language: { code: language.code } },
+    include: { _count: { select: { units: true } } },
   });
 
-  const existing = await prisma.course.count({ where: { languageId: language.id } });
-  if (existing > 0 && !resetContent) {
+  if (existing && !sync) {
     console.log(
-      `  – ${data.name.padEnd(10)} has content already — kept (re-create: npm run db:seed:reset-content -w backend)`,
+      `  – ${language.name.padEnd(10)} already has a course (${existing._count.units} units) — kept. Update it with: npm run db:seed:sync -w backend`,
     );
     return;
   }
 
-  // Start this language's content from a clean slate (cascades to units, lessons, exercises, progress).
-  await prisma.course.deleteMany({ where: { languageId: language.id } });
-  await prisma.vocabularyItem.deleteMany({ where: { languageId: language.id } });
+  if (resetContent) {
+    const row = await prisma.language.findUnique({ where: { code: language.code } });
+    if (row) {
+      // Cascades to units, lessons, exercises and learners' lesson progress and answers.
+      await prisma.course.deleteMany({ where: { languageId: row.id } });
+      await prisma.vocabularyItem.deleteMany({ where: { languageId: row.id } });
+    }
+  }
 
-  await prisma.vocabularyItem.createMany({
-    data: course.vocabulary.map((item) => ({ ...item, languageId: language.id })),
-  });
-
-  await prisma.course.create({
-    data: {
-      id: course.id,
-      languageId: language.id,
-      title: course.title,
-      description: course.description,
-      sortOrder: 1,
-      units: {
-        create: course.units.map((unit, unitIndex) => ({
-          id: unit.id,
-          title: unit.title,
-          description: unit.description,
-          stage: unit.stage,
-          sortOrder: unitIndex + 1,
-          lessons: {
-            create: unit.lessons.map((lesson, lessonIndex) => ({
-              id: lesson.id,
-              title: lesson.title,
-              introText: lesson.introText,
-              kind: lesson.kind,
-              sortOrder: lessonIndex + 1,
-              vocabulary: { connect: lesson.vocabularyIds.map((id) => ({ id })) },
-              exercises: {
-                create: lesson.exercises.map((exercise, exerciseIndex) => ({
-                  id: exercise.id,
-                  type: exercise.type,
-                  sortOrder: exerciseIndex + 1,
-                  instruction: exercise.instruction,
-                  prompt: exercise.prompt,
-                  promptSubtext: exercise.promptSubtext,
-                  sentenceBefore: exercise.sentenceBefore,
-                  sentenceAfter: exercise.sentenceAfter,
-                  translation: exercise.translation,
-                  explanation: exercise.explanation,
-                  options: {
-                    create: exercise.options.map((option, optionIndex) => ({
-                      id: `${exercise.id}-o${optionIndex + 1}`,
-                      text: option.text,
-                      subtext: option.subtext,
-                      isCorrect: option.isCorrect ?? false,
-                      correctPosition: option.correctPosition,
-                      matchText: option.matchText,
-                      sortOrder: optionIndex + 1,
-                    })),
-                  },
-                })),
-              },
-            })),
-          },
-        })),
-      },
-    },
-  });
-
-  await prisma.placementQuestion.createMany({
-    data: course.placementQuestions.map((question, index) => ({
-      id: `${data.code}-pq${index + 1}`,
-      languageId: language.id,
-      exerciseId: question.exerciseId,
-      unitNumber: question.unitNumber,
-      skill: question.skill,
-      sortOrder: index + 1,
-    })),
-  });
-
-  const lessons = course.units.flatMap((unit) => unit.lessons);
-  const exercises = lessons.flatMap((lesson) => lesson.exercises);
+  const started = Date.now();
+  const summary = await syncLanguage(prisma, language, index + 1);
+  const moved = summary.legacyMoved ? ` · ${summary.legacyMoved} old lessons moved` : "";
+  const removed =
+    summary.lessonsRemoved || summary.lessonsUnpublished
+      ? ` · ${summary.lessonsRemoved} old lessons removed, ${summary.lessonsUnpublished} unpublished`
+      : "";
   console.log(
-    `  ✓ ${data.name.padEnd(10)} ${course.units.length} units · ${lessons.length} lessons · ${exercises.length} exercises · ${course.vocabulary.length} vocabulary items · ${course.placementQuestions.length} placement questions`,
+    `  ✓ ${language.name.padEnd(10)} ${summary.units} units · ${summary.lessons} lessons · ${summary.exercises} exercises · ${summary.vocabulary} words/phrases/letters · ${summary.placementQuestions} placement questions${moved}${removed} (${((Date.now() - started) / 1000).toFixed(1)} s)`,
   );
 }
 
@@ -178,7 +103,9 @@ async function seedDemoUser() {
 }
 
 async function main() {
-  console.log("🌱 Seeding the Vachan database…");
+  console.log(
+    `🌱 Seeding the Vachan database${resetContent ? " (reset content)" : sync ? " (sync content, keeping learner data)" : ""}…`,
+  );
   for (let index = 0; index < SEED_LANGUAGES.length; index++) {
     await seedLanguage(index);
   }
@@ -191,7 +118,9 @@ async function main() {
       : process.env.NODE_ENV !== "production";
   if (seedDemo) await seedDemoUser();
   else console.log("  – Demo account skipped (production). Set SEED_DEMO_USER=true to create it.");
-  console.log("✅ Seed finished.");
+  console.log(
+    "✅ Seed finished. Next: npm run rag:index -w backend (updates the AI tutor's knowledge base)",
+  );
 }
 
 main()

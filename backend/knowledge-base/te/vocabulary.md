@@ -18,7 +18,7 @@ Telugu family words: అమ్మ (amma, mother), నాన్న (naanna, fathe
 
 <!-- topic: food -->
 
-Telugu food words: భోజనం (bhojanam, meal), అన్నం (annam, cooked rice), నీళ్ళు (neellu, water), పాలు (paalu, milk), కూర (koora, curry / vegetable dish), పప్పు (pappu, lentils / dal), పెరుగు (perugu, curd / yoghurt), ఉప్పు (uppu, salt), కారం (kaaram, chilli powder / spicy), టీ (tee, tea), కాఫీ (kaafee, coffee). "I want food" is నాకు భోజనం కావాలి (naaku bhojanam kaavaali).
+Telugu food words: భోజనం (bhojanam, meal), అన్నం (annam, cooked rice), నీళ్ళు (neellu, water), పాలు (paalu, milk), కూర (koora, curry / vegetable dish), పప్పు (pappu, lentils / dal), పెరుగు (perugu, curd / yoghurt), ఉప్పు (uppu, salt), కారం (kaaram, chilli powder / spicy), టీ (tee, tea), కాఫీ (kaaphee, coffee). "I want food" is నాకు భోజనం కావాలి (naaku bhojanam kaavaali).
 
 ## Numbers 1 to 10
 

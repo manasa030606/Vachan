@@ -24,7 +24,7 @@ Malayalam is the official language of Kerala and is also spoken in Lakshadweep a
 
 <!-- topic: festivals; level: elementary -->
 
-ഓണം (Onam) is the biggest festival of Kerala and of Malayalam speakers everywhere, a harvest festival in August or September that welcomes the legendary king Mahabali. Families make a പൂക്കളം (pookalam), a carpet of flower petals in front of the house, and share the ഓണസദ്യ (onasadya), a large vegetarian feast served on a banana leaf. People greet each other with ഓണാശംസകൾ (onaashamsakal, Onam greetings). വിഷു (Vishu), in mid-April, begins with the വിഷുക്കണി (vishukkani): the first auspicious sight of the day, an arrangement of yellow konna flowers, fruits, rice, a lamp and gold. Elders give children money called കൈനീട്ടം (kaineettam).
+ഓണം (Onam) is the biggest festival of Kerala and of Malayalam speakers everywhere, a harvest festival in August or September that welcomes the legendary king Mahabali. Families make a പൂക്കളം (pookkalam), a carpet of flower petals in front of the house, and share the ഓണസദ്യ (onasadya), a large vegetarian feast served on a banana leaf. People greet each other with ഓണാശംസകൾ (onaashamsakal, Onam greetings). വിഷു (Vishu), in mid-April, begins with the വിഷുക്കണി (vishukkani): the first auspicious sight of the day, an arrangement of yellow konna flowers, fruits, rice, a lamp and gold. Elders give children money called കൈനീട്ടം (kaineettam).
 
 ## Everyday etiquette
 

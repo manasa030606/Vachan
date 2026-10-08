@@ -60,7 +60,7 @@ export function ProfileView() {
         <div className="flex-1">
           <h2 className="text-lg font-bold">Placement test</h2>
           <p className="text-sm text-slate-600">
-            Already know some {language.name}? 12 questions recommend where to start. You decide
+            Already know some {language.name}? 18 questions recommend where to start. You decide
             whether to skip ahead.
           </p>
         </div>

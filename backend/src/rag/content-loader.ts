@@ -1,6 +1,6 @@
 // Step 1 of the pipeline: COLLECT CONTENT from three approved sources.
 //   1. Curated notes:   backend/knowledge-base/<language>/*.md
-//   2. Course content:  vocabulary and letters already taught in the lessons (VocabularyItem table)
+//   2. Course content:  words, phrases and letters taught in the lessons (VocabularyItem table)
 //   3. Admin notes:     written in the admin dashboard (KnowledgeDocument.body)
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -46,14 +46,71 @@ const topicSlug = (topic: string) => {
   return COURSE_TOPIC_SLUGS[slug] ?? slug;
 };
 
+/** Course word lists are cut into sections of about this many characters (one chunk each). */
+const WORD_SECTION_CHARS = 900;
+
+type CourseItem = {
+  script: string;
+  romanization: string;
+  meaning: string;
+  topic: string;
+  notes: string | null;
+  lessons: Array<{ title: string; unit: { title: string; sortOrder: number } }>;
+};
+
+const wordLine = (item: CourseItem) => `- ${item.script} (${item.romanization}) — ${item.meaning}`;
+
+/** One self-contained section per word or phrase: what it means, how to use it, where it is taught. */
+const itemSection = (item: CourseItem, languageName: string) => ({
+  heading: `${item.meaning} — ${item.script} (${item.romanization})`,
+  body: `How to say "${item.meaning}" in ${languageName}: ${item.script} (${item.romanization}).${item.notes ? ` ${item.notes}` : ""}${taughtIn(item)}`,
+  overrides: { topic: topicSlug(item.topic) },
+});
+
+/** Packs list lines into sections of at most WORD_SECTION_CHARS (a long topic becomes "part 2", …). */
+function packLines(lines: string[]): string[][] {
+  const groups: string[][] = [];
+  let current: string[] = [];
+  let size = 0;
+  for (const line of lines) {
+    if (current.length && size + line.length > WORD_SECTION_CHARS) {
+      groups.push(current);
+      current = [];
+      size = 0;
+    }
+    current.push(line);
+    size += line.length + 1;
+  }
+  if (current.length) groups.push(current);
+  return groups;
+}
+
+const taughtIn = (item: CourseItem) => {
+  const lesson = item.lessons[0];
+  return lesson
+    ? ` It is taught in the lesson "${lesson.title}" (unit ${lesson.unit.sortOrder}, ${lesson.unit.title}).`
+    : "";
+};
+
 /**
- * Turns the course vocabulary (what the lessons teach) into one document per language,
- * with one section per topic, e.g. "Course vocabulary: Greetings".
- * This keeps the tutor consistent with the exact words and spellings used in the lessons.
+ * Turns the course content (what the lessons teach) into knowledge-base documents, so the tutor
+ * uses exactly the words and spellings of the lessons:
+ *   - course/<code>/vocabulary: word and letter lists, grouped by topic ("Course vocabulary: Family")
+ *   - course/<code>/words:      one section per word, with its usage notes and the lesson that teaches it
+ *   - course/<code>/phrases:    one section per phrase, with its usage notes (polite/casual forms,
+ *                               gender, alternatives) and the lesson that teaches it
  */
 export async function loadCourseDocuments(prisma: PrismaClient): Promise<SourceDocument[]> {
   const items = await prisma.vocabularyItem.findMany({
-    include: { language: { select: { code: true, name: true } } },
+    include: {
+      language: { select: { code: true, name: true } },
+      lessons: {
+        where: { isPublished: true },
+        select: { title: true, unit: { select: { title: true, sortOrder: true } } },
+        orderBy: { unit: { sortOrder: "asc" } },
+        take: 1,
+      },
+    },
     orderBy: [{ topic: "asc" }, { script: "asc" }],
   });
 
@@ -68,39 +125,79 @@ export async function loadCourseDocuments(prisma: PrismaClient): Promise<SourceD
   for (const [code, languageItems] of byLanguage) {
     if (!(LANGUAGE_CODES as readonly string[]).includes(code)) continue;
     const languageName = languageItems[0]!.language.name;
+    const languageCode = code as LanguageCode;
+    const reference = `course:${code} (VocabularyItem table, taught in the ${languageName} lessons)`;
 
+    // Words and letters, grouped by topic.
     const groups = new Map<string, typeof items>();
-    for (const item of languageItems) {
+    for (const item of languageItems.filter((row) => row.kind !== "PHRASE")) {
       const key = item.kind === "LETTER" ? "Letters" : item.topic;
       groups.set(key, [...(groups.get(key) ?? []), item]);
     }
-
+    const wordSections = [...groups].flatMap(([topic, group]) => {
+      const isLetters = topic === "Letters";
+      const parts = packLines(group.map(wordLine));
+      return parts.map((lines, index) => {
+        const heading = isLetters ? "Course letters and sounds" : `Course vocabulary: ${topic}`;
+        return {
+          heading: index === 0 ? heading : `${heading} (part ${index + 1})`,
+          body: `${languageName} ${isLetters ? "letters" : `words for ${topic.toLowerCase()}`} taught in the Vachan lessons:\n\n${lines.join("\n")}`,
+          overrides: isLetters
+            ? { topic: "letters", skill: "script" as const, contentType: "alphabet" as const }
+            : { topic: topicSlug(topic) },
+        };
+      });
+    });
     documents.push({
       id: `course/${code}/vocabulary`,
-      languageCode: code as LanguageCode,
+      languageCode,
       title: `${languageName} course vocabulary`,
       source: "Vachan course content",
-      reference: `course:${code} (VocabularyItem table, taught in the ${languageName} lessons)`,
+      reference,
       defaults: {
         level: "beginner",
         topic: "vocabulary",
         skill: "vocabulary",
         contentType: "vocabulary",
       },
-      sections: [...groups].map(([topic, group]) => {
-        const isLetters = topic === "Letters";
-        const lines = group.map(
-          (item) => `${item.script} (${item.romanization}) — ${item.meaning}`,
-        );
-        return {
-          heading: isLetters ? `Course letters and sounds` : `Course vocabulary: ${topic}`,
-          body: `${languageName} ${isLetters ? "letters" : `words for ${topic.toLowerCase()}`} taught in the Vachan lessons:\n\n${lines.map((line) => `- ${line}`).join("\n")}`,
-          overrides: isLetters
-            ? { topic: "letters", skill: "script", contentType: "alphabet" }
-            : { topic: topicSlug(topic) },
-        };
-      }),
+      sections: wordSections,
     });
+
+    // Words and phrases: one self-contained section each (what a learner usually asks about).
+    const words = languageItems.filter((row) => row.kind === "WORD");
+    if (words.length) {
+      documents.push({
+        id: `course/${code}/words`,
+        languageCode,
+        title: `${languageName} course words`,
+        source: "Vachan course content",
+        reference,
+        defaults: {
+          level: "beginner",
+          topic: "vocabulary",
+          skill: "vocabulary",
+          contentType: "vocabulary",
+        },
+        sections: words.map((item) => itemSection(item, languageName)),
+      });
+    }
+    const phrases = languageItems.filter((row) => row.kind === "PHRASE");
+    if (phrases.length) {
+      documents.push({
+        id: `course/${code}/phrases`,
+        languageCode,
+        title: `${languageName} course phrases`,
+        source: "Vachan course content",
+        reference,
+        defaults: {
+          level: "beginner",
+          topic: "everyday-phrases",
+          skill: "conversation",
+          contentType: "phrase",
+        },
+        sections: phrases.map((item) => itemSection(item, languageName)),
+      });
+    }
   }
   return documents;
 }

@@ -30,10 +30,10 @@ Malayalam numbers from one to ten: 1 ഒന്ന് (onnu), 2 രണ്ട് (
 
 <!-- topic: colours; level: elementary -->
 
-Malayalam colour words: ചുവപ്പ് (chuvappu, red), പച്ച (pachcha, green), നീല (neela, blue), മഞ്ഞ (manja, yellow), വെള്ള (vella, white), കറുപ്പ് (karuppu, black). Before a noun some colours take a different form: ചുവന്ന റോസ് (chuvanna rose, red rose), വെളുത്ത ഷർട്ട് (veluththa shirt, white shirt), കറുത്ത പൂച്ച (karuththa poochcha, black cat). Do not confuse വെള്ള (vella, white) with വെള്ളം (vellam, water).
+Malayalam colour words: ചുവപ്പ് (chuvappu, red), പച്ച (pachcha, green), നീല (neela, blue), മഞ്ഞ (manja, yellow), വെള്ള (vella, white), കറുപ്പ് (karuppu, black). Before a noun some colours take a different form: ചുവന്ന റോസ് (chuvanna rose, red rose), വെളുത്ത ഷർട്ട് (velutha shirt, white shirt), കറുത്ത പൂച്ച (karutha poochcha, black cat). Do not confuse വെള്ള (vella, white) with വെള്ളം (vellam, water).
 
 ## Time words
 
 <!-- topic: time; level: elementary -->
 
-Useful Malayalam time words: ഇന്ന് (innu, today), നാളെ (naale, tomorrow), ഇന്നലെ (innale, yesterday), ഇപ്പോൾ (ippol, now), പിന്നെ (pinne, later / then), രാവിലെ (raavile, morning), ഉച്ചയ്ക്ക് (uchchaykku, at noon), വൈകുന്നേരം (vaikunneram, evening), രാത്രി (raathri, night). Example: നാളെ രാവിലെ വരൂ (naale raavile varoo, "please come tomorrow morning").
+Useful Malayalam time words: ഇന്ന് (innu, today), നാളെ (naale, tomorrow), ഇന്നലെ (innale, yesterday), ഇപ്പോൾ (ippol, now), പിന്നെ (pinne, later / then), രാവിലെ (raavile, morning), ഉച്ചയ്ക്ക് (uchchaykku, at noon), വൈകുന്നേരം (vaikunneram, evening), രാത്രി (raathri, night). Also: മറ്റന്നാൾ (mattannaal, the day after tomorrow), ഇപ്പോ (ippo, now — casual), നേരത്തെ (nerathe, early), വൈകി (vaiki, late). Example: നാളെ രാവിലെ വരൂ (naale raavile varoo, "please come tomorrow morning").

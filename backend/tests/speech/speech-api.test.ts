@@ -61,6 +61,14 @@ async function upload(
 
 const wav = (data: Buffer) => ({ data, type: "audio/wav" });
 
+/** Id of the course word "hello" (a fresh database and an upgraded one use different ids). */
+const helloId = async (code: "te" | "hi") =>
+  (
+    await prisma.vocabularyItem.findFirstOrThrow({
+      where: { language: { code }, script: code === "te" ? "నమస్కారం" : "नमस्ते" },
+    })
+  ).id;
+
 before(async () => {
   assert.equal(
     process.env.LLM_PROVIDER,
@@ -104,13 +112,13 @@ describe("speech API", () => {
   });
 
   it("GET /tts returns WAV audio, generated once and then cached", async () => {
-    const first = await fetch(`${base}/api/speech/tts?vocabularyItemId=te-v16-hello`, {
+    const first = await fetch(`${base}/api/speech/tts?vocabularyItemId=${await helloId("te")}`, {
       headers: auth(),
     });
     assert.equal(first.status, 200);
     assert.equal(first.headers.get("content-type"), "audio/wav");
     assert.equal(Buffer.from(await first.arrayBuffer()).toString("ascii", 0, 4), "RIFF");
-    const second = await fetch(`${base}/api/speech/tts?vocabularyItemId=te-v16-hello`, {
+    const second = await fetch(`${base}/api/speech/tts?vocabularyItemId=${await helloId("te")}`, {
       headers: auth(),
     });
     assert.equal(second.headers.get("x-audio-source"), "cache");
@@ -155,7 +163,7 @@ describe("speech API", () => {
   it("POST /evaluate: content match, pronunciation (not supported in mock) and fluency, saved", async () => {
     const { status, body } = await upload("/api/speech/evaluate", wav(sample), {
       language: "te",
-      vocabularyItemId: "te-v16-hello",
+      vocabularyItemId: await helloId("te"),
     });
     assert.equal(status, 200, JSON.stringify(body));
     assert.equal(body.expected.script, "నమస్కారం");
@@ -184,7 +192,7 @@ describe("speech API", () => {
     assert.equal(none.status, 400);
     const other = await upload("/api/speech/evaluate", wav(sample), {
       language: "te",
-      vocabularyItemId: "hi-v16-hello",
+      vocabularyItemId: await helloId("hi"),
     });
     assert.ok([400, 404].includes(other.status));
   });
@@ -192,7 +200,8 @@ describe("speech API", () => {
   it("GET /phrases and /attempts", async () => {
     const phrases = await call("GET", "/api/speech/phrases?language=te");
     assert.equal(phrases.status, 200);
-    const hello = phrases.body.phrases.find((p: Json) => p.id === "te-v16-hello");
+    const id = await helloId("te");
+    const hello = phrases.body.phrases.find((p: Json) => p.id === id);
     assert.equal(hello.bestScore, 100);
     const attempts = await call("GET", "/api/speech/attempts?limit=5");
     assert.ok(attempts.body.attempts.length >= 2);
@@ -294,7 +303,7 @@ describe("conversation API", () => {
     assert.equal(res.body.session.status, "ended");
     assert.equal(summary.stats.replies, 3);
     assert.equal(summary.stats.voiceReplies, 1);
-    assert.ok(summary.stats.vocabularyUsed.some((w: Json) => w.script === "భోజనం"));
+    assert.ok(summary.stats.vocabularyUsed.some((w: Json) => w.script === "నాకు భోజనం కావాలి"));
     assert.ok(summary.review.strengths.length > 0);
     const late = await call("POST", `/api/ai/conversation/${sessionId}/reply`, { text: "హలో" });
     assert.equal(late.status, 409);

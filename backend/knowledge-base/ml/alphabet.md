@@ -18,7 +18,7 @@ Malayalam is written in the Malayalam script, an abugida that grew out of the an
 
 <!-- topic: vowels -->
 
-Malayalam vowels are called സ്വരങ്ങൾ (swarangal). The main ones are: അ (a), ആ (aa), ഇ (i), ഈ (ee), ഉ (u), ഊ (oo), ഋ (ru), എ (e), ഏ (ee), ഐ (ai), ഒ (o), ഓ (oo), ഔ (au). Two extra signs follow them: അം (am, the anusvara, a nasal "m" sound, as at the end of വെള്ളം, vellam, water) and അഃ (ah, the visarga). Short and long vowels are different letters in Malayalam, so എ (short e) and ഏ (long ee), ഒ (short o) and ഓ (long oo) must not be mixed up. Beginners usually start with അ ആ ഇ ഈ ഉ ഊ.
+Malayalam vowels are called സ്വരങ്ങൾ (swarangal). The main ones are: അ (a), ആ (aa), ഇ (i), ഈ (ee), ഉ (u), ഊ (oo), ഋ (ru), എ (e), ഏ (long e), ഐ (ai), ഒ (o), ഓ (long o), ഔ (au). Two extra signs follow them: അം (am, the anusvara, a nasal "m" sound, as at the end of വെള്ളം, vellam, water) and അഃ (ah, the visarga). Short and long vowels are different letters in Malayalam, so എ (short e) and ഏ (long e), ഒ (short o) and ഓ (long o) must not be mixed up. Vachan's romanization writes both e-sounds as "e" and both o-sounds as "o" (പേര്, peru; ഓണം, onam), so check the script for the length. Beginners usually start with അ ആ ഇ ഈ ഉ ഊ.
 
 ## Consonants — വ്യഞ്ജനങ്ങൾ (vyanjanangal)
 
@@ -30,7 +30,7 @@ Malayalam consonants are called വ്യഞ്ജനങ്ങൾ (vyanjanangal)
 
 <!-- topic: vowel-signs -->
 
-When a vowel follows a consonant, Malayalam writes a vowel sign instead of the full vowel: ക (ka), കാ (kaa), കി (ki), കീ (kee), കു (ku), കൂ (koo), കൃ (kru), കെ (ke), കേ (kee), കൈ (kai), കൊ (ko), കോ (koo), കൗ (kau), കം (kam). Note that some Malayalam vowel signs are written before the consonant even though they are said after it: in കെ (ke) and കേ (kee) the sign െ / േ stands on the left, and in കൊ (ko) and കോ (koo) the sign wraps around the letter on both sides.
+When a vowel follows a consonant, Malayalam writes a vowel sign instead of the full vowel: ക (ka), കാ (kaa), കി (ki), കീ (kee), കു (ku), കൂ (koo), കൃ (kru), കെ (ke), കേ (ke, long), കൈ (kai), കൊ (ko), കോ (ko, long), കൗ (kau), കം (kam). Note that some Malayalam vowel signs are written before the consonant even though they are said after it: in കെ (ke) and കേ (long ke) the sign െ / േ stands on the left, and in കൊ (ko) and കോ (long ko) the sign wraps around the letter on both sides.
 
 ## The chandrakkala ് and the half-u
 

@@ -2,6 +2,7 @@
 // lesson, review, AI tutor, speaking, role-play), then logging in again to check it was all saved.
 // Localhost only. First start the backend with LLM_PROVIDER=mock STT_PROVIDER=mock
 // TTS_PROVIDER=mock (npm run dev -w backend) and the frontend, then run: npm test
+import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
@@ -61,8 +62,8 @@ const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const optionButton = (text) =>
   page.getByRole("button", { name: new RegExp(`^${escapeRegExp(text)}(\\s|$)`) }).first();
 
-/** Answers the exercise on screen right or wrong, using the options stored in the database. */
-async function answer(exerciseId, correct) {
+/** Fills in the exercise on screen right or wrong, using the options stored in the database. */
+async function fillIn(exerciseId, correct) {
   const exerciseOptions = await optionsOf(exerciseId);
   const type = await typeOf(exerciseId);
   if (type === "MATCHING") {
@@ -78,10 +79,20 @@ async function answer(exerciseId, correct) {
     const words = exerciseOptions
       .filter((o) => o.correctPosition)
       .sort((a, b) => a.correctPosition - b.correctPosition);
-    for (const o of correct ? words : [...words].reverse()) await optionButton(o.text).click();
+    for (const o of correct ? words : [...words].reverse()) {
+      await page
+        .getByRole("button", { name: `Add ${o.text}`, exact: true })
+        .first()
+        .click();
+    }
   } else {
     await optionButton(exerciseOptions.find((o) => o.isCorrect === correct).text).click();
   }
+}
+
+/** Answers the exercise on screen right or wrong and presses Check. */
+async function answer(exerciseId, correct) {
+  await fillIn(exerciseId, correct);
   await page.getByRole("button", { name: "Check" }).click();
 }
 
@@ -115,40 +126,36 @@ try {
   await page.waitForURL("**/placement");
   await passStep("selected Telugu + self-assessment “I know the script” → placement");
 
-  // Placement: knows units 1, 2 and 4, not unit 3 → recommended Unit 3
+  // Placement: knows every tested unit except Unit 4 (first words) → recommended Unit 4
   await page.getByRole("button", { name: "Start the test" }).click();
-  for (let i = 0; i < 12; i++) {
+  const { rows: placement } = await db.query(
+    `select pq."exerciseId", pq."unitNumber" from "PlacementQuestion" pq join "Language" l on l.id=pq."languageId" where l.code='te' order by pq."sortOrder"`,
+  );
+  for (const [i, question] of placement.entries()) {
     const label = await page
-      .getByText(/^Unit \d · /)
+      .getByText(/^Unit \d+ · /)
       .first()
       .textContent();
-    const unit = Number(label.match(/Unit (\d)/)[1]);
-    const { rows } = await db.query(
-      `select pq."exerciseId" from "PlacementQuestion" pq join "Language" l on l.id=pq."languageId" where l.code='te' and pq."sortOrder"=$1`,
-      [i + 1],
+    assert(
+      Number(label.match(/Unit (\d+)/)[1]) === question.unitNumber,
+      `question ${i + 1}: ${label}`,
     );
-    const exerciseId = rows[0].exerciseId;
-    const exerciseOptions = await optionsOf(exerciseId);
-    const right = unit !== 3;
-    if ((await typeOf(exerciseId)) === "TRANSLATION")
-      await page.getByRole("textbox").fill(right ? exerciseOptions[0].text : "zzz");
-    else await optionButton(exerciseOptions.find((o) => o.isCorrect === right).text).click();
-    await page
-      .getByRole("button", { name: i === 11 ? "See my result" : "Next", exact: true })
-      .click();
-    if (i < 11) await page.getByText(`${i + 2} / 12`).waitFor();
+    await fillIn(question.exerciseId, question.unitNumber !== 4);
+    const last = i === placement.length - 1;
+    await page.getByRole("button", { name: last ? "See my result" : "Next", exact: true }).click();
+    if (!last) await page.getByText(`${i + 2} / ${placement.length}`).waitFor();
   }
-  await page.getByRole("heading", { name: /ready for Unit 3/ }).waitFor();
-  await page.getByRole("button", { name: "Start at Unit 3" }).click();
+  await page.getByRole("heading", { name: /ready for Unit 4/ }).waitFor();
+  await page.getByRole("button", { name: "Start at Unit 4" }).click();
   await page.waitForURL("**/learn");
-  await page.getByText("8 / 16 lessons").waitFor();
-  await passStep("placement → Unit 3 recommended and accepted; learning path shows 8 / 16");
+  await page.getByText("17 / 95 lessons").waitFor();
+  await passStep("placement → Unit 4 recommended and accepted; learning path shows 17 / 95");
 
   // Lesson + exercises: one mistake, then everything right
-  await page.goto(`${BASE}/lesson/te-u3-l1`);
+  await page.goto(`${BASE}/lesson/te-u4-l1`);
   await page.getByRole("button", { name: "Let's start" }).click();
   const { rows: exercises } = await db.query(
-    `select id from "Exercise" where "lessonId"='te-u3-l1' order by "sortOrder"`,
+    `select id from "Exercise" where "lessonId"='te-u4-l1' order by "sortOrder"`,
   );
   await answer(exercises[0].id, false);
   await page.getByText("Not quite").waitFor();
@@ -159,7 +166,7 @@ try {
     await page.getByRole("button", { name: "Continue", exact: true }).click();
   }
   await page.getByText("Lesson complete!").waitFor();
-  await passStep("lesson te-u3-l1: one wrong answer, then completed");
+  await passStep("lesson te-u4-l1: one wrong answer, then completed");
 
   // XP + streak in the top bar
   await page.getByRole("link", { name: "Continue" }).click();
@@ -200,6 +207,8 @@ try {
   // Speaking: record → speech-to-text → feedback
   await page.goto(`${BASE}/speak`);
   await page.getByRole("tab", { name: "Speak" }).click();
+  // The word list is grouped by lesson: open the Greetings lesson first.
+  await page.getByLabel("Lesson").selectOption({ label: "Unit 4 · Greetings" });
   await page
     .getByRole("button", { name: /^నమస్కారం/ })
     .first()
@@ -225,8 +234,8 @@ try {
   // Progress
   await page.goto(`${BASE}/profile`);
   await page.getByText(/of 8 earned/).waitFor();
-  await page.getByText(/9 of 16 lessons completed/).waitFor();
-  await passStep("profile shows progress (9 of 16 lessons) and badges");
+  await page.getByText(/18 of 95 lessons completed/).waitFor();
+  await passStep("profile shows progress (18 of 95 lessons) and badges");
 
   // Logout → login again → data persisted
   const xpBefore = await page
@@ -241,7 +250,7 @@ try {
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: /Log in/i }).click();
   await page.waitForURL("**/learn");
-  await page.getByText("9 / 16 lessons").waitFor();
+  await page.getByText("18 / 95 lessons").waitFor();
   await page.getByTitle(xpBefore).first().waitFor();
   await page.getByTitle("1 day streak").first().waitFor();
   await page.goto(`${BASE}/tutor`);
@@ -261,7 +270,12 @@ try {
   );
 } catch (error) {
   exitCode = 1;
-  console.error(`✗ step ${step + 1} failed: ${String(error.message).split("\n")[0]}`);
+  console.error(
+    `✗ step ${step + 1} failed: ${String(error.message)
+      .split("\n")
+      .slice(0, process.env.E2E_DEBUG ? 12 : 1)
+      .join("\n")}`,
+  );
   if (shots) await page.screenshot({ path: `${shots}/FAILED.png`, fullPage: true });
 } finally {
   await db.query(`delete from "User" where email=$1`, [email]); // clean up the throw-away account

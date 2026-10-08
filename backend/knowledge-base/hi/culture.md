@@ -30,7 +30,7 @@ Hindi is the official language of the Union government of India, together with E
 
 <!-- topic: festivals; level: elementary -->
 
-दिवाली (Diwali), also called दीपावली (deepaavalee), is the festival of lights, held in October or November. Families light small clay lamps called दीये (diye), clean and decorate their homes, and share मिठाई (mithaai, sweets). A common Hindi greeting is दिवाली की शुभकामनाएँ (Diwali kee shubhkaamnaaen, "best wishes for Diwali"). होली (Holi) is the spring festival of colours, when people throw coloured powder (गुलाल, gulaal) and water at each other, often shouting बुरा न मानो, होली है (buraa na maano, Holi hai — "don't mind, it's Holi").
+दिवाली (Diwali), also called दीपावली (deepaavalee), is the festival of lights, held in October or November. Families light small clay lamps called दीये (deeye), clean and decorate their homes, and share मिठाई (mithaaee, sweets). A common Hindi greeting is दिवाली की शुभकामनाएँ (Diwali kee shubhkaamnaaen, "best wishes for Diwali"). होली (Holi) is the spring festival of colours, when people throw coloured powder (गुलाल, gulaal) and water at each other, often shouting बुरा न मानो, होली है (buraa na maano, Holi hai — "don't mind, it's Holi").
 
 ## Everyday etiquette
 

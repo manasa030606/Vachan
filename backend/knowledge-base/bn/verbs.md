@@ -51,3 +51,33 @@ The Bengali future of যাওয়া (jaaoyaa, to go): আমি যাব (
 <!-- topic: imperative -->
 
 Bengali commands have three forms, matching তুই, তুমি and আপনি. Intimate (তুই): আয় (aay, come), বস (bosh, sit), খা (khaa, eat), বল (bol, tell). Familiar (তুমি): এসো (esho, come), বসো (bosho, sit), খাও (khaao, eat), বলো (bolo, tell). Polite (আপনি): আসুন (aashun, please come), বসুন (boshun, please sit), খান (khaan, please eat), বলুন (bolun, please tell). Always use the আপনি form with elders, strangers and teachers.
+
+## To come — আসা (aashaa)
+
+<!-- topic: verb-forms -->
+
+Main forms of the Bengali verb আসা (aashaa, to come). Present: আমি আসি (aami aashi, I come), তুমি আসো (tumi aasho), আপনি আসেন (aapni aashen), সে আসে (she aashe). Continuous: আমি আসছি (aami aashchhi, I am coming). Past: আমি এলাম (aami elaam, I came), সে এল (she elo). Present perfect: আমি এসেছি (aami eshechhi, I have come). Future: আমি আসব (aami aashbo, I will come), আপনি আসবেন (aapni aashben). Commands: আসুন (aashun, polite), এসো (esho, familiar), আয় (aay, intimate). Negative past: আমি আসিনি (aami aashini, I didn't come). Note আসি / আসছি also mean "bye, I'm off".
+
+## To do — করা (koraa)
+
+<!-- topic: verb-forms -->
+
+করা (koraa, to do / make) is the most useful Bengali verb, because it forms many compounds: কাজ করা (kaaj koraa, to work), রান্না করা (raannaa koraa, to cook), ফোন করা (phon koraa, to phone). Present: আমি করি (aami kori), তুমি করো (tumi koro), আপনি করেন (aapni koren), সে করে (she kore). Continuous: আমি করছি (aami korchhi). Past: আমি করলাম (aami korlaam). Perfect: আমি করেছি (aami korechhi). Future: আমি করব (aami korbo), তুমি করবে (tumi korbe), আপনি করবেন (aapni korben). Commands: করুন (korun), করো (koro), কর (kor). Don't: করবেন না (korben naa), কোরো না (koro naa).
+
+## To give and to take — দেওয়া, নেওয়া (deoyaa, neoyaa)
+
+<!-- topic: verb-forms -->
+
+দেওয়া (deoyaa, to give): present আমি দিই (aami dii), তুমি দাও (tumi daao), আপনি দেন (aapni den), সে দেয় (she dey); past আমি দিলাম (aami dilaam); future আমি দেব (aami debo), আপনি দেবেন (aapni deben); commands দিন (din), দাও (daao), দে (de). নেওয়া (neoyaa, to take): present আমি নিই (aami nii), তুমি নাও (tumi naao), আপনি নেন (aapni nen), সে নেয় (she ney); past আমি নিলাম (aami nilaam); future আমি নেব (aami nebo); commands নিন (nin), নাও (naao), নে (ne). In shops: এটা দিন (etaa din, "give me this"), আমি এটা নেব (aami etaa nebo, "I'll take this").
+
+## Can — পারা (paaraa)
+
+<!-- topic: modal-verbs; level: elementary -->
+
+Bengali expresses "can / be able to" with পারা (paaraa) after a verb in the -তে (-te) form. Present: আমি বলতে পারি (aami bolte paari, I can speak), তুমি পারো (tumi paaro), আপনি পারেন (aapni paaren). Right now: আমি বুঝতে পারছি (aami bujhte paarchhi, I can understand). Future: আমি আসতে পারব (aami aashte paarbo, I'll be able to come). Negatives: পারি না (paari naa, can't), পারব না (paarbo naa, won't be able to), পারিনি (paarini, couldn't). Permission: আসতে পারি? (aashte paari?, may I come in?). Request: সাহায্য করতে পারবেন? (shaahaajjo korte paarben?, can you help?).
+
+## To see, say and know — দেখা, বলা, জানা
+
+<!-- topic: verb-forms -->
+
+Three common Bengali verbs in the main tenses (for আমি, I). দেখা (dekhaa, to see / watch): দেখি (dekhi), দেখছি (dekhchhi), দেখলাম (dekhlaam), দেখেছি (dekhechhi), দেখব (dekhbo); command দেখুন / দেখো (dekhun / dekho). বলা (bolaa, to say / tell): বলি (boli), বলছি (bolchhi), বললাম (bollaam), বলেছি (bolechhi), বলব (bolbo); command বলুন / বলো / বল. জানা (jaanaa, to know): জানি (jaani), জানতাম (jaantaam, I used to know / knew), জানব (jaanbo); negative জানি না (jaani naa, I don't know). Examples: আমি সিনেমা দেখলাম (aami sinemaa dekhlaam, "I watched a film"), আমি জানতাম না (aami jaantaam naa, "I didn't know").

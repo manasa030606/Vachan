@@ -124,20 +124,20 @@ describe("a learner's complete journey", () => {
     assert.equal(start.status, 201);
     const testId = start.body.test.id;
     for (const question of start.body.questions as Json[]) {
-      // Knows units 1–2 (letters), not the words and sentences yet.
+      // Knows the letters (units 1–2), not the words and sentences yet.
       const answer = await answerFor(question.exercise.id, question.unit <= 2);
       await call("POST", "/placement/answer", { testId, questionId: question.id, answer });
     }
     const result = await call("GET", `/placement/result?testId=${testId}`);
     assert.equal(result.status, 200);
-    assert.equal(result.body.result.recommendedUnit, 3);
+    assert.equal(result.body.result.recommendedUnit, 4); // units 1–3 are the script
     const decide = await call("POST", "/placement/decide", { testId, choice: "recommended" });
     assert.equal(decide.status, 200);
   });
 
-  it("4. learning path: unit 3 is now open", async () => {
+  it("4. learning path: unit 4 (first words) is now open", async () => {
     const course = await call("GET", "/courses/te-course");
-    const lesson = course.body.course.units[2].lessons[0];
+    const lesson = course.body.course.units[3].lessons[0];
     assert.equal(lesson.status, "available");
     remember.lessonId = lesson.id;
   });
@@ -201,7 +201,10 @@ describe("a learner's complete journey", () => {
       "recording.wav",
     );
     form.append("language", "te");
-    form.append("vocabularyItemId", "te-v16-hello");
+    const hello = await prisma.vocabularyItem.findFirstOrThrow({
+      where: { language: { code: "te" }, script: "నమస్కారం" },
+    });
+    form.append("vocabularyItemId", hello.id);
     const response = await fetch(`${base}/speech/evaluate`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
@@ -246,7 +249,7 @@ describe("a learner's complete journey", () => {
       remember.completed,
     );
     const course = await call("GET", "/courses/te-course");
-    assert.equal(course.body.course.units[2].lessons[0].status, "completed");
+    assert.equal(course.body.course.units[3].lessons[0].status, "completed");
     const tutor = await call("GET", "/ai/conversations?language=te");
     assert.ok(tutor.body.conversations.some((c: Json) => c.id === remember.tutorId));
     const attempts = await call("GET", "/speech/attempts?language=te");

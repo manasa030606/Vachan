@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## Showing respect: ಅವರು, ಅಣ್ಣ, ಅಕ್ಕ and family words
 
-In Kannada, respect is shown with words added to names. ಅವರು (avaru) after a name is polite: ರವಿ ಅವರು (Ravi avaru, respected Ravi). People also call strangers by family words — ಅಣ್ಣ (anna, elder brother), ಅಕ್ಕ (akka, elder sister) — for example a shopkeeper or an auto driver. Teachers and officials are often addressed in English-style forms written in Kannada: ಸರ್ (sar, sir) and ಮೇಡಂ (medam, madam). Use ನೀವು (neevu), not ನೀನು (neenu), with anyone older or unfamiliar, and the polite verb forms such as ಬನ್ನಿ (banni, please come).
+In Kannada, respect is shown with words added to names. ಅವರು (avaru) after a name is polite: ರವಿ ಅವರು (Ravi avaru, respected Ravi). People also call strangers by family words — ಅಣ್ಣ (anna, elder brother), ಅಕ್ಕ (akka, elder sister) — for example a shopkeeper or an auto driver. Teachers and officials are often addressed in English-style forms written in Kannada: ಸಾರ್ (saar, sir) and ಮೇಡಂ (medam, madam). Use ನೀವು (neevu), not ನೀನು (neenu), with anyone older or unfamiliar, and the polite verb forms such as ಬನ್ನಿ (banni, please come).
 
 ## Where Kannada is spoken
 

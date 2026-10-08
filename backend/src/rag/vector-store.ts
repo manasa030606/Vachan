@@ -15,6 +15,9 @@ export const toVectorLiteral = (vector: number[]) => `[${vector.join(",")}]`;
 
 const toEnum = (value: string) => value.toUpperCase().replace(/-/g, "_");
 
+/** Rows per INSERT statement when saving chunks. */
+const INSERT_BATCH = 50;
+
 /** Replaces a document and all of its chunks in one transaction. */
 export async function saveDocument(
   prisma: PrismaClient,
@@ -31,31 +34,39 @@ export async function saveDocument(
   vectors: number[][],
 ) {
   const model = RAG_CONFIG.embedding.model;
+  const rows = chunks.map(
+    (chunk, index) => Prisma.sql`(
+      ${chunk.id}, ${chunk.documentId}, ${chunk.languageCode},
+      ${toEnum(chunk.level)}::"KnowledgeLevel", ${chunk.topic},
+      ${toEnum(chunk.skill)}::"KnowledgeSkill", ${toEnum(chunk.contentType)}::"KnowledgeContentType",
+      ${chunk.source}, ${chunk.reference}, ${chunk.heading}, ${chunk.content},
+      ${chunk.content.length}, ${chunk.contentHash},
+      ${model}, ${toVectorLiteral(vectors[index]!)}::vector, NOW())`,
+  );
   // One transaction: search sees either all the old chunks or all the new ones, never a mix
   // or an empty document. The status and body set by admins are not touched.
-  await prisma.$transaction(async (tx) => {
-    await tx.knowledgeChunk.deleteMany({ where: { documentId: document.id } });
-    const indexed = { chunkCount: chunks.length, needsReindex: false, lastIndexError: null };
-    await tx.knowledgeDocument.upsert({
-      where: { id: document.id },
-      create: { ...document, ...indexed },
-      update: { ...document, ...indexed, indexedAt: new Date() },
-    });
-    for (const [index, chunk] of chunks.entries()) {
-      await tx.$executeRaw`
-        INSERT INTO "KnowledgeChunk" (
-          "id", "documentId", "languageCode", "level", "topic", "skill", "contentType",
-          "source", "reference", "heading", "content", "charCount", "contentHash",
-          "embeddingModel", "embedding", "updatedAt")
-        VALUES (
-          ${chunk.id}, ${chunk.documentId}, ${chunk.languageCode},
-          ${toEnum(chunk.level)}::"KnowledgeLevel", ${chunk.topic},
-          ${toEnum(chunk.skill)}::"KnowledgeSkill", ${toEnum(chunk.contentType)}::"KnowledgeContentType",
-          ${chunk.source}, ${chunk.reference}, ${chunk.heading}, ${chunk.content},
-          ${chunk.content.length}, ${chunk.contentHash},
-          ${model}, ${toVectorLiteral(vectors[index]!)}::vector, NOW())`;
-    }
-  });
+  // Chunks are inserted INSERT_BATCH rows per statement: a course document has ~200 chunks, and
+  // one round trip per row is too slow over the network to a hosted database such as Neon.
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.knowledgeChunk.deleteMany({ where: { documentId: document.id } });
+      const indexed = { chunkCount: chunks.length, needsReindex: false, lastIndexError: null };
+      await tx.knowledgeDocument.upsert({
+        where: { id: document.id },
+        create: { ...document, ...indexed },
+        update: { ...document, ...indexed, indexedAt: new Date() },
+      });
+      for (let start = 0; start < rows.length; start += INSERT_BATCH) {
+        await tx.$executeRaw`
+          INSERT INTO "KnowledgeChunk" (
+            "id", "documentId", "languageCode", "level", "topic", "skill", "contentType",
+            "source", "reference", "heading", "content", "charCount", "contentHash",
+            "embeddingModel", "embedding", "updatedAt")
+          VALUES ${Prisma.join(rows.slice(start, start + INSERT_BATCH))}`;
+      }
+    },
+    { timeout: 60_000, maxWait: 10_000 },
+  );
 }
 
 export type VectorMatch = {

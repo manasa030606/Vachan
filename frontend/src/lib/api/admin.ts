@@ -106,6 +106,8 @@ export type AdminVocabulary = {
   romanization: string;
   meaning: string;
   topic: string;
+  /** Usage notes (formal/casual forms, alternatives) — shown to the AI tutor too. */
+  notes?: string | null;
   lessons?: number;
 };
 

@@ -30,7 +30,7 @@ Bengali numbers from one to ten, with the Bengali digits: ১ এক (ek), ২ �
 
 <!-- topic: colours; level: elementary -->
 
-Bengali colour words: লাল (laal, red), সবুজ (sobuj, green), নীল (nil, blue), হলুদ (holud, yellow — also the word for turmeric), সাদা (saadaa, white), কালো (kaalo, black). The word for colour is রং (rong). Colour words go before the noun and do not change their form: লাল গোলাপ (laal golaap, red rose), সাদা জামা (saadaa jaamaa, white shirt).
+Bengali colour words: লাল (laal, red), সবুজ (shobuj, green), নীল (nil, blue), হলুদ (holud, yellow — also the word for turmeric), সাদা (shaadaa, white), কালো (kaalo, black). The word for colour is রং (rong). Colour words go before the noun and do not change their form: লাল গোলাপ (laal golaap, red rose), সাদা জামা (saadaa jaamaa, white shirt).
 
 ## Time words
 

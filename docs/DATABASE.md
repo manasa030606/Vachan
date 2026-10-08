@@ -58,20 +58,35 @@ Rules:
 - Never edit a migration that has already been applied somewhere.
 - Never run `db:reset` or `migrate dev` against production.
 
-There are 7 migrations in `backend/prisma/migrations/`, each plain SQL you can read.
+There are 8 migrations in `backend/prisma/migrations/`, each plain SQL you can read.
 
 ## Seed data
 
-`npm run db:seed` loads, for each of the six languages: 1 course, 4 units, 16 lessons, 67 exercises
-and 34 vocabulary items, plus 12 placement questions, 8 badges and a demo account (development only).
+`npm run db:seed` loads, for each of the six languages: 1 course, 16 units, 95 lessons, about
+1,340 exercises and about 620 words, phrases and letters (with usage notes), plus 18 placement
+questions, 8 badges and a demo account (development only). Check the numbers with
+`npm run content:stats -w backend`.
 
-The seed is **safe to run again**: it only creates a language's course if that language has none,
-so content edited in the admin dashboard is never overwritten.
-To throw content away and recreate it from code (development only, deletes lesson progress):
-`npm run db:seed:reset-content -w backend`.
+| Command                                    | When                                                  | What it does                                                                                       |
+| ------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `npm run db:seed`                          | New database                                          | Creates the course of every language that has none. An existing course is left alone.              |
+| `npm run db:seed:sync`                     | After the course content changed (also on production) | Updates existing courses to the latest content **and keeps all learner data**                      |
+| `npm run db:seed:reset-content -w backend` | Development only                                      | Deletes the courses (and with them learners' lesson progress and answers), then creates them again |
+
+How `db:seed:sync` keeps learner data (`backend/prisma/content-sync.ts`, one transaction per language):
+
+- Units, lessons and exercises are matched by their stable ids and updated in place.
+- Words are matched by their script, so an existing word keeps its id (speaking history stays linked).
+- The original 16-lesson course is detected and each old lesson is moved onto the new lesson that
+  teaches the same thing, with its progress and answers.
+- Old exercises that learners answered move to a hidden "Retired exercises" lesson, so answer
+  history and open mistakes survive; unused old exercises are deleted.
+- Placement questions are updated in place, so earlier placement results stay.
+- Lessons, exercises and words created in the admin dashboard are never touched. Note: edits made
+  in the dashboard to _generated_ content are replaced by the next sync.
 
 Readable ids make testing easy: course `te-course`, unit `te-u2`, lesson `te-u2-l1`,
-exercise `te-u2-l1-e3`.
+exercise `te-u2-l1-e03`, word `te-w-water`, phrase `te-p-i-want-water`.
 
 ## Useful commands
 

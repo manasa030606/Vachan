@@ -569,7 +569,11 @@ export type VocabularyInput = {
   romanization: string;
   meaning: string;
   topic: string;
+  notes?: string | null;
 };
+
+/** The admin list shows a whole language's vocabulary (~600 items), so the cap is generous. */
+const VOCABULARY_LIST_LIMIT = 2000;
 
 export async function listVocabulary(languageCode: string, search?: string) {
   const items = await prisma.vocabularyItem.findMany({
@@ -587,7 +591,7 @@ export async function listVocabulary(languageCode: string, search?: string) {
     },
     include: { _count: { select: { lessons: true } } },
     orderBy: [{ kind: "asc" }, { topic: "asc" }, { script: "asc" }],
-    take: 500,
+    take: VOCABULARY_LIST_LIMIT,
   });
   return items.map(({ _count, ...item }) => ({ ...item, lessons: _count.lessons }));
 }
@@ -600,7 +604,12 @@ export async function createVocabulary(
   const language = await prisma.language.findUnique({ where: { code: languageCode } });
   if (!language) throw notFound("LANGUAGE_NOT_FOUND", "Language not found");
   const item = await prisma.vocabularyItem.create({
-    data: { ...input, script: input.script.normalize("NFC"), languageId: language.id },
+    data: {
+      ...input,
+      script: input.script.normalize("NFC"),
+      notes: input.notes || null,
+      languageId: language.id,
+    },
   });
   await markCourseVocabularyStale(languageCode);
   await audit(adminId, "vocabulary.create", {
@@ -619,7 +628,11 @@ export async function updateVocabulary(
   const item = await prisma.vocabularyItem
     .update({
       where: { id },
-      data: { ...input, ...(input.script ? { script: input.script.normalize("NFC") } : {}) },
+      data: {
+        ...input,
+        ...(input.script ? { script: input.script.normalize("NFC") } : {}),
+        ...(input.notes !== undefined ? { notes: input.notes || null } : {}),
+      },
       include: { language: true },
     })
     .catch((error: unknown) => {

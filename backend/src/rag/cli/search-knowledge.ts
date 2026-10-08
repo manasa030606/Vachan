@@ -46,7 +46,7 @@ try {
     const r = chunk.relevance;
     console.log(`#${chunk.rank}  ${chunk.id}`);
     console.log(
-      `    score ${r.score} = similarity ${r.similarity} + boost ${r.boost}  (level: ${r.levelMatch}, topic: ${r.topicMatch ?? "-"}, words: ${r.matchedTerms.join(" ") || "-"})`,
+      `    score ${r.score} = similarity ${r.similarity} + boost ${r.boost}  (level: ${r.levelMatch}, topic: ${r.topicMatch ?? "-"}, words: ${r.matchedTerms.join(" ") || "-"}, curated: ${r.curated ? "yes" : "no"})`,
     );
     console.log(
       `    ${chunk.metadata.language} · ${chunk.metadata.level} · ${chunk.metadata.contentType} · ${chunk.metadata.topic} · ${chunk.metadata.source}`,

@@ -7,12 +7,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { admin, type AdminVocabulary } from "@/lib/api/admin";
-import { ActionButton, ConfirmDelete, Field, Input, Notice, Select } from "./admin-ui";
+import { ActionButton, ConfirmDelete, Field, Input, Notice, Select, Textarea } from "./admin-ui";
 import { useLoad } from "./use-load";
 
 /** The editable fields of a vocabulary item. */
 type Word = Omit<AdminVocabulary, "id" | "lessons">;
-const EMPTY_WORD: Word = { kind: "WORD", script: "", romanization: "", meaning: "", topic: "" };
+const EMPTY_WORD: Word = {
+  kind: "WORD",
+  script: "",
+  romanization: "",
+  meaning: "",
+  topic: "",
+  notes: "",
+};
 const KINDS = ["LETTER", "WORD", "PHRASE"] as const;
 
 export function VocabularyView() {
@@ -211,6 +218,7 @@ function WordForm({
     romanization: initial.romanization,
     meaning: initial.meaning,
     topic: initial.topic,
+    notes: initial.notes ?? "",
   });
   const [error, setError] = useState<string | null>(null);
   const set = (key: keyof Word) => (e: { target: { value: string } }) =>
@@ -236,6 +244,17 @@ function WordForm({
           )}
         </Field>
       </div>
+      <Field label="Usage notes (optional)">
+        {(id) => (
+          <Textarea
+            id={id}
+            rows={2}
+            value={word.notes ?? ""}
+            onChange={set("notes")}
+            placeholder="Formal/casual forms, alternatives, literal meaning…"
+          />
+        )}
+      </Field>
       {error && <Notice>{error}</Notice>}
       <div className="flex gap-2">
         <ActionButton size="sm" onFail={setError} action={() => onSave(word)}>

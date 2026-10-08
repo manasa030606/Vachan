@@ -123,9 +123,6 @@ export function LearnView() {
               {units.map((unit) => (
                 <UnitSection key={unit.id} unit={unit} />
               ))}
-              <p className="pb-4 text-center text-sm text-slate-500">
-                More units (Sentence Building → Advanced) are added as the course content grows.
-              </p>
             </div>
 
             {/* On phones/tablets the other stats sit below the path; on desktop they are in the right column. */}

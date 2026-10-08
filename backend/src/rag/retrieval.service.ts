@@ -80,6 +80,7 @@ export async function searchKnowledge(request: SearchRequest) {
         level: request.level,
         topic: request.topic,
         terms: nativeTerms(request.query),
+        preferCurated: true,
       });
   const top = ranked.slice(0, limit);
 

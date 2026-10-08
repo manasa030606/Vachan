@@ -40,10 +40,11 @@ Rule followed: measure first, and only optimise what a measurement shows is slow
 
 | Request                    | Size         | Time          |
 | -------------------------- | ------------ | ------------- |
-| Course with all lessons    | 3 KB         | 6–30 ms       |
+| Course with all 95 lessons | 15 KB        | 6–15 ms       |
 | Stats (XP, streak, hearts) | 1.3 KB       | ~15 ms        |
 | Admin analytics            | 4.5 KB       | ~50 ms        |
-| Full Postman run           | 157 requests | average 12 ms |
+| Full Postman run           | 158 requests | average 12 ms |
+| Knowledge-base search      | 5,300 chunks | ~12 ms        |
 
 **Load test:** with 200,000 extra answers in the database, admin analytics took 0.17–0.27 s and the
 learner pages stayed under 30 ms.
@@ -60,7 +61,7 @@ learner pages stayed under 30 ms.
 
 ### What was not optimised, and why
 
-- **No vector index (HNSW)**: 430 chunks are searched exactly in a few milliseconds. Add an index
+- **No vector index (HNSW)**: about 5,300 chunks are searched exactly in ~12 ms. Add an index
   once there are tens of thousands of chunks.
 - **No cache layer**: no measurement showed a need.
 - **Free hosting cold starts** (30–60 s) are a hosting limit, not a code problem.

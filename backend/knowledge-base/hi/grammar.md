@@ -14,7 +14,9 @@ source: Vachan curated notes
 
 <!-- level: beginner -->
 
-Hindi sentences put the verb at the end. The usual order is subject – object – verb (SOV), unlike English subject – verb – object. मैं खाना खाता हूँ (main khaanaa khaataa hoon) is literally "I food eat am" = "I eat food". Question words usually come just before the verb: आप कहाँ हैं? (aap kahaan hain?, "where are you?"). Unlike Telugu, Hindi "X is Y" sentences keep the verb है (hai, is) at the end: मेरा नाम आशा है (meraa naam Asha hai, "my name is Asha").
+Hindi sentences put the verb at the end. The usual order is subject – object – verb (SOV), unlike English subject – verb – object. मैं खाना खाता हूँ (main khaanaa khaataa hoon) is literally "I food eat am" = "I eat food". Question words usually come just before the verb: आप कहाँ हैं? (aap kahaan hain?, "where are you?"). Hindi "X is Y" sentences keep the verb है (hai, is) at the end: मेरा नाम आशा है (meraa naam Asha hai, "my name is Asha").
+
+Also asked as: what is the word order in Hindi, where does the verb go in a Hindi sentence, how are Hindi sentences built, why is the verb at the end, basic Hindi sentence structure
 
 ## Personal pronouns
 
@@ -44,13 +46,13 @@ Hindi verbs change to match the gender and number of the subject. In the present
 
 <!-- topic: possessives; level: beginner -->
 
-Hindi possessive words come before the noun: मेरा (meraa, my), तेरा (teraa, your — very intimate), तुम्हारा (tumhaaraa, your — informal), आपका (aapkaa, your — respectful), हमारा (hamaaraa, our), उसका (uskaa, his / her), उनका (unkaa, their, or his / her respectfully). They change to match the thing owned, not the owner: मेरा भाई (meraa bhaai, my brother), मेरी बहन (meree bahan, my sister), मेरे दोस्त (mere dost, my friends). So a woman also says मेरा नाम (meraa naam), because नाम is masculine.
+Hindi possessive words come before the noun: मेरा (meraa, my), तेरा (teraa, your — very intimate), तुम्हारा (tumhaaraa, your — informal), आपका (aapkaa, your — respectful), हमारा (hamaaraa, our), उसका (uskaa, his / her), उनका (unkaa, their, or his / her respectfully). They change to match the thing owned, not the owner: मेरा भाई (meraa bhaaee, my brother), मेरी बहन (meree bahan, my sister), मेरे दोस्त (mere dost, my friends). So a woman also says मेरा नाम (meraa naam), because नाम is masculine.
 
 ## Case endings (postpositions)
 
 <!-- topic: postpositions -->
 
-Hindi uses postpositions, small words placed after the noun, where English uses prepositions. में (mein) means "in": घर में (ghar mein, in the house). पर (par) means "on / at": मेज़ पर (mez par, on the table). से (se) means "from" or "with / by": दिल्ली से (Dilli se, from Delhi). को (ko) means "to" and also marks a person as object: माँ को (maa ko, to mother). तक (tak) means "up to / until". Before a postposition, masculine nouns ending in -आ change to -े: कमरा → कमरे में (kamre mein, in the room).
+Hindi uses postpositions, small words placed after the noun, where English uses prepositions. में (mein) means "in": घर में (ghar mein, in the house). पर (par) means "on / at": मेज़ पर (mez par, on the table). से (se) means "from" or "with / by": दिल्ली से (Dillee se, from Delhi). को (ko) means "to" and also marks a person as object: माँ को (maa ko, to mother). तक (tak) means "up to / until". Before a postposition, masculine nouns ending in -आ change to -े: कमरा → कमरे में (kamre mein, in the room).
 
 ## The possessive postposition का / की / के
 
@@ -62,13 +64,13 @@ In Hindi, "X's Y" or "Y of X" is X का Y. The word का changes to agree wi
 
 <!-- topic: dative -->
 
-For wanting, liking and knowing, Hindi says "to me … is needed / liked / known". The person takes को (ko), and मैं + को becomes मुझे (mujhe, to me); आप + को is आपको (aapko). मुझे पानी चाहिए (mujhe paani chaahiye, I want water). मुझे हिंदी पसंद है (mujhe Hindi pasand hai, I like Hindi). मुझे पता है (mujhe pataa hai, I know). मुझे नहीं पता (mujhe nahin pataa, I don't know). आपको क्या चाहिए? (aapko kyaa chaahiye?, what do you want?).
+For wanting, liking and knowing, Hindi says "to me … is needed / liked / known". The person takes को (ko), and मैं + को becomes मुझे (mujhe, to me); आप + को is आपको (aapko). मुझे पानी चाहिए (mujhe paani chaahiye, I want water). मुझे हिंदी पसंद है (mujhe hindee pasand hai, I like Hindi). मुझे पता है (mujhe pataa hai, I know). मुझे नहीं पता (mujhe nahin pataa, I don't know). आपको क्या चाहिए? (aapko kyaa chaahiye?, what do you want?).
 
 ## Asking questions
 
 <!-- topic: questions -->
 
-Hindi question words: क्या (kyaa, what), कौन (kaun, who), कहाँ (kahaan, where), कब (kab, when), क्यों (kyon, why), कैसे (kaise, how), कितना (kitnaa, how much), कौन-सा (kaun-saa, which). They usually go just before the verb: आप कब आएँगे? (aap kab aaenge?, when will you come?). For a yes/no question, keep the normal word order and raise your voice at the end, or put क्या at the start: क्या आप हिंदी बोलते हैं? (kyaa aap Hindi bolte hain?, do you speak Hindi?).
+Hindi question words: क्या (kyaa, what), कौन (kaun, who), कहाँ (kahaan, where), कब (kab, when), क्यों (kyon, why), कैसे (kaise, how), कितना (kitnaa, how much), कौन-सा (kaun-saa, which). They usually go just before the verb: आप कब आएँगे? (aap kab aaenge?, when will you come?). For a yes/no question, keep the normal word order and raise your voice at the end, or put क्या at the start: क्या आप हिंदी बोलते हैं? (kyaa aap hindee bolte hain?, do you speak Hindi?).
 
 ## Saying "not" — नहीं and मत
 
@@ -80,4 +82,28 @@ Hindi makes a sentence negative by putting नहीं (nahin) just before the 
 
 <!-- topic: plurals -->
 
-Hindi plurals depend on gender and ending. Masculine nouns ending in -आ change it to -े: लड़का (ladkaa, boy) → लड़के (ladke, boys), कमरा → कमरे. Other masculine nouns stay the same: घर (ghar, house / houses), दोस्त (dost, friend / friends). Feminine nouns ending in -ई (-ee) change it to -इयाँ (-iyaan): लड़की (ladkee, girl) → लड़कियाँ (ladkiyaan, girls). Other feminine nouns add -ें: किताब (kitaab, book) → किताबें (kitaaben, books), बहन (bahan) → बहनें (bahanen, sisters).
+Hindi plurals depend on gender and ending. Masculine nouns ending in -आ change it to -े: लड़का (ladkaa, boy) → लड़के (ladke, boys), कमरा → कमरे. Other masculine nouns stay the same: घर (ghar, house / houses), दोस्त (dost, friend / friends). Feminine nouns ending in -ई (-ee) change it to -इयाँ (-iyaan): लड़की (ladkee, girl) → लड़कियाँ (ladkiyaan, girls). Other feminine nouns add -ें: किताब (kitaab, book) → किताबें (kitaaben, books), बहन (bahan) → बहनें (bahnen, sisters).
+
+## "To have" in Hindi — के पास, मेरा … है, मुझे … है
+
+<!-- topic: to-have -->
+
+Hindi has no verb "to have"; it uses three patterns, all the same for men and women. 1) Things you own or carry: मेरे पास … है (mere paas … hai, "near me is …"): मेरे पास कार है (mere paas kaar hai, I have a car), मेरे पास पैसे नहीं हैं (mere paas paise nahin hain, I don't have money). 2) Family, friends and body parts: मेरा / मेरी / मेरे … है: मेरी दो बहनें हैं (meree do bahnen hain, I have two sisters). 3) Illnesses, feelings and time: मुझे … है: मुझे बुख़ार है (mujhe bukhaar hai, I have a fever), मुझे काम है (mujhe kaam hai, I have work). Question: क्या आपके पास … है? (kyaa aapke paas … hai?, do you have …?).
+
+## Adjective agreement
+
+<!-- topic: gender -->
+
+Hindi adjectives ending in -आ (-aa) change to agree with the noun: -आ for masculine singular, -े (-e) for masculine plural or respectful, -ई (-ee) for feminine (singular or plural). Examples: अच्छा लड़का (achchhaa ladkaa, good boy), अच्छे लड़के (achchhe ladke, good boys), अच्छी लड़की / लड़कियाँ (achchhee ladkee / ladkiyaan, good girl / girls). Before a postposition the masculine form also becomes -े: बड़े घर में (bade ghar mein, in the big house). Adjectives not ending in -आ never change: सुंदर (sundar, beautiful), लाल (laal, red), ख़ुश (khush, happy), ठीक (theek, fine). The same rule applies when the adjective comes after the noun: लड़की लंबी है (ladkee lambee hai, the girl is tall).
+
+## Pronouns with postpositions — मुझे, मुझसे, मेरे लिए
+
+<!-- topic: pronouns -->
+
+Hindi pronouns change form before postpositions. With को (ko, to) they merge: मैं → मुझे (mujhe, to me), तुम → तुम्हें (tumhen, to you), वह → उसे (use, to him / her), हम → हमें (hamen, to us), वे → उन्हें (unhen, to them); आप just adds को: आपको (aapko). With से (se, from / with): मुझसे (mujhse), तुमसे (tumse), आपसे (aapse), उससे (usse). With के लिए (ke lie, for) the possessive form is used: मेरे लिए (mere lie, for me), आपके लिए (aapke lie, for you). Examples: मुझे चाय चाहिए (mujhe chaay chaahiye, I want tea), आपसे मिलकर अच्छा लगा (aapse milkar achchhaa lagaa, nice to meet you), यह तुम्हारे लिए है (yah tumhaare lie hai, this is for you).
+
+## More postpositions — के लिए, के बाद, से पहले, के पास
+
+<!-- topic: postpositions -->
+
+Many Hindi postpositions are two words, starting with के (ke) or से (se), and always come after the noun: के लिए (ke lie, for): माँ के लिए (maa ke lie, for mother); के बाद (ke baad, after): खाने के बाद (khaane ke baad, after the meal); से पहले (se pahle, before): क्लास से पहले (klaas se pahle, before class); के पास (ke paas, near / with): स्टेशन के पास (steshan ke paas, near the station); के साथ (ke saath, with): दोस्त के साथ (dost ke saath, with a friend); के सामने (ke saamne, in front of); के पीछे (ke peechhe, behind); के अंदर (ke andar, inside); के बाहर (ke baahar, outside). With pronouns के becomes the possessive: मेरे साथ (mere saath, with me), उसके बाद (uske baad, after that).

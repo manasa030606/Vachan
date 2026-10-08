@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## Short and long vowels change the meaning
 
-In Telugu, vowel length matters: a long vowel is held about twice as long as a short one, and swapping them can change the word. కలం (kalam) means "pen", but కాలం (kaalam) means "time". In romanization Vachan writes long vowels doubled: aa, ee, oo. Telugu also has short e and o (ఎ, ఒ) as well as long ee and oo (ఏ, ఓ), which English speakers often merge, for example పెట్టు (pettu, to put) and పేరు (peru, name).
+In Telugu, vowel length matters: a long vowel is held about twice as long as a short one, and swapping them can change the word. కలం (kalam) means "pen", but కాలం (kaalam) means "time". In romanization Vachan writes long vowels doubled: aa, ee, oo. Telugu also has short e and o (ఎ, ఒ) as well as long e and o (ఏ, ఓ), which English speakers often merge, for example పెట్టు (pettu, to put) has a short e and పేరు (peru, name) a long one. Vachan's romanization writes both as "e" / "o", so look at the Telugu letter to know the length.
 
 ## Dental and retroflex sounds
 
@@ -37,3 +37,19 @@ Almost every native Telugu word ends in a vowel, which gives the language its sm
 <!-- topic: double-consonants; level: elementary -->
 
 When a Telugu word has a doubled consonant, hold it for a moment before releasing it. అమ్మ (amma, mother), నాన్న (naanna, father), అక్క (akka, elder sister) and పిల్లి (pilli, cat) all have a held middle consonant. Saying the double sound as a single one can make a word unclear or change it, so practise a short pause: am-ma, ak-ka.
+
+## How to pronounce common Telugu phrases
+
+<!-- level: elementary -->
+
+Tips for saying common Telugu phrases: నమస్కారం (namaskaaram) — stress nothing, hold the long "kaa", end with a light "m". ధన్యవాదాలు (dhanyavaadaalu) — breathy "dh", two long "aa" sounds. నాకు ఆకలిగా ఉంది (naaku aakaligaa undi) — long "naa" and "aa", the "d" in ఉంది is dental (tongue at the teeth). బాగున్నాను (baagunnaanu) — hold the double "nn". నీళ్ళు (neellu, water) — long "ee" and a retroflex "ll" with the tongue curled back. వెళ్ళొస్తాను (vellostaanu) — again retroflex "ll". Say every final vowel: "peru", not "per". Speak evenly; Telugu has no strong word stress like English.
+
+Also asked as: how do I pronounce this phrase in Telugu, pronunciation tips, how to say namaskaaram correctly, how to pronounce Telugu words
+
+## Telugu sounds English speakers find hard
+
+<!-- level: elementary -->
+
+The hardest Telugu sounds for English speakers: (1) retroflex ట డ ణ ళ — curl the tongue tip back: ళ in నీళ్ళు (neellu, water) is not the same as ల in పాలు (paalu, milk). (2) Dental త ద — tongue touching the teeth, softer than English t/d: తల (tala, head), దూరం (dooram, far). (3) Aspirated ఖ ఘ ధ భ — with a puff of air: భోజనం (bhojanam, meal). (4) Long vs short vowels: కలం (kalam, pen) vs కాలం (kaalam, time). (5) Double consonants held longer: అక్క (akka, elder sister), అమ్మ (amma). (6) Short and long e/o: పెట్టు (pettu) vs పేరు (peru).
+
+Also asked as: difficult Telugu sounds, how to pronounce retroflex sounds, Telugu pronunciation problems, hard letters in Telugu

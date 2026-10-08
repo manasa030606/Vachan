@@ -16,9 +16,27 @@ knowledge-base/
     idioms.md          common sayings with meaning and usage
     culture.md         forms of address, etiquette, festivals, the language itself
     beginner-guide.md  how to start, how romanization works, study tips
+    sentence-patterns.md  reusable patterns: I want ___, I like ___, Where is ___?, Do you have ___?…
+    questions.md       question words and how questions are built
+    requests.md        please, help, wait, say it again, polite commands
+    emotions.md        feelings and relationships (I love you, I miss you, sorry, take care…)
+    food.md            hungry/thirsty, ordering, taste, the bill
+    travel.md          transport, tickets, directions, the bathroom
+    shopping.md        prices, bargaining, sizes, paying
+    college.md         college and work
+    numbers-time.md    numbers, age, time, days, months
+    everyday-life.md   daily routine, home, weather, phone, invitations
+    common-mistakes.md mistakes English speakers make, and words that are easy to confuse
+    dialogues.md       GENERATED from the course — edit prisma/content/languages/<code>.ts, then
+                       run `npm run content:dialogues -w backend`
 ```
 
-Course vocabulary that is already in the database (`VocabularyItem`) is indexed too, as `source: Vachan course content` — no file needed.
+The course itself (words and phrases in the `VocabularyItem` table, with their usage notes) is
+indexed too, as `source: Vachan course content` — no file needed.
+
+Phrase sections end with an `Also asked as:` line listing other ways a learner might ask for the
+same thing ("how can I tell someone I love them", "what's I love you in Telugu"). This is how the
+search finds a note when the question is worded differently — prefer it to changing the search code.
 
 ## File format
 

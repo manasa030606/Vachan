@@ -50,8 +50,18 @@ Anything starting with `NEXT_PUBLIC_` is visible in the browser, so never put se
 ```bash
 npm install                     # also generates the Prisma client
 npm run db:migrate              # create all tables
-npm run db:seed                 # 6 languages, 96 lessons, placement questions, badges
-npm run rag:index -w backend    # build the knowledge base (downloads a ~130 MB model once)
+npm run db:seed                 # 6 languages × 95 lessons, ~3,400 words and phrases, badges
+npm run rag:index -w backend    # build the knowledge base (~5,300 notes; downloads a ~130 MB model once, takes ~3 min)
+npm run content:stats -w backend  # print the numbers per language
+```
+
+Already have a database with the older, smaller course? Upgrade it without losing accounts or
+progress:
+
+```bash
+npm run db:migrate
+npm run db:seed:sync
+npm run rag:index -w backend
 ```
 
 Check the AI key (optional):

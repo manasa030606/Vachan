@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## Family words
 
-Hindi family words: माँ (maa, mother), पिता (pitaa, father — at home often पापा, paapaa, or पिताजी, pitaajee), भाई (bhaai, brother), बहन (bahan, sister), बेटा (betaa, son), बेटी (betee, daughter), दादा (daadaa, father's father), दादी (daadee, father's mother), नाना (naanaa, mother's father), नानी (naanee, mother's mother). A friend is दोस्त (dost). Hindi has different words for grandparents on the father's and the mother's side. For older and younger siblings it adds बड़ा (badaa, big) or छोटा (chhotaa, small): बड़ा भाई (badaa bhaai, elder brother), छोटी बहन (chhotee bahan, younger sister).
+Hindi family words: माँ (maa, mother), पिता (pitaa, father — at home often पापा, paapaa, or पिताजी, pitaajee), भाई (bhaaee, brother), बहन (bahan, sister), बेटा (betaa, son), बेटी (betee, daughter), दादा (daadaa, father's father), दादी (daadee, father's mother), नाना (naanaa, mother's father), नानी (naanee, mother's mother). A friend is दोस्त (dost). Hindi has different words for grandparents on the father's and the mother's side. For older and younger siblings it adds बड़ा (badaa, big) or छोटा (chhotaa, small): बड़ा भाई (badaa bhaaee, elder brother), छोटी बहन (chhotee bahan, younger sister).
 
 ## Food and drink
 

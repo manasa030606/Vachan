@@ -7,8 +7,11 @@
 //   4. semantic similarity  → the base score (cosine similarity from pgvector)
 // Plus: a bonus when the question contains a native-script word that appears in the chunk
 // (e.g. "What does అమ్మ mean?"), because exact words matter for vocabulary questions.
+// Plus: a small bonus for curated notes (knowledge-base files and admin notes) over the one-line
+// course entries (course/<code>/…). Very short entries like "Why — ఎందుకు" are close to many
+// questions; when similarities are nearly equal, the written explanation should come first.
 //
-// score = similarity + levelBonus + topicBonus + termBonus — simple and explainable.
+// score = similarity + levelBonus + topicBonus + termBonus + curatedBonus — simple and explainable.
 import { KNOWLEDGE_LEVELS, RAG_CONFIG, type KnowledgeLevelName } from "./config.ts";
 
 export type LevelMatch = "exact" | "easier" | "harder" | "not-requested";
@@ -20,6 +23,8 @@ export type Relevance = {
   topicMatch: boolean | null;
   /** Native-script words from the question found in the chunk */
   matchedTerms: string[];
+  /** A written explanation (knowledge-base file or admin note), not a generated course entry */
+  curated: boolean;
   /** Sum of the metadata bonuses/penalties */
   boost: number;
   /** similarity + boost — results are sorted by this */
@@ -32,6 +37,8 @@ export type RankInput = {
   topic: string;
   content: string;
   heading: string;
+  /** "te/phrases" (curated file), "course/te/words" (generated from the course), … */
+  documentId?: string;
 };
 
 export function compareLevels(
@@ -49,13 +56,14 @@ const round = (value: number) => Math.round(value * 10_000) / 10_000;
 
 export function scoreCandidate(
   candidate: RankInput,
-  request: { level?: KnowledgeLevelName; topic?: string; terms: string[] },
+  request: { level?: KnowledgeLevelName; topic?: string; terms: string[]; preferCurated?: boolean },
 ): Relevance {
   const { boosts } = RAG_CONFIG.retrieval;
   const levelMatch = compareLevels(candidate.level, request.level);
   const topicMatch = request.topic ? candidate.topic === request.topic : null;
   const text = `${candidate.heading}\n${candidate.content}`;
   const matchedTerms = request.terms.filter((term) => text.includes(term));
+  const curated = candidate.documentId !== undefined && !candidate.documentId.startsWith("course/");
 
   let boost = 0;
   if (levelMatch === "exact") boost += boosts.levelExact;
@@ -63,12 +71,14 @@ export function scoreCandidate(
   if (levelMatch === "harder") boost += boosts.levelAbove;
   if (topicMatch) boost += boosts.topicMatch;
   if (matchedTerms.length > 0) boost += boosts.termMatch;
+  if (curated && request.preferCurated) boost += boosts.curatedNotes;
 
   return {
     similarity: round(candidate.similarity),
     levelMatch,
     topicMatch,
     matchedTerms,
+    curated,
     boost: round(boost),
     score: round(candidate.similarity + boost),
   };
@@ -77,7 +87,7 @@ export function scoreCandidate(
 /** Scores and sorts candidates (highest score first; ties keep the vector-search order). */
 export function rankCandidates<T extends RankInput>(
   candidates: T[],
-  request: { level?: KnowledgeLevelName; topic?: string; terms: string[] },
+  request: { level?: KnowledgeLevelName; topic?: string; terms: string[]; preferCurated?: boolean },
 ): Array<T & { relevance: Relevance }> {
   return candidates
     .map((candidate, index) => ({

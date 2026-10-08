@@ -24,13 +24,13 @@ Tamil: நீங்கள் எப்படி இருக்கிறீர�
 
 <!-- topic: dative; level: elementary -->
 
-Tamil: எனக்கு தண்ணீர் வேண்டும் (enakku thanneer vendum). Word by word: எனக்கு (enakku) = to me, தண்ணீர் (thanneer) = water, வேண்டும் (vendum) = is needed / wanted. Literally "to me water is wanted". Swap the noun to ask for other things: எனக்கு பால் வேண்டும் (enakku paal vendum, I want milk), எனக்கு சாப்பாடு வேண்டும் (enakku saappaadu vendum, I want food). In speech: எனக்கு தண்ணீர் வேணும் (enakku thanneer venum).
+Tamil: எனக்கு தண்ணீர் வேண்டும் (enakku thanneer vendum). Word by word: எனக்கு (enakku) = to me, தண்ணீர் (thanneer) = water, வேண்டும் (vendum) = is needed / wanted. Literally "to me water is wanted". Swap the noun to ask for other things: எனக்கு பால் வேண்டும் (enakku paal vendum, I want milk), எனக்கு சாப்பாடு வேண்டும் (enakku saappaadu vendum, I want food). In speech: எனக்குத் தண்ணி வேணும் (enakkuth thanni venum). Careful written Tamil doubles the த after எனக்கு: எனக்குத் தண்ணீர் வேண்டும் (enakkuth thanneer vendum), the spelling used in the Vachan lessons.
 
 ## "I am going home" — நான் வீட்டுக்கு போகிறேன்
 
 <!-- topic: postpositions; level: elementary -->
 
-Tamil: நான் வீட்டுக்கு போகிறேன் (naan veettukku pogiren). Word by word: நான் (naan) = I, வீட்டுக்கு (veettukku) = to the house (வீடு, veedu, house + -க்கு, -kku, to), போகிறேன் (pogiren) = am going. The verb is last and "to" is an ending on the noun. Spoken version: நான் வீட்டுக்கு போறேன் (naan veettukku poren).
+Tamil: நான் வீட்டுக்கு போகிறேன் (naan veettukku pogiren). Word by word: நான் (naan) = I, வீட்டுக்கு (veettukku) = to the house (வீடு, veedu, house + -க்கு, -kku, to), போகிறேன் (pogiren) = am going. The verb is last and "to" is an ending on the noun. Spoken version: நான் வீட்டுக்குப் போறேன் (naan veettukkup poren). Careful writing doubles the ப after -க்கு: வீட்டுக்குப் போகிறேன் (veettukkup pogiren), as in the Vachan lessons.
 
 ## "I don't know Tamil well" — எனக்கு தமிழ் நன்றாகத் தெரியாது
 

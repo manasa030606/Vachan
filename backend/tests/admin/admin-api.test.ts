@@ -110,12 +110,15 @@ describe("content management", () => {
   });
 
   it("creates a lesson (unpublished), refuses to publish it empty", async () => {
+    const water = await prisma.vocabularyItem.findFirstOrThrow({
+      where: { language: { code: "te" }, script: "నీళ్ళు" },
+    });
     const lesson = await call("POST", "/admin/lessons", {
       unitId: "te-u3",
       title: "At the market (test)",
       introText: "Words for shopping.",
       kind: "VOCABULARY",
-      vocabularyIds: ["te-v23-water"],
+      vocabularyIds: [water.id],
     });
     assert.equal(lesson.status, 201);
     assert.equal(lesson.body.lesson.isPublished, false);
@@ -184,7 +187,7 @@ describe("content management", () => {
     const refused = await call("DELETE", "/admin/lessons/te-u1-l1");
     assert.equal(refused.status, 409);
     assert.equal(refused.body.error.code, "HAS_LEARNER_DATA");
-    const exercise = await call("DELETE", "/admin/exercises/te-u1-l1-e1");
+    const exercise = await call("DELETE", "/admin/exercises/te-u1-l1-e01");
     assert.equal(exercise.status, 409);
   });
 
@@ -192,20 +195,20 @@ describe("content management", () => {
     const item = await call("POST", "/admin/vocabulary", {
       languageCode: "te",
       kind: "WORD",
-      script: "బజారు",
-      romanization: "bajaaru",
-      meaning: "Market",
-      topic: "Shopping",
+      script: "గాలిపటం",
+      romanization: "gaalipatam",
+      meaning: "Kite",
+      topic: "Hobbies",
     });
     assert.equal(item.status, 201);
     created.vocabularyId = item.body.item.id;
     const duplicate = await call("POST", "/admin/vocabulary", {
       languageCode: "te",
       kind: "WORD",
-      script: "బజారు",
-      romanization: "bajaaru",
-      meaning: "Market",
-      topic: "Shopping",
+      script: "గాలిపటం",
+      romanization: "gaalipatam",
+      meaning: "Kite",
+      topic: "Hobbies",
     });
     assert.equal(duplicate.status, 409);
     const edited = await call("PATCH", `/admin/vocabulary/${created.vocabularyId}`, {

@@ -43,3 +43,19 @@ Tamil writes three "n" letters. ந is a dental n, used mostly at the start of w
 <!-- topic: double-consonants; level: elementary -->
 
 When a Tamil word has a doubled consonant, hold it for a moment before releasing it. அம்மா (ammaa, mother), அப்பா (appaa, father), அக்கா (akkaa, elder sister), வணக்கம் (vanakkam, hello) and சாப்பாடு (saappaadu, food) all have a held middle consonant. A doubled letter also keeps its hard sound: க்க is always "kk", never "gg". Saying the double sound as a single one can make a word unclear, so practise a short pause: am-maa, ap-paa.
+
+## Pronouncing common Tamil phrases
+
+<!-- topic: common-phrases; level: beginner -->
+
+Tips for the phrases beginners say most in Tamil. வணக்கம் (vanakkam, hello): hold the double kk — va-nak-kam. நன்றி (nandri, thank you): ன்ற is "ndr" — nan-dri, not "nan-ri". தண்ணீர் (thanneer, water): ண is retroflex (tongue curled back) and ஈ is long — than-neer. தமிழ் (Thamizh): த is a soft dental t, and ழ is the curled "zh". நல்லா இருக்கேன் (nallaa irukken, I'm fine): double ll and long aa. எப்படி (eppadi, how): held pp, soft d. ரொம்ப (romba, very): rolled r, short o. Speak slowly and hold doubled letters.
+
+Also asked as: how do I pronounce this phrase in Tamil, how to say vanakkam correctly, pronunciation of nandri, Tamil pronunciation tips
+
+## Aspirated sounds — Tamil has none
+
+<!-- topic: aspiration -->
+
+Unlike Hindi, Tamil has no aspirated consonants (kh, gh, chh, th with a puff, bh). Tamil words are said without a breath of air after the consonant: காலை (kaalai, morning), பால் (paal, milk), தம்பி (thambi, younger brother). In Vachan's romanization "th" and "dh" are not aspirated — they mean a soft dental t / d, as in தண்ணீர் (thanneer) and அது (adhu). Borrowed words such as "Bharatanatyam" are spoken in Tamil without aspiration: பரதநாட்டியம் (Bharadhanaattiyam). So relax and avoid the puff of air.
+
+Also asked as: aspirated sounds in Tamil, does Tamil have kh and bh, how to pronounce th in Tamil, puff of air

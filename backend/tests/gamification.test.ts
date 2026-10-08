@@ -56,6 +56,12 @@ async function answerFor(exerciseId: string, correct = true) {
   const options = exercise.options;
   if (!correct) {
     if (exercise.type === "TRANSLATION") return { text: "definitely wrong" };
+    if (exercise.type === "WORD_ORDER") {
+      const words = options.filter((option) => option.correctPosition !== null);
+      return {
+        optionIds: words.sort((a, b) => b.correctPosition! - a.correctPosition!).map((o) => o.id),
+      };
+    }
     return { optionId: options.find((option) => !option.isCorrect)!.id };
   }
   switch (exercise.type) {
@@ -131,10 +137,10 @@ describe("gamification", () => {
     assert.equal(body.stats.achievements.total, 8);
   });
 
-  it("first day: a perfect lesson gives 23 XP, streak 1, daily goal met and 3 badges", async () => {
+  it("first day: a perfect lesson gives 33 XP, streak 1, daily goal met and 3 badges", async () => {
     const last = await completeLesson(token, "te-u1-l1");
     const rewards = last.body.rewards;
-    assert.equal(rewards.totalXp, 23); // 4 × 2 exercise XP + 10 lesson + 5 perfect bonus
+    assert.equal(rewards.totalXp, 33); // 9 × 2 exercise XP + 10 lesson + 5 perfect bonus
     assert.equal(rewards.xpEarned, 17); // last answer: 2 + 10 + 5
     assert.equal(rewards.streak.current, 1);
     const firstDay = await prisma.userStats.findUniqueOrThrow({ where: { userId } });
@@ -150,19 +156,19 @@ describe("gamification", () => {
     const events = await prisma.xpEvent.findMany({ where: { userId } });
     assert.equal(
       events.reduce((sum, event) => sum + event.amount, 0),
-      23,
+      33,
     );
   });
 
   it("same day: more XP keeps the streak at 1", async () => {
     await call(token, "POST", "/lessons/te-u1-l2/start");
-    const result = await answer(token, "te-u1-l2-e1");
+    const result = await answer(token, "te-u1-l2-e01");
     assert.equal(result.body.rewards.streak.current, 1);
     assert.equal(result.body.rewards.streak.change, "same-day");
   });
 
   it("heart loss: a wrong lesson answer costs one heart and starts the refill timer", async () => {
-    const result = await answer(token, "te-u1-l2-e2", false);
+    const result = await answer(token, "te-u1-l2-e02", false);
     assert.equal(result.body.attempt.isCorrect, false);
     assert.equal(result.body.rewards.hearts.current, 4);
     assert.ok(result.body.rewards.hearts.nextHeartAt);
@@ -171,7 +177,7 @@ describe("gamification", () => {
 
   it("out of hearts: lesson answers are refused, the review still works and gives a heart back", async () => {
     await setStats(userId, { hearts: 0, heartsUpdatedAt: new Date() });
-    const refused = await answer(token, "te-u1-l2-e3");
+    const refused = await answer(token, "te-u1-l2-e03");
     assert.equal(refused.status, 403);
     assert.equal(refused.body.error.code, "OUT_OF_HEARTS");
     assert.ok(refused.body.error.details.nextHeartAt);
@@ -179,7 +185,7 @@ describe("gamification", () => {
     const recs = await call(token, "GET", "/recommendations?languageCode=te");
     assert.equal(recs.body.recommendations[0].type, "earn-hearts");
 
-    const review = await answer(token, "te-u1-l2-e2", true, "review");
+    const review = await answer(token, "te-u1-l2-e02", true, "review");
     assert.equal(review.status, 201);
     assert.equal(review.body.rewards.hearts.current, 1);
     assert.equal(review.body.rewards.xpEarned, 2);
@@ -198,7 +204,7 @@ describe("gamification", () => {
       longestStreak: 2,
       lastActiveDate: addDays(today(), -1),
     });
-    const result = await answer(token, "te-u1-l2-e3");
+    const result = await answer(token, "te-u1-l2-e03");
     assert.equal(result.body.rewards.streak.change, "continued");
     assert.equal(result.body.rewards.streak.current, 3);
     assert.ok(result.body.rewards.newAchievements.some((a: Json) => a.code === "streak-3"));
@@ -215,15 +221,17 @@ describe("gamification", () => {
     assert.equal(before.body.streak.longest, 5);
     assert.equal(before.body.streak.week.length, 7);
 
-    const result = await answer(token, "te-u1-l2-e4");
+    const result = await answer(token, "te-u1-l2-e04");
     assert.equal(result.body.rewards.streak.change, "restarted");
     assert.equal(result.body.rewards.streak.current, 1);
     assert.equal(result.body.rewards.streak.longest, 5);
   });
 
   it("XP thresholds: crossing 50 XP is level 2, crossing 100 XP unlocks the badge", async () => {
-    await setStats(userId, { totalXp: 49, hearts: 5 });
-    const levelUp = await answer(token, "te-u1-l2-e2"); // finishes lesson 2: 2 + 10 XP
+    await setStats(userId, { hearts: 5 });
+    for (const e of ["e05", "e06", "e07", "e08", "e09"]) await answer(token, `te-u1-l2-${e}`);
+    await setStats(userId, { totalXp: 49 });
+    const levelUp = await answer(token, "te-u1-l2-e02"); // finishes lesson 2: 2 + 10 XP
     assert.equal(levelUp.body.lessonProgress.justCompleted, true);
     assert.equal(levelUp.body.rewards.totalXp, 61);
     assert.equal(levelUp.body.rewards.level.level, 2);
@@ -231,15 +239,18 @@ describe("gamification", () => {
 
     await setStats(userId, { totalXp: 99 });
     await call(token, "POST", "/lessons/te-u1-l3/start");
-    const badge = await answer(token, "te-u1-l3-e1");
+    const badge = await answer(token, "te-u1-l3-e01");
     assert.equal(badge.body.rewards.totalXp, 101);
     assert.equal(badge.body.rewards.level.level, 2);
     assert.ok(badge.body.rewards.newAchievements.some((a: Json) => a.code === "xp-100"));
   });
 
   it("first unit completed unlocks its badge", async () => {
-    for (const id of ["te-u1-l3-e2", "te-u1-l3-e3", "te-u1-l3-e4"]) await answer(token, id);
-    const last = await completeLesson(token, "te-u1-l4");
+    const lesson3 = await call(token, "GET", "/lessons/te-u1-l3");
+    for (const exercise of lesson3.body.lesson.exercises.slice(1)) await answer(token, exercise.id);
+    await completeLesson(token, "te-u1-l4");
+    await completeLesson(token, "te-u1-l5");
+    const last = await completeLesson(token, "te-u1-l6");
     assert.ok(last.body.rewards.newAchievements.some((a: Json) => a.code === "first-unit"));
     const all = await call(token, "GET", "/achievements");
     assert.equal(all.body.achievements.find((a: Json) => a.code === "first-unit").unlocked, true);
@@ -249,8 +260,8 @@ describe("gamification", () => {
   it("recommendations follow the transparent rules", async () => {
     // Make a repeated mistake: wrong twice on the same exercise.
     await call(token, "POST", "/lessons/te-u2-l1/start");
-    await answer(token, "te-u2-l1-e1", false);
-    await answer(token, "te-u2-l1-e1", false);
+    await answer(token, "te-u2-l1-e01", false);
+    await answer(token, "te-u2-l1-e01", false);
     const { body } = await call(token, "GET", "/recommendations?languageCode=te");
     const types = body.recommendations.map((r: Json) => r.type);
     assert.equal(types[0], "repeated-mistakes");
@@ -274,13 +285,13 @@ describe("placement test", () => {
   let testId = "";
   let questions: Json[] = [];
 
-  it("start: 12 questions (3 per unit) without answers", async () => {
+  it("start: 18 questions (3 for each of six units) without answers", async () => {
     ({ token } = await newUser("hi", "knows-script"));
     const { status, body } = await call(token, "POST", "/placement/start", {});
     assert.equal(status, 201);
     testId = body.test.id;
     questions = body.questions;
-    assert.equal(questions.length, 12);
+    assert.equal(questions.length, 18);
     assert.equal(body.test.selfAssessment, "knows-script");
     assert.deepEqual([...new Set(questions.map((q) => q.skill))].sort(), [
       "SCRIPT",
@@ -297,8 +308,8 @@ describe("placement test", () => {
     assert.equal(result.body.error.code, "PLACEMENT_INCOMPLETE");
   });
 
-  it("answers: unit 1 3/3, unit 2 2/3, unit 3 1/3, unit 4 3/3 → 'You are ready for Unit 3'", async () => {
-    const correctPerUnit: Record<number, number> = { 1: 3, 2: 2, 3: 1, 4: 3 };
+  it("answers: unit 1 3/3, unit 2 2/3, unit 4 1/3, units 5, 7, 9 3/3 → 'You are ready for Unit 4'", async () => {
+    const correctPerUnit: Record<number, number> = { 1: 3, 2: 2, 4: 1, 5: 3, 7: 3, 9: 3 };
     const seen: Record<number, number> = {};
     let last: Json = {};
     for (const question of questions) {
@@ -323,12 +334,12 @@ describe("placement test", () => {
     assert.equal(again.status, 409);
 
     const { body } = await call(token, "GET", `/placement/result?testId=${testId}`);
-    assert.equal(body.result.recommendedUnit, 3);
-    assert.equal(body.result.correctCount, 9);
-    assert.equal(body.result.message, "You are ready for Unit 3 — First words.");
+    assert.equal(body.result.recommendedUnit, 4);
+    assert.equal(body.result.correctCount, 15);
+    assert.equal(body.result.message, "You are ready for Unit 4 — First words.");
     assert.deepEqual(
       body.result.units.map((u: Json) => u.passed),
-      [true, true, false, true],
+      [true, true, false, true, true, true],
     );
   });
 
@@ -338,20 +349,20 @@ describe("placement test", () => {
     assert.equal(stats.body.stats.xp.total, 0);
   });
 
-  it("accept → units 1–2 unlocked (placed out), Unit 3 lesson 1 available", async () => {
+  it("accept → units 1–3 unlocked (placed out), Unit 4 lesson 1 available", async () => {
     const decide = await call(token, "POST", "/placement/decide", {
       testId,
       choice: "recommended",
     });
     assert.equal(decide.status, 200);
-    assert.equal(decide.body.chosenUnit, 3);
-    assert.equal(decide.body.startLessonId, "hi-u3-l1");
-    assert.equal(decide.body.lessonsUnlocked, 8);
+    assert.equal(decide.body.chosenUnit, 4);
+    assert.equal(decide.body.startLessonId, "hi-u4-l1");
+    assert.equal(decide.body.lessonsUnlocked, 17);
     const course = await call(token, "GET", "/courses/hi-course");
     const lessons = course.body.course.units.flatMap((unit: Json) => unit.lessons);
-    assert.ok(lessons.slice(0, 8).every((l: Json) => l.status === "completed" && l.placedOut));
-    assert.equal(lessons[8].status, "available");
-    assert.equal(course.body.course.progress.currentLessonId, "hi-u3-l1");
+    assert.ok(lessons.slice(0, 17).every((l: Json) => l.status === "completed" && l.placedOut));
+    assert.equal(lessons[17].status, "available");
+    assert.equal(course.body.course.progress.currentLessonId, "hi-u4-l1");
     // Placed-out lessons don't count as studied lessons for badges.
     const badges = await call(token, "GET", "/achievements");
     assert.equal(badges.body.unlockedCount, 0);
@@ -370,7 +381,7 @@ describe("placement test", () => {
       });
     }
     const result = await call(other.token, "GET", "/placement/result");
-    assert.equal(result.body.result.recommendedUnit, 4);
+    assert.equal(result.body.result.recommendedUnit, 9);
     const decide = await call(other.token, "POST", "/placement/decide", {
       testId: start.body.test.id,
       choice: "beginning",

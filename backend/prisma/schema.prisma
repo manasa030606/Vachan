@@ -323,6 +323,8 @@ model VocabularyItem {
   romanization String
   meaning      String
   topic        String
+  /// Usage notes: polite/casual forms, gender, alternatives, literal meaning (also used by the AI tutor)
+  notes        String?
 
   language       Language        @relation(fields: [languageId], references: [id], onDelete: Cascade)
   lessons        Lesson[]

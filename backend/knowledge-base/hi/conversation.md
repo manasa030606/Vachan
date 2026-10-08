@@ -38,7 +38,7 @@ When travelling in Hindi, ask बस अड्डा कहाँ है? (bas a
 
 <!-- topic: directions; level: elementary -->
 
-To ask the way in Hindi, say the place and add कहाँ है? (kahaan hai? — where is it?): अस्पताल कहाँ है? (aspataal kahaan hai? — where is the hospital?). Direction words: बाएँ (baayen — left), दाएँ (daayen — right), सीधे जाइए (seedhe jaaiye — go straight). पास (paas — near), दूर (door — far), यहाँ (yahaan — here), वहाँ (vahaan — there). To say you did not follow: मुझे समझ नहीं आया (mujhe samajh nahin aayaa — I didn't understand).
+To ask the way in Hindi, say the place and add कहाँ है? (kahaan hai? — where is it?): अस्पताल कहाँ है? (aspataal kahaan hai? — where is the hospital?). Direction words: बाएँ (baaen — left), दाएँ (daaen — right), सीधे जाइए (seedhe jaaiye — go straight). पास (paas — near), दूर (door — far), यहाँ (yahaan — here), वहाँ (vahaan — there). To say you did not follow: मुझे समझ नहीं आया (mujhe samajh nahin aayaa — I didn't understand).
 
 ## Everyday conversation — खाना खाया? (khaanaa khaayaa?)
 

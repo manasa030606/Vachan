@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-06T10:18:16.540Z",
+  "generatedAt": "2026-10-08T04:14:01.232Z",
   "provider": "gemini",
   "model": "gemini-3.5-flash",
   "summary": {
     "statusCorrect": 1,
-    "relevantRetrieval": 0.9166666666666666,
-    "grounded": 1,
+    "relevantRetrieval": 0.9901960784313726,
+    "grounded": 0.9705882352941176,
     "levelRespected": 1,
-    "nativeWordsFromNotes": 1
+    "nativeWordsFromNotes": 0.9886914378029079
   },
   "checks": [
     {
@@ -18,13 +18,13 @@
     },
     {
       "name": "relevantRetrieval",
-      "value": 0.9166666666666666,
+      "value": 0.9901960784313726,
       "min": 0.9,
       "passed": true
     },
     {
       "name": "grounded",
-      "value": 1,
+      "value": 0.9705882352941176,
       "min": 0.85,
       "passed": true
     },
@@ -36,7 +36,7 @@
     },
     {
       "name": "nativeWordsFromNotes",
-      "value": 1,
+      "value": 0.9886914378029079,
       "min": 0.9,
       "passed": true
     }
@@ -51,7 +51,10 @@
         "expect": "answered",
         "sources": [
           "te/phrases#hello-namaskaaram",
-          "course/te/vocabulary#course-vocabulary-greetings"
+          "course/te/vocabulary#course-vocabulary-greetings",
+          "course/te/words#hello*",
+          "te/phrases#hello*",
+          "te/phrases#greeting*"
         ],
         "mention": [
           "నమస్కారం"
@@ -62,15 +65,16 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 50,
-      "nativeCount": 3,
+      "words": 54,
+      "nativeCount": 5,
       "unsupported": [],
       "usedIds": [
-        "te/phrases#hello-namaskaaram"
+        "te/phrases#hello-namaskaaram",
+        "course/te/phrases#answering-the-phone-hello-halo"
       ],
-      "ms": 5449,
+      "ms": 21568,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "The most common way to say hello in Telugu is **నమస్కారం (namaskaaram, hello)**. It is polite and you can use it with anyone at any time of day.\n\nAnother word that is understood is **నమస్తే (namaste, hello)**.\n\nIf you are talking to friends, you can ask **ఏంటి? (enti?, what's up?)**."
+      "answer": "To say hello in Telugu, you can use the polite word **నమస్కారం (namaskaaram, hello)**. This works with anyone, at any time of day!\n\nYou can also say **నమస్తే (namaste, hello)**.\n\nIf you are greeting friends, you can ask **ఏంటి సంగతి? (enti sangati?, what's up?)**.\n\nWhen answering the phone, Telugu speakers say **హలో? (halo?, hello?)**."
     },
     {
       "testCase": {
@@ -81,7 +85,9 @@
         "expect": "answered",
         "sources": [
           "te/vocabulary#family-words",
-          "course/te/vocabulary#course-vocabulary-family"
+          "course/te/vocabulary#course-vocabulary-family",
+          "course/te/words*",
+          "course/te/phrases*"
         ],
         "mention": [
           "అమ్మ"
@@ -92,16 +98,16 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 8,
+      "words": 29,
       "nativeCount": 1,
       "unsupported": [],
       "usedIds": [
-        "te/vocabulary#family-words",
-        "course/te/vocabulary#course-vocabulary-family"
+        "course/te/words#mother-amma",
+        "course/te/phrases#this-is-my-mother-eevida-maa-amma"
       ],
-      "ms": 3062,
+      "ms": 4509,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "The Telugu word **అమ్మ (amma, mother)** means **mother**."
+      "answer": "In Telugu, **అమ్మ (amma)** means **Mother**.\n\nIt is a warm and common word. When talking about your own mother, Telugu speakers beautifully say \"our mother\" instead of \"my mother\"."
     },
     {
       "testCase": {
@@ -114,7 +120,9 @@
         "sources": [
           "te/examples#i-want-water",
           "te/grammar#i-want-i-like-i-know-the-dative-construction",
-          "te/phrases#shopping-and-directions-idi-enta"
+          "te/phrases#shopping-and-directions-idi-enta",
+          "te/sentence-patterns#i-want*",
+          "course/te/phrases#i-want-water*"
         ],
         "mention": [
           "కావాలి"
@@ -122,18 +130,18 @@
       },
       "status": "answered",
       "statusOk": true,
-      "retrievalOk": false,
+      "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 31,
-      "nativeCount": 4,
+      "words": 51,
+      "nativeCount": 8,
       "unsupported": [],
       "usedIds": [
-        "te/vocabulary#food-and-drink"
+        "te/sentence-patterns#i-want-naaku-kaavaali"
       ],
-      "ms": 5247,
+      "ms": 4189,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "You can also say \"I want food\" in Telugu by using a similar pattern! \n\nIn Telugu, you say:\n**నాకు భోజనం కావాలి (naaku bhojanam kaavaali)**\n\nHere, **భోజనం (bhojanam)** means \"food\" or \"meal\"."
+      "answer": "Here is another example of how to say you want or need something in Telugu:\n\n**నాకు ఒక టికెట్ కావాలి** (naaku oka tiket kaavaali) — \"I need a ticket.\"\n\nIn this sentence, **నాకు** (naaku, \"to me\") is combined with **ఒక** (oka, \"one\"), **టికెట్** (tiket, \"ticket\"), and **కావాలి** (kaavaali, \"is wanted / needed\")."
     },
     {
       "testCase": {
@@ -143,7 +151,8 @@
         "level": "beginner",
         "expect": "answered",
         "sources": [
-          "te/grammar#word-order-subject-object-verb"
+          "te/grammar#word-order-subject-object-verb",
+          "te/common-mistakes#mistake-english-word-order"
         ],
         "mention": [
           "నేను",
@@ -156,15 +165,15 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 62,
+      "words": 63,
       "nativeCount": 0,
       "unsupported": [],
       "usedIds": [
         "te/grammar#word-order-subject-object-verb"
       ],
-      "ms": 5291,
+      "ms": 2624,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "In Telugu, sentences put the action word (verb) at the very end.\n\nThe usual order is **Subject – Object – Verb**. This is different from English. For example, instead of saying \"I eat rice,\" you say \"I rice eat.\"\n\nQuestion words also go near the end of the sentence.\n\nAlso, simple \"X is Y\" sentences do not need any verb at all!"
+      "answer": "In Telugu, the word order is different from English. \n\nIn English, we say \"Subject - Verb - Object\" (like \"I eat rice\"). \n\nBut in Telugu, the verb always goes at the end! The order is **Subject - Object - Verb**. \n\nSo, \"I eat rice\" becomes \"I rice eat\" in Telugu. \n\nAlso, simple \"X is Y\" sentences do not need a verb at all!"
     },
     {
       "testCase": {
@@ -176,10 +185,19 @@
         "sources": [
           "te/grammar#personal-pronouns",
           "te/beginner-guide#formal-and-informal-you",
-          "te/culture#showing-respect-and-family-words"
+          "te/culture#showing-respect-and-family-words",
+          "te/common-mistakes#formal-and-casual*",
+          "te/common-mistakes*",
+          "te/grammar*",
+          "te/beginner-guide*",
+          "te/requests#polite*",
+          "te/culture*"
         ],
         "mention": [
-          "మీరు"
+          "మీరు",
+          "polite",
+          "formal",
+          "respect"
         ]
       },
       "status": "answered",
@@ -187,18 +205,16 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 97,
-      "nativeCount": 7,
+      "words": 116,
+      "nativeCount": 8,
       "unsupported": [],
       "usedIds": [
-        "te/beginner-guide#formal-and-informal-you",
-        "te/grammar#personal-pronouns",
-        "te/examples#how-are-you-i-am-fine",
-        "te/phrases#how-are-you-meeru-elaa-unnaaru"
+        "te/common-mistakes#formal-and-casual-vs-and-polite-commands",
+        "te/beginner-guide#formal-and-informal-you"
       ],
-      "ms": 4411,
+      "ms": 8157,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "In Telugu, both words mean \"you,\" but they are used in different social situations:\n\n- **మీరు (meeru)** is the respectful or plural form of \"you\". Use it with anyone older, a stranger, a teacher, or a shopkeeper. If you are unsure, it is best to choose this polite form.\n- **నువ్వు (nuvvu)** is the informal form of \"you\". Use it only with close friends, younger family members, and children.\n\nYour choice also changes the verb ending. For example, when asking \"How are you?\":\n- Polite: **మీరు ఎలా ఉన్నారు?** (meeru elaa unnaaru?)\n- Informal: **ఎలా ఉన్నావు?** (elaa unnaavu?)"
+      "answer": "In Telugu, the word for \"you\" changes based on respect and closeness:\n\n- **మీరు (meeru)** is the polite, formal, and plural form of \"you\". Use it with elders, strangers, teachers, shopkeepers, and anyone you do not know well.\n- **నువ్వు (nuvvu)** is the casual, informal form of \"you\". Use it only with close friends, younger family members, and children.\n\nThe verb endings also change to match. For example, the verb for \"how are you?\" changes like this:\n- **మీరు ఎలా ఉన్నారు? (meeru elaa unnaaru?)** is the polite way to ask.\n- **ఎలా ఉన్నావు? (elaa unnaavu?)** is the casual way to ask.\n\nWhen you are unsure, it is always safest to choose **మీరు (meeru)** to be polite!"
     },
     {
       "testCase": {
@@ -207,7 +223,7 @@
         "language": "te",
         "level": "beginner",
         "lessonId": "te-u1-l1",
-        "exerciseId": "te-u1-l1-e1",
+        "exerciseId": "te-u1-l1-e01",
         "wrongAttempt": true,
         "expect": "answered",
         "sources": [
@@ -222,20 +238,18 @@
       },
       "status": "answered",
       "statusOk": true,
-      "retrievalOk": true,
+      "retrievalOk": false,
       "groundedOk": true,
       "levelOk": true,
-      "words": 59,
+      "words": 57,
       "nativeCount": 0,
       "unsupported": [],
       "usedIds": [
-        "course/te/vocabulary#course-letters-and-sounds",
-        "te/alphabet#vowels-achchulu",
-        "te/pronunciation#short-and-long-vowels-change-the-meaning"
+        "course/te/vocabulary#course-letters-and-sounds-part-4"
       ],
-      "ms": 2144,
+      "ms": 5973,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "Don't worry! Learning new letters takes time. \n\nYou wrote **aa**, but the letter **అ** is actually the short **a** sound. It sounds like the \"u\" in \"cup\". \n\nThe letter for the long **aa** sound is **ఆ**, which sounds like the \"a\" in \"father\". \n\nIn Telugu, keeping short and long vowels separate is very important because they are different letters!"
+      "answer": "No problem! Let's look at the difference.\n\nThe letter **అ** (a) makes a short \"a\" sound, like the 'u' in \"cup\".\n\nThe sound \"ee\" belongs to other letters, such as **ఈ** (ii), which makes a long \"ee\" sound like the 'ee' in \"see\", or **ఏ** (ee), which makes a long \"e\" sound like the 'a' in \"cake\"."
     },
     {
       "testCase": {
@@ -258,14 +272,14 @@
       "groundedOk": true,
       "levelOk": true,
       "words": 89,
-      "nativeCount": 3,
+      "nativeCount": 1,
       "unsupported": [],
       "usedIds": [
         "hi/pronunciation#silent-a-schwa-deletion"
       ],
-      "ms": 3583,
+      "ms": 3289,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "In Hindi, every consonant letter naturally carries a short \"a\" sound. However, in spoken Hindi, this \"a\" is often dropped. This is known as **schwa deletion** or a silent \"a\". \n\nWhile the letters in **कमरा** (kamraa, room) might suggest a pronunciation like \"kamaraa\", the short \"a\" in the middle is dropped in speech. Therefore, it is pronounced as **kamraa** (kamraa, room). \n\nThis silent \"a\" also happens at the end of words, such as in **नाम** (naam, name), and in the middle of other words like **समझना** (samajhnaa, to understand)."
+      "answer": "In Hindi, every consonant letter naturally carries a short \"a\" sound. However, in spoken Hindi, this \"a\" is often dropped. This pronunciation rule is known as \"schwa deletion\".\n\nWhile the spelling of the word **कमरा** (kamraa, room) might suggest a pronunciation like \"kamaraa\", the short \"a\" sound in the middle is dropped in speech. Therefore, it is pronounced as **kamraa**.\n\nThis also happens at the end of words, and often in the middle of other words. When in doubt, you can follow the romanization to see the spoken form!"
     },
     {
       "testCase": {
@@ -275,7 +289,8 @@
         "level": "intermediate",
         "expect": "answered",
         "sources": [
-          "hi/verbs#past-tense-with-ne-the-ergative"
+          "hi/verbs#past-tense-with-ne-the-ergative",
+          "hi/common-mistakes#forgetting-ne*"
         ],
         "mention": [
           "ने"
@@ -286,15 +301,16 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 147,
-      "nativeCount": 23,
+      "words": 174,
+      "nativeCount": 24,
       "unsupported": [],
       "usedIds": [
+        "hi/common-mistakes#forgetting-ne-in-the-past-tense",
         "hi/verbs#past-tense-with-ne-the-ergative"
       ],
-      "ms": 7553,
+      "ms": 4495,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "In Hindi, you use the particle **ने** (ne) in the simple past tense when a verb takes an object (such as eat, see, drink, write).\n\nHere is how it works:\n- **Subject Agreement:** The subject gets **ने** (ne), and the verb agrees with the object instead of the subject. For example, in **राम ने रोटी खाई** (Ram ne rotee khaayee, Ram ate a roti), the verb is feminine to agree with the feminine object **रोटी** (rotee).\n- **Pronouns:** Pronouns join with **ने** (ne) to form combined words like **मैंने** (mainne), **तुमने** (tumne), **आपने** (aapne), **उसने** (usne), **हमने** (hamne), and **उन्होंने** (unhonne).\n- **With को:** If the object has **को** (ko), the verb stays masculine singular, as in **मैंने माँ को देखा** (mainne maa ko dekhaa, I saw mother).\n\n**When not to use it:**\nVerbs without an object, like **जाना** (jaanaa) and **आना** (aanaa), never take **ने** (ne)."
+      "answer": "In Hindi, you use the postposition **ने** (ne) in the simple past tense when the verb takes an object (transitive verbs like eat, see, drink, buy, say, write).\n\nWhen you use **ने**:\n- The subject gets **ने** (ne).\n- The verb agrees with the object in gender and number, rather than the subject. For example, in **मैंने चाय पी** (mainne chaay pee, I drank tea), the verb **पी** (pee) is feminine because **चाय** (chaay, tea) is feminine.\n- Pronouns combine with **ने** (ne) to form words like **मैंने** (mainne, I), **तुमने** (tumne, you), or **उसने** (usne, he/she).\n- If the object is followed by **को** (ko), the verb defaults to the masculine singular form, as in **मैंने माँ को देखा** (mainne maa ko dekhaa, I saw mother).\n\n**When NOT to use it:**\nVerbs without an object, including verbs of motion like **जाना** (jaanaa, to go) and **आना** (aanaa, to come), never take **ने** (ne). For example, \"I went\" is **मैं गया** (main gayaa) for a man, or **मैं गई** (main gaee) for a woman."
     },
     {
       "testCase": {
@@ -316,15 +332,16 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 75,
+      "words": 81,
       "nativeCount": 0,
       "unsupported": [],
       "usedIds": [
-        "ta/pronunciation#the-special-sound-zha"
+        "ta/pronunciation#the-special-sound-zha",
+        "ta/pronunciation#three-l-sounds"
       ],
-      "ms": 4749,
+      "ms": 2819,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "The letter **ழ** (zha) is a famous Tamil sound. \n\nTo pronounce it:\n- Curl the tip of your tongue far back towards the roof of your mouth.\n- Do **not** touch the roof of your mouth.\n- Let the sound flow. It sounds a bit like an American \"r\" sound.\n\nEven though we write it as \"zh\" in English, it is not a \"z\" sound! In some regions, people casually pronounce it like **ள** (la)."
+      "answer": "The letter **ழ** (zha) is the most famous sound in Tamil! It is written as \"zh\" in English, but it is not a \"z\" sound.\n\nTo pronounce it:\n1. Curl the tip of your tongue far back towards the roof of your mouth.\n2. **Do not let your tongue touch** the roof of your mouth.\n3. Let the sound flow. It sounds a bit like an American \"r\".\n\nIn some regions, people might casually pronounce it like the letter **ள** (la)."
     },
     {
       "testCase": {
@@ -336,7 +353,9 @@
         "sources": [
           "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
           "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone",
-          "ml/verbs#simple-present-tense-unnu"
+          "ml/verbs#simple-present-tense-unnu",
+          "ml/grammar*",
+          "ml/verbs*"
         ],
         "mention": [
           "same",
@@ -351,16 +370,15 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 76,
-      "nativeCount": 0,
+      "words": 118,
+      "nativeCount": 7,
       "unsupported": [],
       "usedIds": [
-        "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
-        "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone"
+        "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number"
       ],
-      "ms": 2592,
+      "ms": 5228,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "No, Malayalam verbs do not change for person, number, or gender! \n\nIn modern Malayalam, the verb keeps the exact same form regardless of who is doing the action (whether it is \"I\", \"you\", \"he\", \"she\", or \"they\"). This makes Malayalam verbs much simpler to learn compared to many other Indian languages. \n\nBecause the verb itself does not show who is acting, speakers usually include the subject pronoun so it is clear who is performing the action."
+      "answer": "In Malayalam, verbs do **not** change based on who is doing the action! Whether the subject is \"I\", \"you\", \"he\", or anyone else, the verb form remains exactly the same.\n\nThere are no person, number, or gender endings to learn for verbs in modern Malayalam. Because the verb itself does not show who is performing the action, speakers usually include the subject pronoun in the sentence so the meaning is clear.\n\nFor example, the verb for \"go\" is പോകുന്നു (pokunnu). It stays the same no matter who is going:\n- **ഞാൻ പോകുന്നു** (njaan pokunnu, I go)\n- **നീ പോകുന്നു** (nee pokunnu, you go)\n- **അവൻ പോകുന്നു** (avan pokunnu, he goes)\n\nThis makes learning Malayalam verb conjugations much simpler!"
     },
     {
       "testCase": {
@@ -382,16 +400,16 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 51,
-      "nativeCount": 5,
+      "words": 38,
+      "nativeCount": 2,
       "unsupported": [],
       "usedIds": [
         "kn/phrases#my-name-is-nanna-hesaru",
         "kn/examples#my-name-is-asha"
       ],
-      "ms": 5231,
+      "ms": 2774,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "To say \"My name is...\" in Kannada, you say **ನನ್ನ ಹೆಸರು…** (nanna hesaru…).\n\nIn Kannada, you do not need a word for \"is\" in this sentence. You simply say \"my name\" followed by your name. \n\nFor example, if your name is Asha, you would say **ನನ್ನ ಹೆಸರು ಆಶಾ** (nanna hesaru Asha)."
+      "answer": "To say \"My name is...\" in Kannada, you can use the phrase **ನನ್ನ ಹೆಸರು...** (nanna hesaru...). \n\nIn Kannada, you do not need a word for \"is\" when introducing yourself. You simply say your name right after the phrase!"
     },
     {
       "testCase": {
@@ -403,10 +421,18 @@
         "sources": [
           "bn/grammar#three-levels-of-you",
           "bn/beginner-guide#formal-and-informal-you",
-          "bn/culture#showing-respect-and"
+          "bn/culture#showing-respect-and",
+          "bn/common-mistakes*",
+          "bn/grammar*",
+          "bn/beginner-guide*",
+          "bn/requests#polite*",
+          "bn/culture*"
         ],
         "mention": [
-          "আপনি"
+          "আপনি",
+          "polite",
+          "formal",
+          "respect"
         ]
       },
       "status": "answered",
@@ -414,17 +440,3162 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 102,
+      "words": 106,
       "nativeCount": 9,
       "unsupported": [],
       "usedIds": [
         "bn/grammar#three-levels-of-you",
+        "bn/common-mistakes#using-the-wrong-you",
         "bn/beginner-guide#formal-and-informal-you",
         "bn/phrases#how-are-you-aapni-kemon-aachhen"
       ],
-      "ms": 4009,
+      "ms": 4764,
       "model": "gemini/gemini-3.5-flash",
-      "answer": "In Bengali, there are different words for \"you\" depending on who you are talking to. \n\n- **তুমি** (tumi, you) is the **familiar** form. You use it with friends, family, and people your own age.\n- **আপনি** (aapni, you) is the **polite** form. You use it with elders, strangers, teachers, and shopkeepers. If you are ever unsure, it is best to choose **আপনি** (aapni).\n\nThe verb ending changes depending on which \"you\" you use. For example, the verb \"to be\" changes like this:\n- **তুমি কেমন আছো?** (tumi kemon aachho?, how are you?)\n- **আপনি কেমন আছেন?** (aapni kemon aachhen?, how are you?)"
+      "answer": "In Bengali, there are different words for \"you\" depending on who you are talking to:\n\n- **আপনি** (aapni, polite) is used with elders, strangers, teachers, shopkeepers, and anyone you have just met.\n- **তুমি** (tumi, familiar) is used with friends, family, and people your age or younger.\n\nThe verb endings change depending on which \"you\" you use. For example, to ask \"How are you?\", you say:\n- **আপনি কেমন আছেন?** (aapni kemon aachhen?) when being polite.\n- **তুমি কেমন আছো?** (tumi kemon aachho?) when being familiar.\n\nIf you are unsure which one to use, it is always safest to choose **আপনি** (aapni) to avoid sounding rude!"
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-hello",
+        "question": "How do I say \"Hello\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/vocabulary#course-vocabulary-greetings",
+          "hi/phrases#hello-namaste",
+          "course/hi/words#hello*",
+          "hi/phrases#hello*",
+          "hi/phrases#greeting*"
+        ],
+        "mention": [
+          "नमस्ते"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 56,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "hi/phrases#hello-namaste",
+        "course/hi/words#hello-formal-namaskaar",
+        "course/hi/phrases#answering-the-phone-hello-helo"
+      ],
+      "ms": 3578,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "The most common way to say hello in Hindi is **नमस्ते** (namaste, hello). It can be used with anyone at any time of day!\n\nHere are a few other ways to say hello:\n- For a slightly more formal greeting, you can say **नमस्कार** (namaskaar, hello).\n- When answering the phone, you say **हेलो?** (helo?, hello?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-love",
+        "question": "How do I say \"I love you\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#i-love-you-main-tumse-pyaar-kartaa-hoon",
+          "hi/emotions#i-love-you-main-tumse-pyaar-kartaa-hoon"
+        ],
+        "mention": [
+          "मैं",
+          "तुमसे",
+          "प्यार",
+          "करता",
+          "हूँ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 103,
+      "nativeCount": 19,
+      "unsupported": [],
+      "usedIds": [
+        "hi/emotions#i-love-you-main-tumse-pyaar-kartaa-hoon",
+        "course/hi/phrases#i-love-you-main-tumse-pyaar-kartaa-hoon"
+      ],
+      "ms": 4582,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "In Hindi, how you say \"I love you\" depends on your gender:\n\n- If you are a man, say: **मैं तुमसे प्यार करता हूँ** (main tumse pyaar kartaa hoon, I love you).\n- If you are a woman, say: **मैं तुमसे प्यार करती हूँ** (main tumse pyaar kartee hoon, I love you).\n\nIn these phrases, **प्यार** (pyaar, love) means love, and **तुमसे** (tumse, with you / to you) means \"with you / to you\". \n\nFor a more respectful tone, you can replace **तुमसे** (tumse) with **आपसे** (aapse), saying **मैं आपसे प्यार करता हूँ** (main aapse pyaar kartaa hoon) if you are a man."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-miss",
+        "question": "How do I say \"I miss you\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#i-miss-you-mujhe-tumhaaree-yaad-aa-rahee-hai",
+          "hi/emotions#i-miss-you-mujhe-tumhaaree-yaad-aa-rahee-hai"
+        ],
+        "mention": [
+          "मुझे",
+          "तुम्हारी",
+          "याद",
+          "रही",
+          "है"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 83,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "hi/emotions#i-miss-you-mujhe-tumhaaree-yaad-aa-rahee-hai",
+        "course/hi/phrases#i-miss-you-mujhe-tumhaaree-yaad-aa-rahee-hai"
+      ],
+      "ms": 4853,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "To say \"I miss you\" in Hindi, you can say:\n\n**मुझे तुम्हारी याद आ रही है** (mujhe tumhaaree yaad aa rahee hai, I miss you).\n\nThis literally means \"your memory is coming to me.\" It is the same whether a man or a woman is speaking, and is perfect for friends, family, or partners.\n\nIf you want to show respect to an elder or parent, you can say:\n\n**मुझे आपकी याद आ रही है** (mujhe aapkee yaad aa rahee hai, I miss you)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-hungry",
+        "question": "How do I say \"I am hungry\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#i-am-hungry-mujhe-bhookh-lagee-hai",
+          "hi/food#i-am-hungry-mujhe-bhookh-lagee-hai"
+        ],
+        "mention": [
+          "मुझे",
+          "भूख",
+          "लगी",
+          "है"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 72,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "hi/food#i-am-hungry-mujhe-bhookh-lagee-hai",
+        "course/hi/phrases#i-am-hungry-mujhe-bhookh-lagee-hai",
+        "course/hi/words#hungry-bhookhaa"
+      ],
+      "ms": 4070,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "The most natural way to say \"I am hungry\" in Hindi is **मुझे भूख लगी है** (mujhe bhookh lagee hai). This literally means \"hunger has struck me\" and is the same for both men and women.\n\nYou can also use the adjective for hungry. A man says **मैं भूखा हूँ** (main bhookhaa hoon) and a woman says **मैं भूखी हूँ** (main bhookhee hoon). This sounds a bit stronger, like \"I am starving.\""
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-thirsty",
+        "question": "How do I say \"I am thirsty\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#i-am-thirsty-mujhe-pyaas-lagee-hai",
+          "hi/food#i-am-thirsty-mujhe-pyaas-lagee-hai"
+        ],
+        "mention": [
+          "मुझे",
+          "प्यास",
+          "लगी",
+          "है"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 59,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "hi/food#i-am-thirsty-mujhe-pyaas-lagee-hai",
+        "course/hi/phrases#i-am-thirsty-mujhe-pyaas-lagee-hai",
+        "course/hi/words#thirsty-pyaasaa"
+      ],
+      "ms": 4521,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "To say \"I am thirsty\" in Hindi, you say:\n\n**मुझे प्यास लगी है (mujhe pyaas lagee hai, I am thirsty)**\n\nThis literally means \"thirst has struck me.\" It is the same for both men and women!\n\nIf you just want the word for \"thirsty\", you can use:\n- **प्यासा (pyaasaa, thirsty)** (for men)\n- **प्यासी (pyaasee, thirsty)** (for women)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-going",
+        "question": "How do I say \"Where are you going?\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#where-are-you-going-aap-kahaan-jaa-rahe-hain",
+          "hi/phrases#where-are-you-going-aap-kahaan-jaa-rahe-hain"
+        ],
+        "mention": [
+          "आप",
+          "कहाँ",
+          "जा",
+          "रहे",
+          "हैं"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 83,
+      "nativeCount": 14,
+      "unsupported": [],
+      "usedIds": [
+        "hi/phrases#where-are-you-going-aap-kahaan-jaa-rahe-hain",
+        "course/hi/phrases#where-are-you-going-aap-kahaan-jaa-rahe-hain"
+      ],
+      "ms": 4872,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "To ask \"Where are you going?\" in Hindi, you can say:\n\n- **आप कहाँ जा रहे हैं?** (aap kahaan jaa rahe hain?, Where are you going?) - Use this politely to a man.\n- **आप कहाँ जा रही हैं?** (aap kahaan jaa rahee hain?, Where are you going?) - Use this politely to a woman.\n- **कहाँ जा रहे हो?** (kahaan jaa rahe ho?, Where are you going?) - Use this with a friend.\n\nIn India, this is a friendly question, not nosy!"
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-doing",
+        "question": "How do I say \"What are you doing?\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#what-are-you-doing-aap-kyaa-kar-rahe-hain",
+          "hi/phrases#what-are-you-doing-aap-kyaa-kar-rahe-hain"
+        ],
+        "mention": [
+          "आप",
+          "क्या",
+          "कर",
+          "रहे",
+          "हैं"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 107,
+      "nativeCount": 18,
+      "unsupported": [],
+      "usedIds": [
+        "hi/phrases#what-are-you-doing-aap-kyaa-kar-rahe-hain",
+        "course/hi/phrases#what-are-you-doing-aap-kyaa-kar-rahe-hain"
+      ],
+      "ms": 3666,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "To ask \"What are you doing?\" in Hindi, you can say:\n\n- **आप क्या कर रहे हैं?** (aap kyaa kar rahe hain?, what are you doing?) - This is the polite way to ask a man.\n- **आप क्या कर रही हैं?** (aap kyaa kar rahee hain?, what are you doing?) - This is the polite way to ask a woman.\n\nIf you are talking to a friend, you can say:\n- **क्या कर रहे हो?** (kyaa kar rahe ho?, what are you doing?) - To a male friend.\n- **क्या कर रही हो?** (kyaa kar rahee ho?, what are you doing?) - To a female friend."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-understand",
+        "question": "How do I say \"I don't understand\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa",
+          "hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa"
+        ],
+        "mention": [
+          "मुझे",
+          "समझ",
+          "नहीं",
+          "आया"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 67,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "course/hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa"
+      ],
+      "ms": 2504,
+      "model": "gemini/gemini-3.5-flash",
+      "answer": "To say \"I don't understand\" in Hindi, you can say **मुझे समझ नहीं आया** (mujhe samajh nahin aayaa). This literally means \"understanding did not come to me\" and is the same for both men and women.\n\nIf you prefer, you can also say:\n- **मैं समझा नहीं** (main samjhaa nahin) if you are a man.\n- **मैं समझी नहीं** (main samajhee nahin) if you are a woman."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-repeat",
+        "question": "How do I say \"Please repeat\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#please-say-it-again-phir-se-boliye",
+          "hi/requests#say-it-again-please-phir-se-boliye",
+          "hi/requests*",
+          "hi/phrases#please*",
+          "course/hi/phrases#please-say*"
+        ],
+        "mention": [
+          "फिर",
+          "से",
+          "बोलिए"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 53,
+      "nativeCount": 11,
+      "unsupported": [],
+      "usedIds": [
+        "hi/requests#say-it-again-please-phir-se-boliye"
+      ],
+      "ms": 5477,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "If you want someone to repeat something in Hindi, you can say:\n\n- फिर से बोलिए (phir se boliye, please say it again)\n- एक बार फिर से बोलिए (ek baar phir se boliye, please say it once more)\n\nIf you are speaking casually, you can say फिर से बोलो (phir se bolo)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-cost",
+        "question": "How do I ask \"How much does this cost?\" in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#how-much-does-this-cost-yah-kitne-kaa-hai",
+          "hi/sentence-patterns#how-much-is-kitne-kaa-hai",
+          "hi/shopping#how-much-is-this-yah-kitne-kaa-hai"
+        ],
+        "mention": [
+          "यह",
+          "कितने",
+          "का",
+          "है",
+          "how much"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 46,
+      "nativeCount": 12,
+      "unsupported": [],
+      "usedIds": [
+        "hi/shopping#how-much-is-this-yah-kitne-kaa-hai",
+        "course/hi/phrases#how-much-does-this-cost-yah-kitne-kaa-hai"
+      ],
+      "ms": 6315,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"How much does this cost?\" in Hindi, you can say यह कितने का है? (yah kitne kaa hai?).\n\n- यह कितने का है? (yah kitne kaa hai?, How much is this?)\n- इसका दाम क्या है? (iskaa daam kyaa hai?, What is its price?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-intro",
+        "question": "How do I introduce myself in Hindi?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#my-name-is-asha-meraa-naam-asha-hai",
+          "hi/conversation#introductions-aapse-milkar-khushee-huee",
+          "hi/examples#my-name-is-asha",
+          "hi/phrases#my-name-is-meraa-naam-hai",
+          "hi/phrases#introducing-yourself-name-home-town-and-age",
+          "hi/phrases#introduc*",
+          "hi/phrases#my-name*"
+        ],
+        "mention": [
+          "मेरा",
+          "नाम"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 79,
+      "nativeCount": 13,
+      "unsupported": [],
+      "usedIds": [
+        "hi/conversation#introductions-aapse-milkar-khushee-huee",
+        "hi/phrases#introducing-yourself-name-home-town-and-age"
+      ],
+      "ms": 5787,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To introduce yourself in Hindi, you can start by saying hello and your name, such as नमस्ते, मेरा नाम आशा है (namaste, meraa naam Asha hai — hello, my name is Asha).\n\nYou can also tell where you are from, like मैं दिल्ली से हूँ (main Dillee se hoon — I am from Delhi).\n\nFinally, you can finish by saying nice to meet you, such as आपसे मिलकर ख़ुशी हुई (aapse milkar khushee huee — nice to meet you)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-word",
+        "question": "What does पानी mean?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/vocabulary#course-vocabulary-drinks",
+          "course/hi/vocabulary#course-vocabulary-drinks-part-2",
+          "course/hi/phrases#i-want-water-mujhe-paani-chaahiye",
+          "hi/vocabulary#food-and-drink",
+          "hi/examples#i-want-water",
+          "course/hi/vocabulary#course-vocabulary-everyday-things*",
+          "course/hi/words*",
+          "course/hi/phrases*"
+        ],
+        "mention": [
+          "पानी",
+          "water"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 4,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "course/hi/words#water-paani"
+      ],
+      "ms": 5529,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "पानी (paani) means water."
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-example",
+        "previous": "How do I say \"I want water\" in Hindi?",
+        "question": "Give me another example.",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/hi/phrases#i-want-water-mujhe-paani-chaahiye",
+          "hi/examples#i-want-water",
+          "hi/sentence-patterns#i-want-mujhe-chaahiye",
+          "hi/sentence-patterns#i-want-to-main-chaahtaa-hoon",
+          "hi/examples*",
+          "course/hi/phrases*"
+        ],
+        "mention": [
+          "चाहिए",
+          "मुझे",
+          "पानी",
+          "चाहिए"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 31,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "hi/sentence-patterns#i-want-mujhe-chaahiye"
+      ],
+      "ms": 2379,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Here is another example of asking for something you want or need using मुझे (mujhe) and चाहिए (chaahiye):\n\n- मुझे एक टिकट चाहिए (mujhe ek tikat chaahiye, I need one ticket)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-formal",
+        "question": "What is the difference between the formal and casual \"you\" in Hindi?",
+        "language": "hi",
+        "level": "elementary",
+        "expect": "answered",
+        "sources": [
+          "hi/beginner-guide#formal-and-informal-you",
+          "hi/grammar#three-forms-of-you",
+          "hi/requests#polite-casual-and-intimate-commands",
+          "hi/common-mistakes*",
+          "hi/grammar*",
+          "hi/beginner-guide*",
+          "hi/requests#polite*",
+          "hi/culture*"
+        ],
+        "mention": [
+          "आप",
+          "polite",
+          "formal",
+          "respect"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 87,
+      "nativeCount": 9,
+      "unsupported": [],
+      "usedIds": [
+        "hi/common-mistakes#using-or-with-strangers",
+        "hi/grammar#three-forms-of-you",
+        "hi/beginner-guide#formal-and-informal-you"
+      ],
+      "ms": 7440,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Hello! In Hindi, there are different words for \"you\" depending on who you are talking to. \n\n- आप (aap, polite) is the polite form used for strangers, elders, teachers, shopkeepers, and anyone you have just met.\n- तुम (tum, informal) is the casual form used for friends, younger people, and family.\n\nEach word also changes the verb that goes with it, for example: आप कैसे हैं? (aap kaise hain?) and तुम कैसे हो? (tum kaise ho?). When you are unsure, it is best to use आप (aap)!"
+    },
+    {
+      "testCase": {
+        "id": "beginner-hi-pronounce",
+        "question": "How do I pronounce नमस्ते?",
+        "language": "hi",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "hi/pronunciation#how-to-pronounce-and",
+          "hi/pronunciation#how-to-pronounce-and-2",
+          "hi/pronunciation#how-to-pronounce-and-3",
+          "hi/pronunciation#how-to-pronounce-and-4",
+          "course/hi/vocabulary#course-vocabulary-greetings",
+          "hi/phrases#hello-namaste",
+          "hi/pronunciation*",
+          "course/hi/words#hello*",
+          "hi/phrases#hello*",
+          "hi/phrases#greeting*"
+        ],
+        "mention": [
+          "नमस्ते"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 51,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "hi/pronunciation#how-to-pronounce-and",
+        "hi/phrases#hello-namaste"
+      ],
+      "ms": 5060,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To pronounce नमस्ते (namaste, hello), break it into three parts: \"na-mas-te\".\n\n- The first sounds are plain.\n- The last part uses an s and a dental t sound (your tongue touches the back of your upper teeth).\n- It ends with a clear \"e\" sound like in \"café\", not \"ee\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-hello",
+        "question": "How do I say \"Hello\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/phrases#hello-namaskaaram",
+          "course/te/vocabulary#course-vocabulary-greetings",
+          "course/te/words#hello*",
+          "te/phrases#hello*",
+          "te/phrases#greeting*"
+        ],
+        "mention": [
+          "నమస్కారం"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 28,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "te/phrases#hello-namaskaaram"
+      ],
+      "ms": 2033,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "The usual way to say hello in Telugu is నమస్కారం (namaskaaram, hello). It works at any time of day and with anyone. You can also say నమస్తే (namaste)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-love",
+        "question": "How do I say \"I love you\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/emotions#i-love-you-nenu-ninnu-premistunnaanu",
+          "course/te/phrases#i-love-you-nenu-ninnu-premistunnaanu"
+        ],
+        "mention": [
+          "నేను",
+          "నిన్ను",
+          "ప్రేమిస్తున్నాను"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 44,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "course/te/phrases#i-love-you-nenu-ninnu-premistunnaanu"
+      ],
+      "ms": 2201,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I love you\" in Telugu, you can use:\n\n నేను నిన్ను ప్రేమిస్తున్నాను (nenu ninnu premistunnaanu, I love you).\n\nIt is romantic and strong, like a film dialogue. Couples often say it in English or use a phrase meaning \"I like you very much\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-miss",
+        "question": "How do I say \"I miss you\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/emotions#i-miss-you-nuvvu-gurtostunnaavu",
+          "course/te/phrases#i-miss-you-nuvvu-gurtostunnaavu"
+        ],
+        "mention": [
+          "నువ్వు",
+          "గుర్తొస్తున్నావు"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 37,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "course/te/phrases#i-miss-you-nuvvu-gurtostunnaavu"
+      ],
+      "ms": 2534,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I miss you\" in Telugu, you can say:\n\n- నువ్వు గుర్తొస్తున్నావు (nuvvu gurtostunnaavu, I miss you)\n\nThis literally means \"you are coming to (my) mind\" and is the natural, gentle Telugu way to say it."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-hungry",
+        "question": "How do I say \"I am hungry\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/food#i-am-hungry-naaku-aakaligaa-undi",
+          "course/te/phrases#i-am-hungry-naaku-aakaligaa-undi"
+        ],
+        "mention": [
+          "నాకు",
+          "ఆకలిగా",
+          "ఉంది"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 39,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "te/food#i-am-hungry-naaku-aakaligaa-undi",
+        "course/te/phrases#i-am-hungry-naaku-aakaligaa-undi"
+      ],
+      "ms": 2502,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am hungry\" in Telugu, you say నాకు ఆకలిగా ఉంది (naaku aakaligaa undi). Telugu says the feeling happens to you, so we use నాకు (to me).\n\n- You can also say ఆకలేస్తోంది (aakalestondi) for \"I'm getting hungry\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-thirsty",
+        "question": "How do I say \"I am thirsty\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/food#i-am-thirsty-naaku-daahangaa-undi",
+          "course/te/phrases#i-am-thirsty-naaku-daahangaa-undi"
+        ],
+        "mention": [
+          "నాకు",
+          "దాహంగా",
+          "ఉంది"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 47,
+      "nativeCount": 9,
+      "unsupported": [],
+      "usedIds": [
+        "te/food#i-am-thirsty-naaku-daahangaa-undi",
+        "course/te/phrases#i-am-thirsty-naaku-daahangaa-undi"
+      ],
+      "ms": 2147,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am thirsty\" in Telugu, you can say నాకు దాహంగా ఉంది (naaku daahangaa undi). You can also say నాకు దాహం వేస్తోంది (naaku daaham vestondi).\n\nIf you want to ask for water, you can say కొంచెం నీళ్ళు ఇవ్వండి (konchem neellu ivvandi, please give me some water)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-going",
+        "question": "How do I say \"Where are you going?\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/phrases#where-are-you-going-meeru-ekkadiki-veltunnaaru",
+          "course/te/phrases#where-are-you-going-meeru-ekkadiki-veltunnaaru"
+        ],
+        "mention": [
+          "మీరు",
+          "ఎక్కడికి",
+          "వెళ్తున్నారు"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 32,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "te/phrases#where-are-you-going-meeru-ekkadiki-veltunnaaru",
+        "course/te/phrases#where-are-you-going-meeru-ekkadiki-veltunnaaru"
+      ],
+      "ms": 2655,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"Where are you going?\" in Telugu, you can say:\n\nమీరు ఎక్కడికి వెళ్తున్నారు? (meeru ekkadiki veltunnaaru?)\n\nIf you are speaking casually to a friend, you can say:\nఎక్కడికి వెళ్తున్నావు? (ekkadiki veltunnaavu?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-doing",
+        "question": "How do I say \"What are you doing?\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/phrases#what-are-you-doing-meeru-em-chestunnaaru",
+          "course/te/phrases#what-are-you-doing-meeru-em-chestunnaaru"
+        ],
+        "mention": [
+          "మీరు",
+          "ఏం",
+          "చేస్తున్నారు"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 61,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "te/phrases#what-are-you-doing-meeru-em-chestunnaaru",
+        "course/te/phrases#what-are-you-doing-meeru-em-chestunnaaru"
+      ],
+      "ms": 2218,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"What are you doing?\" politely in Telugu, you say:\n\n- మీరు ఏం చేస్తున్నారు? (meeru em chestunnaaru?, polite)\n\nTo a friend casually, you can say:\n- ఏం చేస్తున్నావు? (em chestunnaavu?) or shortened to ఏం చేస్తున్నావ్? (em chestunnaav?)\n\nIf you want to ask \"What are you up to these days?\", you say:\n- ఈ మధ్య ఏం చేస్తున్నారు? (ee madhya em chestunnaaru?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-understand",
+        "question": "How do I say \"I don't understand\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/phrases#i-dont-understand-naaku-artham-kaaledu",
+          "te/requests#i-dont-understand-naaku-artham-kaaledu",
+          "course/te/phrases#i-dont-understand-naaku-artham-kaaledu"
+        ],
+        "mention": [
+          "నాకు",
+          "అర్థం",
+          "కాలేదు"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 24,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "te/requests#i-dont-understand-naaku-artham-kaaledu",
+        "course/te/phrases#i-dont-understand-naaku-artham-kaaledu"
+      ],
+      "ms": 2141,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I don't understand\" in Telugu, you say నాకు అర్థం కాలేదు (naaku artham kaaledu).\n\nIt literally means \"to me, the meaning didn't come\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-repeat",
+        "question": "How do I say \"Please repeat\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/requests#say-it-again-please-mallee-cheppandi",
+          "course/te/phrases#please-say-it-again-mallee-cheppandi",
+          "te/requests*",
+          "te/phrases#please*",
+          "course/te/phrases#please-say*"
+        ],
+        "mention": [
+          "మళ్ళీ",
+          "చెప్పండి"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 32,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "te/requests#say-it-again-please-mallee-cheppandi"
+      ],
+      "ms": 1766,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"Please repeat\" or \"Say it again, please\" in Telugu, you can say మళ్ళీ చెప్పండి (mallee cheppandi). You can also say ఇంకొకసారి చెప్పండి (inkokasaari cheppandi) which means \"say it once more\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-cost",
+        "question": "How do I ask \"How much does this cost?\" in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/sentence-patterns#how-much-is-enta",
+          "te/shopping#how-much-is-this-idi-enta",
+          "course/te/phrases#how-much-does-this-cost-idi-enta"
+        ],
+        "mention": [
+          "ఇది",
+          "ఎంత",
+          "how much"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 38,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "te/shopping#how-much-is-this-idi-enta",
+        "course/te/phrases#how-much-does-this-cost-idi-enta"
+      ],
+      "ms": 2695,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"How much does this cost?\" in Telugu, you can say:\n\n- ఇది ఎంత? (idi enta?, how much is this?)\n\nYou can also say:\n- దీని ధర ఎంత? (deeni dhara enta?, what is the price of this?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-intro",
+        "question": "How do I introduce myself in Telugu?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/examples#my-name-is-asha",
+          "te/conversation#introductions-mimmalni-kalavadam-santosham",
+          "te/phrases#my-name-is-naa-peru",
+          "course/te/phrases#my-name-is-asha-naa-peru-asha",
+          "te/phrases#introduc*",
+          "te/phrases#my-name*"
+        ],
+        "mention": [
+          "నా",
+          "పేరు"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 67,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "te/conversation#introductions-mimmalni-kalavadam-santosham",
+        "te/phrases#my-name-is-naa-peru"
+      ],
+      "ms": 2676,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To introduce yourself in Telugu, you can say your name like this:\n\n- నా పేరు ఆశ (naa peru Asha, hello, my name is Asha).\n\nYou can also say where you are from:\n\n- నేను హైదరాబాదు నుండి వచ్చాను (nenu Haidaraabaadu nundi vachchaanu, I come from Hyderabad).\n\nTo finish your introduction, you can say nice to meet you:\n\n- మిమ్మల్ని కలవడం సంతోషం (mimmalni kalavadam santosham, nice to meet you)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-word",
+        "question": "What does నీళ్ళు mean?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/examples#i-want-water",
+          "te/vocabulary#food-and-drink",
+          "course/te/vocabulary#course-vocabulary-drinks",
+          "course/te/vocabulary#course-vocabulary-drinks-part-2",
+          "course/te/phrases#i-want-water-naaku-neellu-kaavaali",
+          "course/te/vocabulary#course-vocabulary-everyday-things*",
+          "course/te/words*",
+          "course/te/phrases*"
+        ],
+        "mention": [
+          "నీళ్ళు",
+          "water"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 17,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "course/te/words#water-neellu"
+      ],
+      "ms": 1849,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Hello! The word నీళ్ళు (neellu) means water. It is grammatically plural in Telugu.\n\nHere is an example:"
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-example",
+        "previous": "How do I say \"I want water\" in Telugu?",
+        "question": "Give me another example.",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/examples#i-want-water",
+          "te/sentence-patterns#i-want-naaku-kaavaali",
+          "te/sentence-patterns#i-want-to-do-something",
+          "course/te/phrases#i-want-water-naaku-neellu-kaavaali",
+          "te/examples*",
+          "course/te/phrases*"
+        ],
+        "mention": [
+          "కావాలి",
+          "నాకు",
+          "నీళ్ళు",
+          "కావాలి"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 22,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "te/sentence-patterns#i-want-naaku-kaavaali"
+      ],
+      "ms": 1838,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say you need a ticket, you can say:\n\n- నాకు ఒక టికెట్ కావాలి (naaku oka tiket kaavaali, I need a ticket)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-formal",
+        "question": "What is the difference between the formal and casual \"you\" in Telugu?",
+        "language": "te",
+        "level": "elementary",
+        "expect": "answered",
+        "sources": [
+          "te/beginner-guide#formal-and-informal-you",
+          "te/common-mistakes#formal-and-casual-vs-and-polite-commands",
+          "te/requests#polite-commands",
+          "te/common-mistakes*",
+          "te/grammar*",
+          "te/beginner-guide*",
+          "te/requests#polite*",
+          "te/culture*"
+        ],
+        "mention": [
+          "మీరు",
+          "polite",
+          "formal",
+          "respect"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 80,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "te/common-mistakes#formal-and-casual-vs-and-polite-commands",
+        "te/beginner-guide#formal-and-informal-you",
+        "course/te/words#you-casual-nuvvu"
+      ],
+      "ms": 2769,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "In Telugu, the biggest difference between formal and casual \"you\" is who you are speaking to.\n\n- మీరు (meeru, polite) is polite and plural. Use it with elders, strangers, teachers, shopkeepers, and anyone you do not know well.\n- నువ్వు (nuvvu, casual) is casual. Use it only for close friends, younger family, and children. Using it with elders or strangers is considered rude.\n\nVerb endings and words like \"your\" also change to match whether you are being formal or casual."
+    },
+    {
+      "testCase": {
+        "id": "beginner-te-pronounce",
+        "question": "How do I pronounce నమస్కారం?",
+        "language": "te",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "te/pronunciation#how-to-pronounce-common-telugu-phrases",
+          "te/phrases#hello-namaskaaram",
+          "course/te/vocabulary#course-vocabulary-greetings",
+          "te/pronunciation*",
+          "course/te/words#hello*",
+          "te/phrases#hello*",
+          "te/phrases#greeting*"
+        ],
+        "mention": [
+          "నమస్కారం"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 17,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "te/phrases#hello-namaskaaram",
+        "course/te/words#hello-namaskaaram"
+      ],
+      "ms": 2419,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To pronounce hello, you say నమస్కారం (namaskaaram). It is the polite way to greet someone in Telugu!"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-hello",
+        "question": "How do I say \"Hello\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/phrases#hello-vanakkam",
+          "course/ta/vocabulary#course-vocabulary-greetings",
+          "course/ta/words#hello*",
+          "ta/phrases#hello*",
+          "ta/phrases#greeting*"
+        ],
+        "mention": [
+          "வணக்கம்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 38,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "ta/phrases#hello-vanakkam",
+        "course/ta/phrases#answering-the-phone-hello-halo",
+        "course/ta/words#hello-vanakkam"
+      ],
+      "ms": 2361,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"Hello\" in Tamil when meeting someone in person, you can use வணக்கம் (vanakkam, hello). It works at any time of day and with anyone!\n\nIf you are answering the phone, Tamil speakers use ஹலோ? (halo?, hello?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-love",
+        "question": "How do I say \"I love you\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/emotions#i-love-you-naan-unnaik-kaadhalikkiren",
+          "course/ta/phrases#i-love-you-naan-unnaik-kaadhalikkiren"
+        ],
+        "mention": [
+          "நான்",
+          "உன்னைக்",
+          "காதலிக்கிறேன்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 36,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "course/ta/phrases#i-love-you-naan-unnaik-kaadhalikkiren"
+      ],
+      "ms": 5403,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I love you\" in Tamil, you can say:\n\nநான் உன்னைக் காதலிக்கிறேன் (naan unnaik kaadhalikkiren)\n\nThis is strictly romantic. Lovers use the casual உன்னை. It sounds like a film line and is rarely said aloud."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-miss",
+        "question": "How do I say \"I miss you\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/emotions#i-miss-you-un-ninaivaagave-irukkiradhu",
+          "course/ta/phrases#i-miss-you-un-ninaivaagave-irukkiradhu"
+        ],
+        "mention": [
+          "உன்",
+          "நினைவாகவே",
+          "இருக்கிறது"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 51,
+      "nativeCount": 9,
+      "unsupported": [],
+      "usedIds": [
+        "course/ta/phrases#i-miss-you-un-ninaivaagave-irukkiradhu"
+      ],
+      "ms": 3213,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I miss you\" in Tamil, you can say உன் நினைவாகவே இருக்கிறது (un ninaivaagave irukkiradhu). Literally, this means \"(I) keep thinking of you\". To family, you can politely say உங்கள் ஞாபகமாகவே இருக்கிறது (ungal gnaabagamaagave irukkiradhu). In real life, most people use Tanglish and say உன்னை மிஸ் பண்றேன் (unnai mis panren)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-hungry",
+        "question": "How do I say \"I am hungry\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/food#i-am-hungry-enakkup-pasikkiradhu",
+          "course/ta/phrases#i-am-hungry-enakkup-pasikkiradhu"
+        ],
+        "mention": [
+          "எனக்குப்",
+          "பசிக்கிறது"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 29,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "ta/food#i-am-hungry-enakkup-pasikkiradhu",
+        "course/ta/phrases#i-am-hungry-enakkup-pasikkiradhu"
+      ],
+      "ms": 2408,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am hungry\" in Tamil, you can say எனக்குப் பசிக்கிறது (enakkup pasikkiradhu). \n\nIn everyday speech, people often say எனக்குப் பசிக்குது (enakkup pasikkudhu) or ரொம்ப பசிக்குது (romba pasikkudhu)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-thirsty",
+        "question": "How do I say \"I am thirsty\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/food#i-am-thirsty-enakkuth-thaagamaaga-irukkiradhu",
+          "course/ta/phrases#i-am-thirsty-enakkuth-thaagamaaga-irukkiradhu"
+        ],
+        "mention": [
+          "எனக்குத்",
+          "தாகமாக",
+          "இருக்கிறது"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 42,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "ta/food#i-am-thirsty-enakkuth-thaagamaaga-irukkiradhu",
+        "course/ta/phrases#i-am-thirsty-enakkuth-thaagamaaga-irukkiradhu"
+      ],
+      "ms": 2996,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am thirsty\" in Tamil, you can say எனக்குத் தாகமாக இருக்கிறது (enakkuth thaagamaaga irukkiradhu). In everyday polite speech, people often say தாகமா இருக்கு (thaagamaa irukku). You can also simply ask for water by saying எனக்குத் தண்ணி வேணும் (enakkuth thanni venum)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-going",
+        "question": "How do I say \"Where are you going?\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/phrases#where-are-you-going-enge-pogireergal",
+          "course/ta/phrases#where-are-you-going-neengal-enge-pogireergal"
+        ],
+        "mention": [
+          "நீங்கள்",
+          "எங்கே",
+          "போகிறீர்கள்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 40,
+      "nativeCount": 7,
+      "unsupported": [],
+      "usedIds": [
+        "ta/phrases#where-are-you-going-enge-pogireergal",
+        "course/ta/phrases#where-are-you-going-neengal-enge-pogireergal"
+      ],
+      "ms": 2726,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"Where are you going?\" politely in everyday Tamil, you can say எங்க போறீங்க? (enga poreenga?). The written form is நீங்கள் எங்கே போகிறீர்கள்? (neengal enge pogireergal?). If you are talking to a friend, you say எங்க போற? (enga pora?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-doing",
+        "question": "How do I say \"What are you doing?\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/phrases#what-are-you-doing-enna-seygireergal",
+          "course/ta/phrases#what-are-you-doing-neengal-enna-seygireergal"
+        ],
+        "mention": [
+          "நீங்கள்",
+          "என்ன",
+          "செய்கிறீர்கள்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 41,
+      "nativeCount": 7,
+      "unsupported": [],
+      "usedIds": [
+        "ta/phrases#what-are-you-doing-enna-seygireergal",
+        "course/ta/phrases#what-are-you-doing-neengal-enna-seygireergal"
+      ],
+      "ms": 2274,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"What are you doing?\" politely in everyday Tamil, you can say என்ன பண்றீங்க? (enna panreenga?).\n\nThe written form is நீங்கள் என்ன செய்கிறீர்கள்? (neengal enna seygireergal?).\n\nIf you are talking to a friend, you can say என்ன பண்ற? (enna panra?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-understand",
+        "question": "How do I say \"I don't understand\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/phrases#i-dont-understand-enakku-puriyavillai",
+          "course/ta/phrases#i-dont-understand-enakkup-puriyavillai"
+        ],
+        "mention": [
+          "எனக்குப்",
+          "புரியவில்லை"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 30,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "course/ta/phrases#i-dont-understand-enakkup-puriyavillai"
+      ],
+      "ms": 2625,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I don't understand\" in Tamil, you can use this phrase:\n\n- எனக்குப் புரியவில்லை (enakkup puriyavillai, I don't understand)\n\nIn everyday speech, people often just say:\n- புரியல (puriyala)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-repeat",
+        "question": "How do I say \"Please repeat\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/requests#please-say-it-again",
+          "course/ta/phrases#once-more-one-more-time-innoru-murai",
+          "course/ta/phrases#please-say-it-again-meendum-sollungal",
+          "ta/requests*",
+          "ta/phrases#please*",
+          "course/ta/phrases#please-say*"
+        ],
+        "mention": [
+          "மீண்டும்",
+          "சொல்லுங்கள்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": false,
+      "levelOk": true,
+      "words": 37,
+      "nativeCount": 10,
+      "unsupported": [
+        "இது",
+        "மற்றும்",
+        "பயன்பாட்டுக்கு",
+        "எழுத்து",
+        "வடிவம்"
+      ],
+      "usedIds": [
+        "ta/requests#please-say-it-again"
+      ],
+      "ms": 2329,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask someone to repeat in Tamil, you can say இன்னொரு தடவை சொல்லுங்க (innoru thadavai sollunga, say it one more time).\n\n- இது polite மற்றும் everyday பயன்பாட்டுக்கு.\n- எழுத்து வடிவம்: மீண்டும் சொல்லுங்கள் (meendum sollungal, please say again)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-cost",
+        "question": "How do I ask \"How much does this cost?\" in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/sentence-patterns#how-much-is-enna-vilai",
+          "ta/shopping#how-much-is-this-idhu-enna-vilai",
+          "course/ta/phrases#how-much-does-this-cost-idhu-enna-vilai"
+        ],
+        "mention": [
+          "இது",
+          "என்ன",
+          "விலை",
+          "how much"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": false,
+      "levelOk": true,
+      "words": 35,
+      "nativeCount": 6,
+      "unsupported": [
+        "அல்லது"
+      ],
+      "usedIds": [
+        "ta/shopping#how-much-is-this-idhu-enna-vilai",
+        "ta/questions#how-much-evvalavu",
+        "course/ta/phrases#how-much-does-this-cost-idhu-enna-vilai"
+      ],
+      "ms": 2809,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"How much does this cost?\" in Tamil, you can say:\n\n- இது என்ன விலை? (idhu enna vilai?)\n- அல்லது இது எவ்வளவு? (idhu evvalavu?)\n\nIt is a polite way to ask for the price."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-intro",
+        "question": "How do I introduce myself in Tamil?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/conversation#introductions-ungalaich-chandhiththadhil-magizhchi",
+          "ta/examples#my-name-is-asha",
+          "ta/phrases#my-name-is-en-peyar",
+          "ta/phrases#introducing-yourself-name-age-and-home-town",
+          "course/ta/phrases#my-name-is-asha-en-peyar-asha",
+          "ta/phrases#introduc*",
+          "ta/phrases#my-name*"
+        ],
+        "mention": [
+          "என்",
+          "பெயர்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 67,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "ta/phrases#introducing-yourself-name-age-and-home-town",
+        "ta/conversation#introductions-ungalaich-chandhiththadhil-magizhchi"
+      ],
+      "ms": 2253,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To introduce yourself in Tamil, you can start by saying hello and giving your name:\n\n- வணக்கம். என் பெயர் ஆஷா (vanakkam, en peyar Asha, hello, my name is Asha).\n\nYou can also tell where you come from:\n\n- நான் சென்னையிலிருந்து வருகிறேன் (naan Chennaiyilirundhu varugiren, I come from Chennai).\n\nFinally, you can end with a polite greeting:\n\n- உங்களைச் சந்தித்ததில் மகிழ்ச்சி (ungalaich sandhiththadhil magizhchchi, nice to meet you)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-word",
+        "question": "What does தண்ணீர் mean?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/examples#i-want-water",
+          "ta/vocabulary#food-and-drink",
+          "course/ta/vocabulary#course-vocabulary-drinks",
+          "course/ta/vocabulary#course-vocabulary-drinks-part-2",
+          "course/ta/phrases#i-want-water-enakkuth-thanneer-vendum",
+          "course/ta/vocabulary#course-vocabulary-everyday-things*",
+          "course/ta/words*",
+          "course/ta/phrases*"
+        ],
+        "mention": [
+          "தண்ணீர்",
+          "water"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 12,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "course/ta/words#water-thanneer"
+      ],
+      "ms": 3189,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Hello! The Tamil word தண்ணீர் (thanneer) means \"Water\".\n\nHere is an example:"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-example",
+        "previous": "How do I say \"I want water\" in Tamil?",
+        "question": "Give me another example.",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/examples#i-want-water",
+          "ta/sentence-patterns#i-want-enakku-vendum",
+          "ta/sentence-patterns#i-want-to-virumbugiren-and-aasai",
+          "course/ta/phrases#i-want-water-enakkuth-thanneer-vendum",
+          "ta/examples*",
+          "course/ta/phrases*"
+        ],
+        "mention": [
+          "வேண்டும்",
+          "எனக்குத்",
+          "தண்ணீர்",
+          "வேண்டும்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 30,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "ta/sentence-patterns#i-want-enakku-vendum"
+      ],
+      "ms": 2869,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Here is another example of asking for something:\n\nஎனக்கு டீ வேண்டும் (enakku tee vendum, I want a tea).\nIn everyday spoken Tamil, it is எனக்கு டீ வேணும் (enakku tee venum)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-formal",
+        "question": "What is the difference between the formal and casual \"you\" in Tamil?",
+        "language": "ta",
+        "level": "elementary",
+        "expect": "answered",
+        "sources": [
+          "ta/beginner-guide#formal-and-informal-you",
+          "ta/common-mistakes#using-nee-with-strangers-formal-vs-informal-you",
+          "ta/grammar#formal-and-casual-forms-you-commands-he-and-she",
+          "ta/requests#polite-commands-the-ending",
+          "ta/common-mistakes*",
+          "ta/grammar*",
+          "ta/beginner-guide*",
+          "ta/requests#polite*",
+          "ta/culture*"
+        ],
+        "mention": [
+          "நீங்கள்",
+          "polite",
+          "formal",
+          "respect"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 89,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "ta/grammar#formal-and-casual-forms-you-commands-he-and-she",
+        "ta/common-mistakes#using-nee-with-strangers-formal-vs-informal-you",
+        "ta/beginner-guide#formal-and-informal-you"
+      ],
+      "ms": 2977,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "In Tamil, the choice between the formal and casual \"you\" depends on respect and who you are speaking to.\n\n- **Formal/Respected \"You\"**: நீங்கள் (neengal, spoken நீங்க, neenga) is used for strangers, elders, teachers, shopkeepers, or as a plural form. \n- **Casual \"You\"**: நீ (nee) is used only for close friends your age, younger family members, and children. Using நீ (nee) with strangers or elders is considered rude.\n\nVerbs also change depending on which form you use, and when you are unsure, it is best to use the polite form."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ta-pronounce",
+        "question": "How do I pronounce வணக்கம்?",
+        "language": "ta",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ta/pronunciation#pronouncing-common-tamil-phrases",
+          "ta/phrases#hello-vanakkam",
+          "course/ta/vocabulary#course-vocabulary-greetings",
+          "ta/pronunciation*",
+          "course/ta/words#hello*",
+          "ta/phrases#hello*",
+          "ta/phrases#greeting*"
+        ],
+        "mention": [
+          "வணக்கம்"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 21,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "ta/pronunciation#pronouncing-common-tamil-phrases"
+      ],
+      "ms": 2744,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say வணக்கம் (vanakkam, hello) correctly, hold the double kk sound like this: va-nak-kam. Speak slowly and hold the doubled letters!"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-hello",
+        "question": "How do I say \"Hello\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/phrases#hello-namaskaaram",
+          "course/ml/vocabulary#course-vocabulary-greetings",
+          "course/ml/words#hello*",
+          "ml/phrases#hello*",
+          "ml/phrases#greeting*"
+        ],
+        "mention": [
+          "നമസ്കാരം"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 40,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "ml/phrases#hello-namaskaaram",
+        "course/ml/words#hello-namaskaaram"
+      ],
+      "ms": 2571,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"Hello\" in Malayalam, you can use:\n\n- നമസ്കാരം (namaskaaram, hello)\n\nThis is the usual, polite way to greet anyone at any time of day, often said with your palms pressed together. Among friends, people also just say \"hi\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-love",
+        "question": "How do I say \"I love you\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/emotions#i-love-you-njaan-ninne-snehikkunnu",
+          "course/ml/phrases#i-love-you-njaan-ninne-snehikkunnu"
+        ],
+        "mention": [
+          "ഞാൻ",
+          "നിന്നെ",
+          "സ്നേഹിക്കുന്നു"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 45,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "course/ml/phrases#i-love-you-njaan-ninne-snehikkunnu"
+      ],
+      "ms": 2639,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I love you\" in Malayalam, you can say ഞാൻ നിന്നെ സ്നേഹിക്കുന്നു (njaan ninne snehikkunnu). However, this can sound a bit bookish or film-like.\n\nCouples often just say \"I love you\" in English, or use a phrase that means \"I like you so much\":"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-miss",
+        "question": "How do I say \"I miss you\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/emotions#i-miss-you-ninne-miss-cheyyunnu",
+          "course/ml/phrases#i-miss-you-njaan-ninne-miss-cheyyunnu"
+        ],
+        "mention": [
+          "ഞാൻ",
+          "നിന്നെ",
+          "മിസ്",
+          "ചെയ്യുന്നു"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 57,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "course/ml/phrases#i-miss-you-njaan-ninne-miss-cheyyunnu"
+      ],
+      "ms": 3014,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I miss you\" in Malayalam, you can use ഞാൻ നിന്നെ മിസ് ചെയ്യുന്നു (njaan ninne miss cheyyunnu). Malayalam does not have a single native verb for \"miss\", so people mix English with \"ചെയ്യുന്നു\" (cheyyunnu).\n\nA warmer, native way to say it is നിന്നെ ഒരുപാട് ഓർക്കുന്നു (ninne orupaadu orkkunnu), which means \"I think of you a lot\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-hungry",
+        "question": "How do I say \"I am hungry\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/food#i-am-hungry-enikku-vishakkunnu",
+          "course/ml/phrases#i-am-hungry-enikku-vishakkunnu"
+        ],
+        "mention": [
+          "എനിക്ക്",
+          "വിശക്കുന്നു"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 42,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "ml/food#i-am-hungry-enikku-vishakkunnu",
+        "course/ml/words#hungry-vishappu",
+        "course/ml/phrases#i-am-hungry-enikku-vishakkunnu"
+      ],
+      "ms": 2220,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am hungry\" in Malayalam, you can say:\n\n- എനിക്ക് വിശക്കുന്നു (enikku vishakkunnu, I am hungry)\n\nThis literally means \"to me (it) hungers\". Another correct way to say it is:\n\n- എനിക്ക് വിശപ്പുണ്ട് (enikku vishappundu, to me there is hunger)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-thirsty",
+        "question": "How do I say \"I am thirsty\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/food#i-am-thirsty-enikku-daahikkunnu",
+          "course/ml/phrases#i-am-thirsty-enikku-daahikkunnu"
+        ],
+        "mention": [
+          "എനിക്ക്",
+          "ദാഹിക്കുന്നു"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 34,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "ml/food#i-am-thirsty-enikku-daahikkunnu",
+        "course/ml/words#thirsty-daaham",
+        "course/ml/phrases#i-am-thirsty-enikku-daahikkunnu"
+      ],
+      "ms": 2544,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am thirsty\" in Malayalam, you can say:\n\n- എനിക്ക് ദാഹിക്കുന്നു (enikku daahikkunnu), which means \"to me (it) thirsts\".\n- Or എനിക്ക് ദാഹമുണ്ട് (enikku daahamundu), which means \"to me there is thirst\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-going",
+        "question": "How do I say \"Where are you going?\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/phrases#where-are-you-going-ningal-evide-pokukayaanu",
+          "course/ml/phrases#where-are-you-going-ningal-evide-pokukayaanu"
+        ],
+        "mention": [
+          "നിങ്ങൾ",
+          "എവിടെ",
+          "പോകുകയാണ്"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 34,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "ml/phrases#where-are-you-going-ningal-evide-pokukayaanu",
+        "course/ml/phrases#where-are-you-going-ningal-evide-pokukayaanu"
+      ],
+      "ms": 2455,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"Where are you going?\" in Malayalam, you can use: നിങ്ങൾ എവിടെ പോകുകയാണ്? (ningal evide pokukayaanu?).\n\nCasually on the road, you can also say: എവിടെ പോകുന്നു? (evide pokunnu?) or എങ്ങോട്ടാ? (engottaa?, which way?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-doing",
+        "question": "How do I say \"What are you doing?\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/phrases#what-are-you-doing-ningal-enthu-cheyyukayaanu",
+          "course/ml/phrases#what-are-you-doing-ningal-enthu-cheyyukayaanu"
+        ],
+        "mention": [
+          "നിങ്ങൾ",
+          "എന്ത്",
+          "ചെയ്യുകയാണ്"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 44,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "ml/phrases#what-are-you-doing-ningal-enthu-cheyyukayaanu",
+        "course/ml/phrases#what-are-you-doing-ningal-enthu-cheyyukayaanu"
+      ],
+      "ms": 2287,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"What are you doing?\" in Malayalam, you can say:\n\nനിങ്ങൾ എന്ത് ചെയ്യുകയാണ്? (ningal enthu cheyyukayaanu?)\n\nIf you are talking casually to a friend, you can say:\n\nനീ എന്താ ചെയ്യുന്നേ? (nee enthaa cheyyunne?)\n\nOver the phone, you can ask:\n\nഎന്താ പരിപാടി? (enthaa paripaadi?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-understand",
+        "question": "How do I say \"I don't understand\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/phrases#i-dont-understand-enikku-manassilaayilla",
+          "course/ml/phrases#i-dont-understand-enikku-manassilaayilla"
+        ],
+        "mention": [
+          "എനിക്ക്",
+          "മനസ്സിലായില്ല"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 24,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "course/ml/phrases#i-dont-understand-enikku-manassilaayilla"
+      ],
+      "ms": 2779,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I don't understand.\" in Malayalam, you can say എനിക്ക് മനസ്സിലായില്ല (enikku manassilaayilla). It literally means \"it did not come into my mind\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-repeat",
+        "question": "How do I say \"Please repeat\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/requests#say-it-again-onnukoodi-parayaamo",
+          "course/ml/phrases#please-say-it-again-onnukoodi-parayaamo",
+          "ml/requests*",
+          "ml/phrases#please*",
+          "course/ml/phrases#please-say*"
+        ],
+        "mention": [
+          "ഒന്നുകൂടി",
+          "പറയാമോ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 32,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "ml/requests#say-it-again-onnukoodi-parayaamo"
+      ],
+      "ms": 2486,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask someone to repeat in Malayalam, you can say ഒന്നുകൂടി പറയാമോ? (onnukoodi parayaamo?, could you say it once more?). \n\n- ഒന്നുകൂടി (onnukoodi, once more)\n- പറയാമോ? (parayaamo?, could you tell me?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-cost",
+        "question": "How do I ask \"How much does this cost?\" in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/sentence-patterns#how-much-is-nu-ethrayaanu",
+          "ml/shopping#how-much-is-this-ithinu-ethrayaanu",
+          "course/ml/phrases#how-much-does-this-cost-ithinu-ethrayaanu"
+        ],
+        "mention": [
+          "ഇതിന്",
+          "എത്രയാണ്",
+          "how much"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 40,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "ml/shopping#how-much-is-this-ithinu-ethrayaanu",
+        "course/ml/phrases#how-much-does-this-cost-ithinu-ethrayaanu"
+      ],
+      "ms": 2739,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"How much does this cost?\" in Malayalam, you can say ഇതിന് എത്രയാണ്? (ithinu ethrayaanu?). Literally, it means \"for this, how much is it?\".\n\nYou can also ask ഇതിന് എന്താ വില? (ithinu enthaa vila?, what's the price of this?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-intro",
+        "question": "How do I introduce myself in Malayalam?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/examples#my-name-is-asha",
+          "ml/conversation#introductions-kandathil-santhosham",
+          "ml/phrases#my-name-is-ente-peru",
+          "ml/phrases#introducing-yourself-name-age-and-hometown",
+          "course/ml/phrases#my-name-is-asha-ente-peru-asha",
+          "ml/phrases#introduc*",
+          "ml/phrases#my-name*"
+        ],
+        "mention": [
+          "എന്റെ",
+          "പേര്"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 50,
+      "nativeCount": 7,
+      "unsupported": [],
+      "usedIds": [
+        "ml/conversation#introductions-kandathil-santhosham"
+      ],
+      "ms": 2868,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To introduce yourself in Malayalam, you can say your name by starting with:\n\n- നമസ്കാരം, എന്റെ പേര് ആശ (namaskaaram, ente peru Asha — hello, my name is Asha).\n\nYou can also tell where you are from by saying:\n\n- ഞാൻ കൊച്ചിയിൽ നിന്നാണ് (njaan Kochiyil ninnaanu — I am from Kochi)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-word",
+        "question": "What does വെള്ളം mean?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/examples#i-want-water",
+          "ml/vocabulary#food-and-drink",
+          "course/ml/vocabulary#course-vocabulary-drinks",
+          "course/ml/vocabulary#course-vocabulary-drinks-part-2",
+          "course/ml/phrases#i-want-water-enikku-vellam-venam",
+          "course/ml/vocabulary#course-vocabulary-everyday-things*",
+          "course/ml/words*",
+          "course/ml/phrases*"
+        ],
+        "mention": [
+          "വെള്ളം",
+          "water"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 14,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "course/ml/words#water-vellam"
+      ],
+      "ms": 2057,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Water means വെള്ളം (vellam) in Malayalam. For example, drinking water is often കുടിവെള്ളം (kudivellam)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-example",
+        "previous": "How do I say \"I want water\" in Malayalam?",
+        "question": "Give me another example.",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/examples#i-want-water",
+          "ml/sentence-patterns#i-want-enikku-venam",
+          "course/ml/phrases#i-want-water-enikku-vellam-venam",
+          "ml/examples*",
+          "course/ml/phrases*"
+        ],
+        "mention": [
+          "വേണം",
+          "എനിക്ക്",
+          "വെള്ളം",
+          "വേണം"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 35,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "ml/sentence-patterns#i-want-enikku-venam"
+      ],
+      "ms": 2766,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I want a tea.\", you can say:\n\nഎനിക്ക് ഒരു ചായ വേണം (enikku oru chaaya venam).\n\nYou can also say:\n\nഎനിക്ക് കുറച്ച് വെള്ളം വേണം (enikku kurachchu vellam venam), which means \"I want some water.\""
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-formal",
+        "question": "What is the difference between the formal and casual \"you\" in Malayalam?",
+        "language": "ml",
+        "level": "elementary",
+        "expect": "answered",
+        "sources": [
+          "ml/beginner-guide#formal-and-informal-you",
+          "ml/common-mistakes#formal-and-casual-you-vs",
+          "ml/common-mistakes#formal-and-casual-commands-vs",
+          "ml/common-mistakes*",
+          "ml/grammar*",
+          "ml/beginner-guide*",
+          "ml/requests#polite*",
+          "ml/culture*"
+        ],
+        "mention": [
+          "നിങ്ങൾ",
+          "polite",
+          "formal",
+          "respect"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 72,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "ml/common-mistakes#formal-and-casual-you-vs",
+        "ml/beginner-guide#formal-and-informal-you"
+      ],
+      "ms": 2578,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "In Malayalam, there is a polite (formal) and a casual \"you\".\n\n- നിങ്ങൾ (ningal, polite \"you\"): Use this with strangers, elders, teachers, shopkeepers, and anyone you are unsure about. It is also used as the plural \"you\".\n- നീ (nee, casual \"you\"): Use this only for close friends, younger siblings, and children. Using നീ with an elder sounds rude.\n- താങ്കൾ (thaankal, very formal \"you\"): This is used for speeches and letters."
+    },
+    {
+      "testCase": {
+        "id": "beginner-ml-pronounce",
+        "question": "How do I pronounce നമസ്കാരം?",
+        "language": "ml",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "ml/pronunciation#pronouncing-common-phrases",
+          "ml/phrases#hello-namaskaaram",
+          "course/ml/vocabulary#course-vocabulary-greetings",
+          "ml/pronunciation*",
+          "course/ml/words#hello*",
+          "ml/phrases#hello*",
+          "ml/phrases#greeting*"
+        ],
+        "mention": [
+          "നമസ്കാരം"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 21,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "ml/phrases#hello-namaskaaram"
+      ],
+      "ms": 2622,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say hello, you use നമസ്കാരം (namaskaaram, hello). It is the polite way to greet anyone at any time of day!"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-hello",
+        "question": "How do I say \"Hello\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/phrases#hello-namaskaara",
+          "course/kn/vocabulary#course-vocabulary-greetings",
+          "course/kn/words#hello*",
+          "kn/phrases#hello*",
+          "kn/phrases#greeting*"
+        ],
+        "mention": [
+          "ನಮಸ್ಕಾರ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 27,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "kn/phrases#hello-namaskaara"
+      ],
+      "ms": 2723,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "The usual way to say hello in Kannada is ನಮಸ್ಕಾರ (namaskaara). It works at any time and with anyone. Another word you can use is ನಮಸ್ತೆ (namaste)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-love",
+        "question": "How do I say \"I love you\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/emotions#i-love-you-naanu-ninnannu-preetisuttene",
+          "course/kn/phrases#i-love-you-naanu-ninnannu-preetisuttene"
+        ],
+        "mention": [
+          "ನಾನು",
+          "ನಿನ್ನನ್ನು",
+          "ಪ್ರೀತಿಸುತ್ತೇನೆ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 49,
+      "nativeCount": 7,
+      "unsupported": [],
+      "usedIds": [
+        "course/kn/phrases#i-love-you-naanu-ninnannu-preetisuttene"
+      ],
+      "ms": 3994,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I love you.\" in Kannada, you can say:\n\nನಾನು ನಿನ್ನನ್ನು ಪ್ರೀತಿಸುತ್ತೇನೆ (naanu ninnannu preetisuttene).\n\nIt is romantic and quite serious. Couples often use ನೀನು (neenu, you) with each other. Spoken, many people say ನಾನು ನಿನ್ನ ಪ್ರೀತಿಸ್ತೀನಿ (naanu ninna preetisteeni), or simply say \"I love you\" in English."
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-miss",
+        "question": "How do I say \"I miss you\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/emotions#i-miss-you-ninna-nenapu-tumbaa-aaguttide",
+          "course/kn/phrases#i-miss-you-ninna-nenapu-tumbaa-aaguttide"
+        ],
+        "mention": [
+          "ನಿನ್ನ",
+          "ನೆನಪು",
+          "ತುಂಬಾ",
+          "ಆಗುತ್ತಿದೆ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 43,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "course/kn/phrases#i-miss-you-ninna-nenapu-tumbaa-aaguttide"
+      ],
+      "ms": 1930,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I miss you\" in Kannada, you can say ನಿನ್ನ ನೆನಪು ತುಂಬಾ ಆಗುತ್ತಿದೆ (ninna nenapu tumbaa aaguttide). This is the warm native way, and it is fine for family and friends. For a polite way, you can say ನಿಮ್ಮ ನೆನಪು ತುಂಬಾ ಆಗುತ್ತಿದೆ."
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-hungry",
+        "question": "How do I say \"I am hungry\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/food#i-am-hungry-nanage-hasivaagide",
+          "course/kn/phrases#i-am-hungry-nanage-hasivaagide"
+        ],
+        "mention": [
+          "ನನಗೆ",
+          "ಹಸಿವಾಗಿದೆ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 26,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "kn/food#i-am-hungry-nanage-hasivaagide"
+      ],
+      "ms": 2225,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am hungry\" in Kannada, you can say ನನಗೆ ಹಸಿವಾಗಿದೆ (nanage hasivaagide). \n\nHere is an example:\n- ನನಗೆ ಹಸಿವಾಗಿದೆ (nanage hasivaagide, I am hungry)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-thirsty",
+        "question": "How do I say \"I am thirsty\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/food#i-am-thirsty-nanage-baayaarikeyaagide",
+          "course/kn/phrases#i-am-thirsty-nanage-baayaarikeyaagide"
+        ],
+        "mention": [
+          "ನನಗೆ",
+          "ಬಾಯಾರಿಕೆಯಾಗಿದೆ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 53,
+      "nativeCount": 7,
+      "unsupported": [],
+      "usedIds": [
+        "kn/food#i-am-thirsty-nanage-baayaarikeyaagide",
+        "course/kn/phrases#i-am-thirsty-nanage-baayaarikeyaagide"
+      ],
+      "ms": 2656,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am thirsty\" in Kannada, you can say:\n\n ನನಗೆ ಬಾಯಾರಿಕೆಯಾಗಿದೆ (nanage baayaarikeyaagide), which literally means \"to me thirst has happened\".\n\nIn everyday speech, people often just ask for water by saying:\n- ಸ್ವಲ್ಪ ನೀರು ಕೊಡಿ (svalpa neeru kodi) - Some water please\n- ನೀರು ಬೇಕು (neeru beku) - I need water"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-going",
+        "question": "How do I say \"Where are you going?\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/phrases#where-are-you-going-neevu-ellige-hoguttiddeeri",
+          "course/kn/phrases#where-are-you-going-neevu-ellige-hoguttiddeeri"
+        ],
+        "mention": [
+          "ನೀವು",
+          "ಎಲ್ಲಿಗೆ",
+          "ಹೋಗುತ್ತಿದ್ದೀರಿ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 30,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "kn/phrases#where-are-you-going-neevu-ellige-hoguttiddeeri"
+      ],
+      "ms": 1911,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"Where are you going?\" in a polite way, you can say ನೀವು ಎಲ್ಲಿಗೆ ಹೋಗುತ್ತಿದ್ದೀರಿ? (neevu ellige hoguttiddeeri?).\n\n- ನೀವು ಎಲ್ಲಿಗೆ ಹೋಗುತ್ತಿದ್ದೀರಿ? (neevu ellige hoguttiddeeri?, Where are you going?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-doing",
+        "question": "How do I say \"What are you doing?\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/phrases#what-are-you-doing-neevu-enu-maaduttiddeeri",
+          "course/kn/phrases#what-are-you-doing-neevu-enu-maaduttiddeeri"
+        ],
+        "mention": [
+          "ನೀವು",
+          "ಏನು",
+          "ಮಾಡುತ್ತಿದ್ದೀರಿ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 48,
+      "nativeCount": 9,
+      "unsupported": [],
+      "usedIds": [
+        "kn/phrases#what-are-you-doing-neevu-enu-maaduttiddeeri",
+        "course/kn/phrases#what-are-you-doing-neevu-enu-maaduttiddeeri"
+      ],
+      "ms": 2087,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"What are you doing?\" politely in Kannada, you can say:\n\nನೀವು ಏನು ಮಾಡುತ್ತಿದ್ದೀರಿ? (neevu enu maaduttiddeeri?)\n\nIn everyday spoken Kannada, people often say ಏನ್ ಮಾಡ್ತಿದ್ದೀರಾ? (en maadtiddeeraa?). If you are talking to a friend, you can say ಏನು ಮಾಡುತ್ತಿದ್ದೀಯ? (enu maaduttiddneeya?) or ಏನ್ ಮಾಡ್ತಿದ್ದೀಯಾ? (en maadtiddeeyaa?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-understand",
+        "question": "How do I say \"I don't understand\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/phrases#i-dont-understand-nanage-artha-aagalilla",
+          "kn/requests#i-dont-understand-please-speak-slowly-nidhaanavaagi-maatanaa",
+          "course/kn/phrases#i-dont-understand-nanage-artha-aagalilla"
+        ],
+        "mention": [
+          "ನನಗೆ",
+          "ಅರ್ಥ",
+          "ಆಗಲಿಲ್ಲ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 26,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "course/kn/phrases#i-dont-understand-nanage-artha-aagalilla"
+      ],
+      "ms": 2586,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I don't understand\" in Kannada, you can say ನನಗೆ ಅರ್ಥ ಆಗಲಿಲ್ಲ (nanage artha aagalilla).\n\n- ನನಗೆ ಅರ್ಥ ಆಗಲಿಲ್ಲ (nanage artha aagalilla, I don't understand)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-repeat",
+        "question": "How do I say \"Please repeat\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/requests#please-say-it-again-innomme-heli",
+          "course/kn/phrases#please-say-it-again-dayavittu-innomme-heli",
+          "kn/requests*",
+          "kn/phrases#please*",
+          "course/kn/phrases#please-say*"
+        ],
+        "mention": [
+          "ದಯವಿಟ್ಟು",
+          "ಇನ್ನೊಮ್ಮೆ",
+          "ಹೇಳಿ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 35,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "kn/requests#please-say-it-again-innomme-heli"
+      ],
+      "ms": 2241,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask someone to repeat in Kannada, you can say ದಯವಿಟ್ಟು ಇನ್ನೊಮ್ಮೆ ಹೇಳಿ (dayavittu innomme heli), which means \"please say it once more\".\n\n- ದಯವಿಟ್ಟು ಇನ್ನೊಮ್ಮೆ ಹೇಳಿ (dayavittu innomme heli, please say it once more)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-cost",
+        "question": "How do I ask \"How much does this cost?\" in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/sentence-patterns#how-much-is-eshtu",
+          "kn/shopping#how-much-is-this-idu-eshtu",
+          "course/kn/phrases#how-much-does-this-cost-idara-bele-eshtu"
+        ],
+        "mention": [
+          "ಇದರ",
+          "ಬೆಲೆ",
+          "ಎಷ್ಟು",
+          "how much"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 38,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "kn/shopping#how-much-is-this-idu-eshtu",
+        "course/kn/phrases#how-much-does-this-cost-idara-bele-eshtu"
+      ],
+      "ms": 2538,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"How much does this cost?\" in Kannada, you can say ಇದರ ಬೆಲೆ ಎಷ್ಟು? (idara bele eshtu?).\n\n- ಇದರ ಬೆಲೆ ಎಷ್ಟು? (idara bele eshtu?, what is its price?)\n- ಇದು ಎಷ್ಟು? (idu eshtu?, how much is this?)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-intro",
+        "question": "How do I introduce myself in Kannada?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/conversation#introductions-nimmannu-bhetiyaagi-santoshavaayitu",
+          "kn/examples#my-name-is-asha",
+          "kn/phrases#my-name-is-nanna-hesaru",
+          "kn/phrases#introducing-yourself-fully-nanna-bagge",
+          "course/kn/phrases#my-name-is-asha-nanna-hesaru-asha",
+          "kn/phrases#introduc*",
+          "kn/phrases#my-name*"
+        ],
+        "mention": [
+          "ನನ್ನ",
+          "ಹೆಸರು"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 71,
+      "nativeCount": 9,
+      "unsupported": [],
+      "usedIds": [
+        "kn/conversation#introductions-nimmannu-bhetiyaagi-santoshavaayitu",
+        "kn/phrases#my-name-is-nanna-hesaru"
+      ],
+      "ms": 2462,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To introduce yourself in Kannada, you can start by saying your name using:\n\n- ನನ್ನ ಹೆಸರು… (nanna hesaru… - my name…)\n\nFor example, to say your name is Asha, you say:\n\n- ನಮಸ್ಕಾರ, ನನ್ನ ಹೆಸರು ಆಶಾ (namaskaara, nanna hesaru Asha - hello, my name is Asha)\n\nYou can also tell which town you are from, and finish by saying:\n\n- ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿ ಸಂತೋಷವಾಯಿತು (nimmannu bhetiyaagi santoshavaayitu - happy to meet you)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-word",
+        "question": "What does ನೀರು mean?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/vocabulary#food-and-drink",
+          "kn/examples#i-want-water",
+          "course/kn/vocabulary#course-vocabulary-drinks",
+          "course/kn/phrases#i-want-water-nanage-neeru-beku",
+          "course/kn/vocabulary#course-vocabulary-everyday-things*",
+          "course/kn/words*",
+          "course/kn/phrases*"
+        ],
+        "mention": [
+          "ನೀರು",
+          "water"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 22,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "course/kn/words#water-neeru"
+      ],
+      "ms": 2117,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "In Kannada, ನೀರು (neeru) means \"Water\".\n\nFor example:\n- ಕುಡಿಯುವ ನೀರು (kudiyuva neeru, drinking water)\n- ಬಿಸಿ ನೀರು (bisi neeru, hot water)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-example",
+        "previous": "How do I say \"I want water\" in Kannada?",
+        "question": "Give me another example.",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/examples#i-want-water",
+          "kn/sentence-patterns#i-want-nanage-beku",
+          "course/kn/phrases#i-want-water-nanage-neeru-beku",
+          "kn/examples*",
+          "course/kn/phrases*"
+        ],
+        "mention": [
+          "ಬೇಕು",
+          "ನನಗೆ",
+          "ನೀರು",
+          "ಬೇಕು"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 22,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "course/kn/phrases#please-give-me-some-water-svalpa-neeru-kodi"
+      ],
+      "ms": 2178,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Here is another way to ask for water in Kannada:\n\n- ಸ್ವಲ್ಪ ನೀರು ಕೊಡಿ (svalpa neeru kodi, Please give me some water.)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-formal",
+        "question": "What is the difference between the formal and casual \"you\" in Kannada?",
+        "language": "kn",
+        "level": "elementary",
+        "expect": "answered",
+        "sources": [
+          "kn/beginner-guide#formal-and-informal-you",
+          "kn/common-mistakes#formal-vs-informal-you-vs-neevu-vs-neenu",
+          "kn/common-mistakes#formal-vs-casual-commands-vs-banni-vs-baa",
+          "kn/common-mistakes*",
+          "kn/grammar*",
+          "kn/beginner-guide*",
+          "kn/requests#polite*",
+          "kn/culture*"
+        ],
+        "mention": [
+          "ನೀವು",
+          "polite",
+          "formal",
+          "respect"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": false,
+      "levelOk": true,
+      "words": 129,
+      "nativeCount": 9,
+      "unsupported": [
+        "మీరు"
+      ],
+      "usedIds": [
+        "kn/common-mistakes#formal-vs-informal-you-vs-neevu-vs-neenu",
+        "kn/beginner-guide#formal-and-informal-you",
+        "course/kn/words#you-casual-neenu"
+      ],
+      "ms": 2918,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "In Kannada, the formal and casual words for \"you\" are used differently depending on who you are talking to.\n\n- ನೀವು (neevu, you) is the respectful and plural form. You should use it with elders, teachers, shopkeepers, auto drivers, and anyone you don't know well.\n- ನೀನು (neenu, you) is the casual form. It is only for close friends, younger family members, and children. Using it with an elder sounds rude!\n\nVerbs and possessive words change depending on which form you use. For example, \"how are you?\" is మీరు ಹೇಗಿದ್ದೀರಿ? (neevu hegiddeeri?) when formal, and ನೀನು ಹೇಗಿದ್ದೀಯ? (neenu hegiddeeya?) when casual. Also, \"your\" is ನಿಮ್ಮ (nimma) for formal and ನಿನ್ನ (ninna) for casual. When you are not sure, the best rule of thumb is to start with ನೀವು (neevu)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-kn-pronounce",
+        "question": "How do I pronounce ನಮಸ್ಕಾರ?",
+        "language": "kn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "kn/pronunciation#how-to-pronounce-common-kannada-phrases",
+          "kn/phrases#hello-namaskaara",
+          "course/kn/vocabulary#course-vocabulary-greetings",
+          "kn/pronunciation*",
+          "course/kn/words#hello*",
+          "kn/phrases#hello*",
+          "kn/phrases#greeting*"
+        ],
+        "mention": [
+          "ನಮಸ್ಕಾರ"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 19,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "kn/pronunciation#how-to-pronounce-common-kannada-phrases",
+        "kn/phrases#hello-namaskaara"
+      ],
+      "ms": 2090,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say ನಮಸ್ಕಾರ (namaskaara, hello), the pronunciation is na-mas-KAA-ra. Hold the long \"aa\" sound and tap the ರ lightly."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-hello",
+        "question": "How do I say \"Hello\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/bn/vocabulary#course-vocabulary-greetings",
+          "bn/phrases#hello-nomoshkar",
+          "course/bn/words#hello*",
+          "bn/phrases#hello*",
+          "bn/phrases#greeting*"
+        ],
+        "mention": [
+          "নমস্কার"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 57,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "course/bn/phrases#answering-the-phone-hello-hyaalo",
+        "bn/phrases#hello-nomoshkar",
+        "course/bn/words#hello-nomoshkaar"
+      ],
+      "ms": 2534,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "A common and polite way to say hello in Bengali for any time of day is নমস্কার (nomoshkaar). It is often said with the palms pressed together.\n\nMuslims and many people in Bangladesh also say আসসালামু আলাইকুম (aassaalaamu aalaaikum). Among friends, people often just say হাই (haai) or use English \"hello\" when answering the phone: হ্যালো? (hyaalo?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-love",
+        "question": "How do I say \"I love you\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/emotions#i-love-you-aami-tomaake-bhaalobaashi",
+          "course/bn/phrases#i-love-you-aami-tomaake-bhaalobaashi"
+        ],
+        "mention": [
+          "আমি",
+          "তোমাকে",
+          "ভালোবাসি"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 39,
+      "nativeCount": 6,
+      "unsupported": [],
+      "usedIds": [
+        "bn/emotions#i-love-you-aami-tomaake-bhaalobaashi"
+      ],
+      "ms": 2492,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I love you\" in Bengali, you say আমি তোমাকে ভালোবাসি (aami tomaake bhaalobaashi).\n\nHere is the word-by-word meaning:\n- আমি (aami) = I\n- তোমাকে (tomaake) = you\n- ভালোবাসি (bhaalobaashi) = love\n\nThe verb comes last."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-miss",
+        "question": "How do I say \"I miss you\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/emotions#i-miss-you-tomaar-kothaa-khub-mone-porchhe",
+          "course/bn/phrases#i-miss-you-tomaar-kothaa-khub-mone-porchhe"
+        ],
+        "mention": [
+          "তোমার",
+          "কথা",
+          "খুব",
+          "মনে",
+          "পড়ছে"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 61,
+      "nativeCount": 15,
+      "unsupported": [],
+      "usedIds": [
+        "bn/emotions#i-miss-you-tomaar-kothaa-khub-mone-porchhe",
+        "course/bn/phrases#i-miss-you-tomaar-kothaa-khub-mone-porchhe"
+      ],
+      "ms": 2533,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I miss you\" in Bengali, you can say তোমার কথা খুব মনে পড়ছে (tomaar kothaa khub mone porchhe). Literally, it means \"your words keep coming to my mind a lot\".\n\n- To an elder: আপনার কথা খুব মনে পড়ছে (aapnaar kothaa khub mone porchhe)\n- To a close friend: তোর কথা খুব মনে পড়ছে (tor kothaa khub mone porchhe)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-hungry",
+        "question": "How do I say \"I am hungry\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/food#i-am-hungry-aamaar-khide-peyechhe",
+          "course/bn/phrases#i-am-hungry-aamaar-khide-peyechhe"
+        ],
+        "mention": [
+          "আমার",
+          "খিদে",
+          "পেয়েছে"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 56,
+      "nativeCount": 7,
+      "unsupported": [],
+      "usedIds": [
+        "bn/food#i-am-hungry-aamaar-khide-peyechhe",
+        "course/bn/phrases#i-am-hungry-aamaar-khide-peyechhe"
+      ],
+      "ms": 2419,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am hungry\" in Bengali, you can say আমার খিদে পেয়েছে (aamaar khide peyechhe), which literally means \"to me hunger has come\". It is the same for men and women, and works in both polite and casual speech.\n\nIf you are very hungry, you can say আমার খুব খিদে পেয়েছে (aamaar khub khide peyechhe)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-thirsty",
+        "question": "How do I say \"I am thirsty\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/food#i-am-thirsty-aamaar-teshtaa-peyechhe",
+          "course/bn/phrases#i-am-thirsty-aamaar-teshtaa-peyechhe"
+        ],
+        "mention": [
+          "আমার",
+          "তেষ্টা",
+          "পেয়েছে"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 20,
+      "nativeCount": 3,
+      "unsupported": [],
+      "usedIds": [
+        "bn/food#i-am-thirsty-aamaar-teshtaa-peyechhe",
+        "course/bn/phrases#i-am-thirsty-aamaar-teshtaa-peyechhe"
+      ],
+      "ms": 2119,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I am thirsty\" in Bengali, you can say আমার তেষ্টা পেয়েছে (aamaar teshtaa peyechhe).\n\nHere is an example:"
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-going",
+        "question": "How do I say \"Where are you going?\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/phrases#where-are-you-going-aapni-kothaay-jaachchhen",
+          "course/bn/phrases#where-are-you-going-aapni-kothaay-jaachchhen"
+        ],
+        "mention": [
+          "আপনি",
+          "কোথায়",
+          "যাচ্ছেন"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 38,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "bn/phrases#where-are-you-going-aapni-kothaay-jaachchhen"
+      ],
+      "ms": 2485,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"Where are you going?\" in Bengali, you can say:\n\n- আপনি কোথায় যাচ্ছেন? (aapni kothaay jaachchhen?) politely.\n- তুমি কোথায় যাচ্ছ? (tumi kothaay jaachchho?) to a friend.\n- কোথায় যাচ্ছিস? (kothaay jaachchhis?) to a close friend."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-doing",
+        "question": "How do I say \"What are you doing?\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "course/bn/phrases#what-are-you-doing-aapni-ki-korchhen",
+          "bn/everyday-life#what-are-you-doing-at-home-ki-korchho",
+          "bn/phrases#what-are-you-doing-aapni-ki-korchhen"
+        ],
+        "mention": [
+          "আপনি",
+          "কী",
+          "করছেন"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 40,
+      "nativeCount": 8,
+      "unsupported": [],
+      "usedIds": [
+        "bn/phrases#what-are-you-doing-aapni-ki-korchhen"
+      ],
+      "ms": 2335,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"What are you doing?\" in Bengali, you can say আপনি কী করছেন? (aapni ki korchhen?) politely.\n\nFor a friend, you say তুমি কী করছ? (tumi ki korchho?), and to a close friend, you say কী করছিস? (ki korchhis?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-understand",
+        "question": "How do I say \"I don't understand\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/phrases#i-dont-understand-aami-bujhte-paarchhi-naa",
+          "course/bn/phrases#i-dont-understand-aami-bujhte-paarchhi-naa"
+        ],
+        "mention": [
+          "আমি",
+          "বুঝতে",
+          "পারছি",
+          "না"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 32,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "course/bn/phrases#i-dont-understand-aami-bujhte-paarchhi-naa"
+      ],
+      "ms": 2712,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To say \"I don't understand.\" in Bengali, you can say:\n\n- আমি বুঝতে পারছি না (aami bujhte paarchhi naa, \"I don't understand.\")\n\nYou add না (naa) after the verb to mean \"not\"."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-repeat",
+        "question": "How do I say \"Please repeat\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/requests#say-it-again-aarekbaar-bolun",
+          "course/bn/phrases#please-say-it-again-aarekbaar-bolun",
+          "bn/requests*",
+          "bn/phrases#please*",
+          "course/bn/phrases#please-say*"
+        ],
+        "mention": [
+          "আরেকবার",
+          "বলুন"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 37,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "bn/requests#say-it-again-aarekbaar-bolun"
+      ],
+      "ms": 2426,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask someone to repeat in Bengali, you can say আরেকবার বলুন (aarekbaar bolun, say it once more).\n\nFor a softer and very natural way, you can say আরেকবার বলবেন? (aarekbaar bolben?, would you say it again?)."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-cost",
+        "question": "How do I ask \"How much does this cost?\" in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/sentence-patterns#how-much-is-koto",
+          "bn/shopping#how-much-does-this-cost-etaar-daam-koto",
+          "course/bn/phrases#how-much-does-this-cost-etaar-daam-koto"
+        ],
+        "mention": [
+          "এটার",
+          "দাম",
+          "কত",
+          "how much"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 47,
+      "nativeCount": 5,
+      "unsupported": [],
+      "usedIds": [
+        "bn/shopping#how-much-does-this-cost-etaar-daam-koto",
+        "course/bn/phrases#how-much-does-this-cost-etaar-daam-koto"
+      ],
+      "ms": 2631,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To ask \"How much does this cost?\" in Bengali, you say এটার দাম কত? (etaar daam koto?, \"how much does this cost?\"). Literally, it means \"this one's price how much?\". In shops and markets, people often shorten it to এটা কত? (etaa koto?, \"how much is this?\")."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-intro",
+        "question": "How do I introduce myself in Bengali?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/examples#my-name-is-asha",
+          "bn/conversation#introductions-aapnaar-shonge-dekhaa-hoye-bhaalo-laaglo",
+          "bn/phrases#my-name-is-aamaar-naam",
+          "bn/phrases#introducing-yourself-fully",
+          "course/bn/phrases#my-name-is-asha-aamaar-naam-asha",
+          "bn/phrases#introduc*",
+          "bn/phrases#my-name*"
+        ],
+        "mention": [
+          "আমার",
+          "নাম"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 87,
+      "nativeCount": 21,
+      "unsupported": [],
+      "usedIds": [
+        "bn/conversation#introductions-aapnaar-shonge-dekhaa-hoye-bhaalo-laaglo"
+      ],
+      "ms": 2293,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To introduce yourself in Bengali, you can say আপনার নাম কী? (aapnaar naam ki? — what is your name?) and আপনি কোথা থেকে এসেছেন? (aapni kothaa theke eshechhen? — where are you from?). \n\nHere is how you do it:\n- নমস্কার, আমার নাম আশা (nomoshkaar, aamaar naam Asha — hello, my name is Asha)\n- আমি কলকাতা থেকে এসেছি (aami Kolkata theke eshechhi — I have come from Kolkata)\n- আপনার সঙ্গে দেখা হয়ে ভালো লাগল (aapnaar shonge dekhaa hoye bhaalo laaglo — nice to meet you)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-word",
+        "question": "What does জল mean?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/examples#i-want-water",
+          "course/bn/vocabulary#course-vocabulary-drinks",
+          "course/bn/vocabulary#course-vocabulary-drinks-part-2",
+          "bn/vocabulary#food-and-drink",
+          "course/bn/phrases#i-want-water-aamaar-jol-chaai",
+          "course/bn/vocabulary#course-vocabulary-everyday-things*",
+          "course/bn/words*",
+          "course/bn/phrases*"
+        ],
+        "mention": [
+          "জল",
+          "water"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 20,
+      "nativeCount": 2,
+      "unsupported": [],
+      "usedIds": [
+        "course/bn/words#water-jol"
+      ],
+      "ms": 2388,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "In Bengali, জল (jol) means water. For example, you can say জল (jol) when talking about water in West Bengal."
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-example",
+        "previous": "How do I say \"I want water\" in Bengali?",
+        "question": "Give me another example.",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/examples#i-want-water",
+          "bn/sentence-patterns#i-want-aamaar-chaai",
+          "bn/sentence-patterns#i-want-to-do-aami-te-chaai",
+          "course/bn/phrases#i-want-water-aamaar-jol-chaai",
+          "bn/examples*",
+          "course/bn/phrases*"
+        ],
+        "mention": [
+          "চাই",
+          "আমার",
+          "জল",
+          "চাই"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 23,
+      "nativeCount": 4,
+      "unsupported": [],
+      "usedIds": [
+        "bn/sentence-patterns#i-want-aamaar-chaai"
+      ],
+      "ms": 2212,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Here is another example of how to say you want something:\n\nআমার একটা টিকিট চাই (aamaar ektaa tikit chaai, \"I want a ticket\")"
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-formal",
+        "question": "What is the difference between the formal and casual \"you\" in Bengali?",
+        "language": "bn",
+        "level": "elementary",
+        "expect": "answered",
+        "sources": [
+          "bn/beginner-guide#formal-and-informal-you",
+          "bn/grammar#three-levels-of-you",
+          "bn/requests#polite-commands-three-forms",
+          "bn/common-mistakes*",
+          "bn/grammar*",
+          "bn/beginner-guide*",
+          "bn/requests#polite*",
+          "bn/culture*"
+        ],
+        "mention": [
+          "আপনি",
+          "polite",
+          "formal",
+          "respect"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 83,
+      "nativeCount": 10,
+      "unsupported": [],
+      "usedIds": [
+        "bn/grammar#three-levels-of-you",
+        "bn/common-mistakes#using-the-wrong-you",
+        "course/bn/words#you-casual-tumi",
+        "bn/beginner-guide#formal-and-informal-you"
+      ],
+      "ms": 2391,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "Bengali has three words for \"you\", and the verb ending changes with each:\n\n- আপনি (aapni) is the polite form used for elders, strangers, teachers, and shopkeepers.\n- তুমি (tumi) is the familiar form used for friends, family, and people your age.\n- তুই (tui) is very intimate, used only for very close friends, younger siblings, and small children.\n\nFor example, with the verb \"to eat\" খাওয়া (khaowa):\n- তুমি খাও (tumi khaao)\n- আপনি খান (aapni khaan)\n- তুই খাস (tui khaash)"
+    },
+    {
+      "testCase": {
+        "id": "beginner-bn-pronounce",
+        "question": "How do I pronounce নমস্কার?",
+        "language": "bn",
+        "level": "beginner",
+        "expect": "answered",
+        "sources": [
+          "bn/pronunciation#pronouncing-common-phrases",
+          "course/bn/vocabulary#course-vocabulary-greetings",
+          "bn/phrases#hello-nomoshkar",
+          "bn/pronunciation*",
+          "course/bn/words#hello*",
+          "bn/phrases#hello*",
+          "bn/phrases#greeting*"
+        ],
+        "mention": [
+          "নমস্কার"
+        ]
+      },
+      "status": "answered",
+      "statusOk": true,
+      "retrievalOk": true,
+      "groundedOk": true,
+      "levelOk": true,
+      "words": 24,
+      "nativeCount": 1,
+      "unsupported": [],
+      "usedIds": [
+        "bn/pronunciation#pronouncing-common-phrases"
+      ],
+      "ms": 2044,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "To pronounce নমস্কার (nomoshkaar, hello), both o's are short like \"hot\", the স is \"sh\", and the আ is long. It sounds like no-mosh-KAAR."
     },
     {
       "testCase": {
@@ -443,7 +3614,7 @@
       "nativeCount": 0,
       "unsupported": [],
       "usedIds": [],
-      "ms": 28,
+      "ms": 43,
       "model": null,
       "answer": "I couldn't find this in Vachan's Telugu notes, so I won't guess. I can help with Telugu letters and sounds, everyday phrases, basic grammar and the words from your lessons — try one of the suggested questions."
     },
@@ -461,13 +3632,13 @@
       "retrievalOk": true,
       "groundedOk": true,
       "levelOk": true,
-      "words": 41,
+      "words": 19,
       "nativeCount": 0,
       "unsupported": [],
       "usedIds": [],
-      "ms": 5870,
-      "model": "gemini/gemini-3.5-flash",
-      "answer": "I'm sorry, but the provided notes do not contain information on how to write a formal business email in Telugu. They only cover past tense verbs, polite commands, conjunct letters, gender in verbs, and the basics of the Telugu writing system."
+      "ms": 2199,
+      "model": "gemini/gemini-3.5-flash-lite",
+      "answer": "I'm sorry, but the notes do not contain information on how to write a formal business email in Telugu."
     },
     {
       "testCase": {

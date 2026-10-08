@@ -122,7 +122,9 @@ async function loadExercise(userId: string, exerciseId: string, languageCode: st
   const correctAnswer = correctAnswerText(exercise);
   return {
     lessonId: exercise.lessonId,
-    searchText: `${exercise.prompt} — ${correctAnswer}. ${exercise.explanation ?? ""}`.trim(),
+    // The lesson title ("Vowels: a and aa", "Ordering food") tells the search what the exercise is about.
+    searchText:
+      `${exercise.lesson.title}: ${exercise.prompt} — ${correctAnswer}. ${exercise.explanation ?? ""}`.trim(),
     prompt: `${exercise.instruction}: ${exercise.prompt}${exercise.promptSubtext ? ` (${exercise.promptSubtext})` : ""}`,
     learnerAnswer: describeAnswer(exercise, attempt.answer) || "(no answer)",
     correctAnswer,

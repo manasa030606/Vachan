@@ -37,3 +37,19 @@ Tamil colour words: சிவப்பு (sivappu, red), பச்சை (pachc
 <!-- topic: time; level: elementary -->
 
 Useful Tamil time words: இன்று (indru, today — in speech இன்னைக்கு, innaikku), நாளை (naalai, tomorrow — in speech நாளைக்கு, naalaikku), நேற்று (netru, yesterday), இப்போது (ippodhu, now — in speech இப்ப, ippa), பிறகு (piragu, later / after), காலை (kaalai, morning), மாலை (maalai, evening), இரவு (iravu, night). Example: நாளை காலை வாருங்கள் (naalai kaalai vaarungal, "please come tomorrow morning").
+
+## Body parts
+
+<!-- topic: body; level: elementary -->
+
+Tamil body words: தலை (thalai, head), கண் (kan, eye), காது (kaadhu, ear), வாய் (vaai, mouth), பல் (pal, tooth), கை (kai, hand / arm), கால் (kaal, leg / foot), வயிறு (vayiru, stomach). For pain Tamil says "to me the … aches": எனக்குத் தலை வலிக்கிறது (enakkuth thalai valikkiradhu, I have a headache), spoken தலை வலிக்குது (thalai valikkudhu). "I'm not well": எனக்கு உடம்பு சரியில்லை (enakku udambu sariyillai), spoken உடம்பு சரியில்ல; உடம்பு (udambu) means body / health.
+
+Also asked as: body parts in Tamil, head hand leg in Tamil, I have a headache, I am sick
+
+## Places in town
+
+<!-- topic: places; level: elementary -->
+
+Tamil place words (written / spoken): கடை (kadai, shop), சந்தை / மார்க்கெட் (sandhai / maarkket, market), ஹோட்டல் (hottal, restaurant), மருத்துவமனை / ஆஸ்பத்திரி (maruththuvamanai / aaspaththiri, hospital), ரயில் நிலையம் / ஸ்டேஷன் (rayil nilaiyam / steshan, station), வங்கி / பேங்க் (vangi / baenk, bank), கோயில் (koyil, temple), பள்ளி / ஸ்கூல் (palli / skool, school), கல்லூரி / காலேஜ் (kalloori / kaalej, college), அலுவலகம் / ஆபீஸ் (aluvalagam / aapees, office). Ask: … எங்க இருக்கு? (… enga irukku?, where is …?).
+
+Also asked as: places in Tamil, hospital in Tamil, bank in Tamil, shop and market

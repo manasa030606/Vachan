@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## How to start learning Tamil
 
-A good order for a beginner in Tamil: first learn the 12 vowels (start with அ ஆ இ ஈ உ ஊ) and a few consonants (க ம ன ப ர ல), the dot ் (pulli) and how vowel signs attach to consonants; then learn greetings such as வணக்கம் (vanakkam) and நன்றி (nandri); then simple sentences like என் பெயர் … (en peyar …, my name is …) and எனக்கு தண்ணீர் வேண்டும் (enakku thanneer vendum, I want water). A few minutes every day works better than one long session. Reading the letters aloud helps you remember both the shape and the sound.
+A good order for a beginner in Tamil: first learn the 12 vowels (start with அ ஆ இ ஈ உ ஊ) and a few consonants (க ம ன ப ர ல), the dot ் (pulli) and how vowel signs attach to consonants; then learn greetings such as வணக்கம் (vanakkam) and நன்றி (nandri); then simple sentences like என் பெயர் … (en peyar …, my name is …) and எனக்குத் தண்ணீர் வேண்டும் (enakkuth thanneer vendum, I want water). A few minutes every day works better than one long session. Reading the letters aloud helps you remember both the shape and the sound.
 
 ## Reading the romanization
 

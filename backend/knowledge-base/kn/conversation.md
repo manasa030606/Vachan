@@ -14,7 +14,7 @@ source: Vachan curated notes
 
 <!-- topic: introductions -->
 
-To introduce yourself in Kannada: ನಮಸ್ಕಾರ, ನನ್ನ ಹೆಸರು ಆಶಾ (namaskaara, nanna hesaru Aashaa — hello, my name is Asha). Ask the other person: ನಿಮ್ಮ ಹೆಸರು ಏನು? (nimma hesaru enu? — what is your name?) and ನೀವು ಯಾವ ಊರಿನವರು? (neevu yaava oorinavaru? — which town are you from?). Answer with ನಾನು ಬೆಂಗಳೂರಿನವಳು (naanu Bengaloorinavalu — I am from Bengaluru; a man says ಬೆಂಗಳೂರಿನವನು, Bengaloorinavanu). Finish with ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿ ಸಂತೋಷವಾಯಿತು (nimmannu bhetiyaagi santoshavaayitu — happy to meet you).
+To introduce yourself in Kannada: ನಮಸ್ಕಾರ, ನನ್ನ ಹೆಸರು ಆಶಾ (namaskaara, nanna hesaru Asha — hello, my name is Asha). Ask the other person: ನಿಮ್ಮ ಹೆಸರು ಏನು? (nimma hesaru enu? — what is your name?) and ನೀವು ಯಾವ ಊರಿನವರು? (neevu yaava oorinavaru? — which town are you from?). Answer with ನಾನು ಬೆಂಗಳೂರಿನವಳು (naanu bengaloorinavalu — I am from Bengaluru; a man says ಬೆಂಗಳೂರಿನವನು, bengaloorinavanu). Finish with ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿ ಸಂತೋಷವಾಯಿತು (nimmannu bhetiyaagi santoshavaayitu — happy to meet you).
 
 ## At a restaurant — ನನಗೆ ಊಟ ಬೇಕು (nanage oota beku)
 
@@ -32,7 +32,7 @@ At a Kannada shop or market, point and ask ಇದು ಎಷ್ಟು? (idu eshtu
 
 <!-- topic: travel; level: elementary -->
 
-When travelling in Karnataka, ask ಬಸ್ ನಿಲ್ದಾಣ ಎಲ್ಲಿದೆ? (bas nildaana ellide? — where is the bus station?). People also simply say "bus stand". At the counter say ಒಂದು ಟಿಕೆಟ್ ಕೊಡಿ (ondu tiket kodi — one ticket, please). Ask the time: ಮೈಸೂರಿಗೆ ಬಸ್ ಯಾವಾಗ? (Maisoorige bas yaavaaga? — when is the bus to Mysuru?). Check the route: ಈ ಬಸ್ ಮಂಗಳೂರಿಗೆ ಹೋಗುತ್ತಾ? (ee bas Mangaloorige hoguttaa? — does this bus go to Mangaluru?).
+When travelling in Karnataka, ask ಬಸ್ ನಿಲ್ದಾಣ ಎಲ್ಲಿದೆ? (bas nildaana ellide? — where is the bus station?). People also simply say "bus stand". At the counter say ಒಂದು ಟಿಕೆಟ್ ಕೊಡಿ (ondu tiket kodi — one ticket, please). Ask the time: ಮೈಸೂರಿಗೆ ಬಸ್ ಯಾವಾಗ? (maisoorige bas yaavaaga? — when is the bus to Mysuru?). Check the route: ಈ ಬಸ್ ಮಂಗಳೂರಿಗೆ ಹೋಗುತ್ತಾ? (ee bas mangaloorige hoguttaa? — does this bus go to Mangaluru?).
 
 ## Asking for directions — ಎಲ್ಲಿದೆ? (ellide?)
 

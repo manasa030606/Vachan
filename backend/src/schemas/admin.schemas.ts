@@ -112,6 +112,8 @@ export const vocabularySchema = z
     romanization: text(120, "Romanization"),
     meaning: text(200, "Meaning"),
     topic: text(60, "Topic"),
+    /** Usage notes for learners and the AI tutor (formal/casual forms, alternatives…). */
+    notes: optionalText(1000),
   })
   .strict();
 export const vocabularyCreateSchema = vocabularySchema

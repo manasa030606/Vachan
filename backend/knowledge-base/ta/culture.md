@@ -12,7 +12,7 @@ source: Vachan curated notes
 
 ## Showing respect: அண்ணா, அக்கா, -ங்க and சார்
 
-In Tamil, respect is shown through words of address and polite endings. People call strangers by family words: அண்ணா (annaa, elder brother) for a man a little older than you, and அக்கா (akkaa, elder sister) for a woman. In spoken Tamil, adding -ங்க (-nga) makes a word polite: ஆமாங்க (aamaanga, "yes (polite)"), சரிங்க (saringa, "okay (polite)"). Teachers, officials and customers are often called சார் (saar, "sir") or மேடம் (madam). Use நீங்கள் (neengal), not நீ (nee), with anyone older or unfamiliar, and the respectful அவர் (avar) when talking about them.
+In Tamil, respect is shown through words of address and polite endings. People call strangers by family words: அண்ணா (annaa, elder brother) for a man a little older than you, and அக்கா (akkaa, elder sister) for a woman. In spoken Tamil, adding -ங்க (-nga) makes a word polite: ஆமாங்க (aamaanga, "yes (polite)"), சரிங்க (saringa, "okay (polite)"). Teachers, officials and customers are often called சார் (saar, "sir") or மேடம் (medam). Use நீங்கள் (neengal), not நீ (nee), with anyone older or unfamiliar, and the respectful அவர் (avar) when talking about them.
 
 ## Where Tamil is spoken
 

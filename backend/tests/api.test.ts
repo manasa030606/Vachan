@@ -149,13 +149,13 @@ describe("Vachan API (Postman order)", () => {
     assert.equal(telugu.body.courses[0].id, "te-course");
   });
 
-  it("8. course detail: 4 units, first lesson available, the rest locked", async () => {
+  it("8. course detail: 16 units, first lesson available, the rest locked", async () => {
     const result = await call("GET", "/courses/te-course");
     assert.equal(result.status, 200);
     const course = result.body.course;
-    assert.equal(course.units.length, 4);
+    assert.equal(course.units.length, 16);
     const lessons = course.units.flatMap((unit: Json) => unit.lessons);
-    assert.equal(lessons.length, 16);
+    assert.equal(lessons.length, 95);
     assert.equal(lessons[0].status, "available");
     assert.ok(lessons.slice(1).every((lesson: Json) => lesson.status === "locked"));
     assert.equal(course.progress.currentLessonId, "te-u1-l1");
@@ -189,9 +189,9 @@ describe("Vachan API (Postman order)", () => {
 
   it("11. attempts are saved with feedback; leaving and coming back resumes the lesson", async () => {
     const wrongOption = await prisma.exerciseOption.findFirstOrThrow({
-      where: { exerciseId: "te-u1-l1-e1", isCorrect: false },
+      where: { exerciseId: "te-u1-l1-e01", isCorrect: false },
     });
-    const wrong = await call("POST", "/exercises/te-u1-l1-e1/attempt", {
+    const wrong = await call("POST", "/exercises/te-u1-l1-e01/attempt", {
       answer: { optionId: wrongOption.id },
     });
     assert.equal(wrong.status, 201);
@@ -200,7 +200,7 @@ describe("Vachan API (Postman order)", () => {
     assert.match(wrong.body.attempt.explanation, /అ is “a”/);
     assert.equal(wrong.body.lessonProgress.incorrectAttempts, 1);
 
-    for (const id of ["te-u1-l1-e1", "te-u1-l1-e2"]) {
+    for (const id of ["te-u1-l1-e01", "te-u1-l1-e02"]) {
       const right = await call("POST", `/exercises/${id}/attempt`, {
         answer: await correctAnswerFor(id),
       });
@@ -211,23 +211,24 @@ describe("Vachan API (Postman order)", () => {
     const resumed = await call("POST", "/lessons/te-u1-l1/start");
     assert.equal(resumed.body.resumed, true);
     assert.deepEqual(resumed.body.progress.completedExerciseIds.sort(), [
-      "te-u1-l1-e1",
-      "te-u1-l1-e2",
+      "te-u1-l1-e01",
+      "te-u1-l1-e02",
     ]);
   });
 
   it("12. answering the last exercise completes the lesson", async () => {
     let last: Json = {};
-    for (const id of ["te-u1-l1-e3", "te-u1-l1-e4"]) {
+    const rest = ["e03", "e04", "e05", "e06", "e07", "e08", "e09"].map((e) => `te-u1-l1-${e}`);
+    for (const id of rest) {
       last = await call("POST", `/exercises/${id}/attempt`, { answer: await correctAnswerFor(id) });
     }
     const progress = last.body.lessonProgress;
     assert.equal(progress.justCompleted, true);
     assert.equal(progress.status, "COMPLETED");
     assert.equal(progress.timesCompleted, 1);
-    assert.equal(progress.correctAttempts, 4);
+    assert.equal(progress.correctAttempts, 9);
     assert.equal(progress.incorrectAttempts, 1);
-    assert.equal(progress.accuracy, 80); // 4 right out of 5 answers
+    assert.equal(progress.accuracy, 90); // 9 right out of 10 answers
   });
 
   it("13. completing a lesson unlocks the next one", async () => {
@@ -250,13 +251,13 @@ describe("Vachan API (Postman order)", () => {
   it("15. typed answers ignore capitals and spaces; wrong format → 400", async () => {
     await completeLesson("te-u1-l2");
     await completeLesson("te-u1-l3");
-    for (const text of ["EE", " i i "]) {
-      const result = await call("POST", "/exercises/te-u1-l4-e5/attempt", { answer: { text } });
+    for (const text of ["E", " e "]) {
+      const result = await call("POST", "/exercises/te-u1-l4-e08/attempt", { answer: { text } });
       assert.equal(result.body.attempt.isCorrect, true, text);
     }
-    const wrong = await call("POST", "/exercises/te-u1-l4-e5/attempt", { answer: { text: "u" } });
+    const wrong = await call("POST", "/exercises/te-u1-l4-e08/attempt", { answer: { text: "u" } });
     assert.equal(wrong.body.attempt.isCorrect, false);
-    const badFormat = await call("POST", "/exercises/te-u1-l1-e1/attempt", {
+    const badFormat = await call("POST", "/exercises/te-u1-l1-e01/attempt", {
       answer: { text: "aa" },
     });
     assert.equal(badFormat.status, 400);
@@ -268,9 +269,9 @@ describe("Vachan API (Postman order)", () => {
     assert.equal(review.status, 200);
     assert.equal(review.body.review.openMistakes, 2);
     const ids = review.body.review.mistakes.map((mistake: Json) => mistake.exerciseId);
-    assert.deepEqual(ids, ["te-u1-l4-e5", "te-u1-l1-e1"]); // newest first
+    assert.deepEqual(ids, ["te-u1-l4-e08", "te-u1-l1-e01"]); // newest first
     assert.equal(review.body.review.mistakes[0].yourAnswer, "u");
-    assert.equal(review.body.review.mistakes[0].correctAnswer, "ii");
+    assert.equal(review.body.review.mistakes[0].correctAnswer, "e");
     assert.ok(review.body.review.learnedVocabulary.length >= 6);
 
     const attempts = await call("GET", "/review/attempts?languageCode=te&limit=10");
@@ -284,8 +285,8 @@ describe("Vachan API (Postman order)", () => {
 
   it("17. a correct review answer clears the mistake without changing lesson counters", async () => {
     const before = await call("GET", "/progress/te-u1-l1");
-    const result = await call("POST", "/exercises/te-u1-l1-e1/attempt", {
-      answer: await correctAnswerFor("te-u1-l1-e1"),
+    const result = await call("POST", "/exercises/te-u1-l1-e01/attempt", {
+      answer: await correctAnswerFor("te-u1-l1-e01"),
       mode: "review",
     });
     assert.equal(result.status, 201);
@@ -316,7 +317,7 @@ describe("Vachan API (Postman order)", () => {
 
     const lesson = await call("GET", "/progress/te-u1-l1");
     assert.equal(lesson.body.progress.status, "COMPLETED");
-    assert.equal(lesson.body.progress.exercises.length, 4);
+    assert.equal(lesson.body.progress.exercises.length, 9);
     const untouched = await call("GET", "/progress/hi-u1-l1");
     assert.equal(untouched.body.progress.status, "NOT_STARTED");
   });

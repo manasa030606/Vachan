@@ -502,6 +502,8 @@ export type SpeechPhraseDto = {
   meaning: string;
   topic: string;
   lesson: string | null;
+  /** Unit number of that lesson (null for words not taught in a lesson). */
+  unit: number | null;
   bestScore: number | null;
   attempts: number;
 };

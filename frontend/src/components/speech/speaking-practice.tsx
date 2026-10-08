@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { useApi } from "@/hooks/use-api";
 import { ApiError } from "@/lib/api/client";
 import { evaluateSpeaking, getSpeakingPhrases } from "@/lib/api/endpoints";
-import type { SpeakingEvaluationDto, SpeechStatusDto } from "@/lib/api/types";
+import type { SpeakingEvaluationDto, SpeechPhraseDto, SpeechStatusDto } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { MicButton } from "./mic-button";
 import { PhraseAudio } from "./phrase-audio";
@@ -32,6 +32,9 @@ const RETRYABLE = new Set([
 
 type Props = { language: string; status: SpeechStatusDto };
 
+/** Words are grouped by the lesson that teaches them. */
+const groupKey = (item: SpeechPhraseDto) => `${item.unit ?? "-"}:${item.lesson ?? ""}`;
+
 /** The Speak tab: pick a phrase, record it and get feedback. */
 export function SpeakingPractice({ language, status }: Props) {
   const phrases = useApi(() => getSpeakingPhrases(language), `speak-phrases:${language}`);
@@ -50,6 +53,19 @@ export function SpeakingPractice({ language, status }: Props) {
 
   const list = useMemo(() => phrases.data?.phrases ?? [], [phrases.data]);
   const phrase = list[Math.min(index, list.length - 1)];
+  // The course has hundreds of words, so the picker shows one lesson at a time.
+  const groups = useMemo(() => {
+    const result: Array<{ key: string; label: string; first: number }> = [];
+    list.forEach((item, itemIndex) => {
+      const key = groupKey(item);
+      if (!result.some((group) => group.key === key)) {
+        const label = item.lesson ? `Unit ${item.unit} · ${item.lesson}` : "Other words";
+        result.push({ key, label, first: itemIndex });
+      }
+    });
+    return result;
+  }, [list]);
+  const currentGroup = phrase ? groupKey(phrase) : "";
 
   const submit = async (recording: Recording, source: "recorded" | "uploaded") => {
     if (!phrase) return;
@@ -115,11 +131,33 @@ export function SpeakingPractice({ language, status }: Props) {
     <div className="space-y-4">
       {/* Phrase picker */}
       <div>
-        <h2 className="mb-2 text-sm font-bold tracking-wide text-slate-500 uppercase">
-          Choose a word or phrase
-        </h2>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-bold tracking-wide text-slate-500 uppercase">
+            Choose a word or phrase
+          </h2>
+          {groups.length > 1 && (
+            <label className="flex min-w-0 items-center gap-2 text-sm font-semibold text-slate-600">
+              <span className="sr-only sm:not-sr-only">Lesson</span>
+              <select
+                className="h-10 max-w-[16rem] min-w-0 rounded-2xl border-2 border-slate-200 bg-white px-3 font-bold text-ink outline-none focus:border-brand-400"
+                value={currentGroup}
+                onChange={(event) => {
+                  const group = groups.find((item) => item.key === event.target.value);
+                  if (group) goTo(group.first);
+                }}
+              >
+                {groups.map((group) => (
+                  <option key={group.key} value={group.key}>
+                    {group.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
         <ul className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2" aria-label="Phrases to practise">
           {list.map((item, itemIndex) => {
+            if (groupKey(item) !== currentGroup) return null;
             const score = best(item.id, item.bestScore);
             return (
               <li key={item.id} className="shrink-0">

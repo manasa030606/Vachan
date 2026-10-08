@@ -21,7 +21,10 @@
       "expect": "answered",
       "sources": [
         "te/phrases#hello-namaskaaram",
-        "course/te/vocabulary#course-vocabulary-greetings"
+        "course/te/vocabulary#course-vocabulary-greetings",
+        "course/te/words#hello*",
+        "te/phrases#hello*",
+        "te/phrases#greeting*"
       ],
       "mention": ["నమస్కారం"]
     },
@@ -31,7 +34,12 @@
       "language": "te",
       "level": "beginner",
       "expect": "answered",
-      "sources": ["te/vocabulary#family-words", "course/te/vocabulary#course-vocabulary-family"],
+      "sources": [
+        "te/vocabulary#family-words",
+        "course/te/vocabulary#course-vocabulary-family",
+        "course/te/words*",
+        "course/te/phrases*"
+      ],
       "mention": ["అమ్మ"]
     },
     {
@@ -44,7 +52,9 @@
       "sources": [
         "te/examples#i-want-water",
         "te/grammar#i-want-i-like-i-know-the-dative-construction",
-        "te/phrases#shopping-and-directions-idi-enta"
+        "te/phrases#shopping-and-directions-idi-enta",
+        "te/sentence-patterns#i-want*",
+        "course/te/phrases#i-want-water*"
       ],
       "mention": ["కావాలి"]
     },
@@ -54,7 +64,10 @@
       "language": "te",
       "level": "beginner",
       "expect": "answered",
-      "sources": ["te/grammar#word-order-subject-object-verb"],
+      "sources": [
+        "te/grammar#word-order-subject-object-verb",
+        "te/common-mistakes#mistake-english-word-order"
+      ],
       "mention": ["నేను", "end", "last"]
     },
     {
@@ -66,9 +79,15 @@
       "sources": [
         "te/grammar#personal-pronouns",
         "te/beginner-guide#formal-and-informal-you",
-        "te/culture#showing-respect-and-family-words"
+        "te/culture#showing-respect-and-family-words",
+        "te/common-mistakes#formal-and-casual*",
+        "te/common-mistakes*",
+        "te/grammar*",
+        "te/beginner-guide*",
+        "te/requests#polite*",
+        "te/culture*"
       ],
-      "mention": ["మీరు"]
+      "mention": ["మీరు", "polite", "formal", "respect"]
     },
     {
       "id": "te-why-wrong",
@@ -76,7 +95,7 @@
       "language": "te",
       "level": "beginner",
       "lessonId": "te-u1-l1",
-      "exerciseId": "te-u1-l1-e1",
+      "exerciseId": "te-u1-l1-e01",
       "wrongAttempt": true,
       "expect": "answered",
       "sources": [
@@ -102,7 +121,7 @@
       "language": "hi",
       "level": "intermediate",
       "expect": "answered",
-      "sources": ["hi/verbs#past-tense-with-ne-the-ergative"],
+      "sources": ["hi/verbs#past-tense-with-ne-the-ergative", "hi/common-mistakes#forgetting-ne*"],
       "mention": ["ने"]
     },
     {
@@ -123,7 +142,9 @@
       "sources": [
         "ml/grammar#malayalam-verbs-do-not-change-for-person-or-number",
         "ml/beginner-guide#good-news-for-beginners-one-verb-form-for-everyone",
-        "ml/verbs#simple-present-tense-unnu"
+        "ml/verbs#simple-present-tense-unnu",
+        "ml/grammar*",
+        "ml/verbs*"
       ],
       "mention": ["same", "not change", "does not", "don't", "doesn't"]
     },
@@ -145,9 +166,1302 @@
       "sources": [
         "bn/grammar#three-levels-of-you",
         "bn/beginner-guide#formal-and-informal-you",
-        "bn/culture#showing-respect-and"
+        "bn/culture#showing-respect-and",
+        "bn/common-mistakes*",
+        "bn/grammar*",
+        "bn/beginner-guide*",
+        "bn/requests#polite*",
+        "bn/culture*"
       ],
-      "mention": ["আপনি"]
+      "mention": ["আপনি", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-hi-hello",
+      "question": "How do I say \"Hello\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/vocabulary#course-vocabulary-greetings",
+        "hi/phrases#hello-namaste",
+        "course/hi/words#hello*",
+        "hi/phrases#hello*",
+        "hi/phrases#greeting*"
+      ],
+      "mention": ["नमस्ते"]
+    },
+    {
+      "id": "beginner-hi-love",
+      "question": "How do I say \"I love you\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#i-love-you-main-tumse-pyaar-kartaa-hoon",
+        "hi/emotions#i-love-you-main-tumse-pyaar-kartaa-hoon"
+      ],
+      "mention": ["मैं", "तुमसे", "प्यार", "करता", "हूँ"]
+    },
+    {
+      "id": "beginner-hi-miss",
+      "question": "How do I say \"I miss you\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#i-miss-you-mujhe-tumhaaree-yaad-aa-rahee-hai",
+        "hi/emotions#i-miss-you-mujhe-tumhaaree-yaad-aa-rahee-hai"
+      ],
+      "mention": ["मुझे", "तुम्हारी", "याद", "रही", "है"]
+    },
+    {
+      "id": "beginner-hi-hungry",
+      "question": "How do I say \"I am hungry\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#i-am-hungry-mujhe-bhookh-lagee-hai",
+        "hi/food#i-am-hungry-mujhe-bhookh-lagee-hai"
+      ],
+      "mention": ["मुझे", "भूख", "लगी", "है"]
+    },
+    {
+      "id": "beginner-hi-thirsty",
+      "question": "How do I say \"I am thirsty\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#i-am-thirsty-mujhe-pyaas-lagee-hai",
+        "hi/food#i-am-thirsty-mujhe-pyaas-lagee-hai"
+      ],
+      "mention": ["मुझे", "प्यास", "लगी", "है"]
+    },
+    {
+      "id": "beginner-hi-going",
+      "question": "How do I say \"Where are you going?\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#where-are-you-going-aap-kahaan-jaa-rahe-hain",
+        "hi/phrases#where-are-you-going-aap-kahaan-jaa-rahe-hain"
+      ],
+      "mention": ["आप", "कहाँ", "जा", "रहे", "हैं"]
+    },
+    {
+      "id": "beginner-hi-doing",
+      "question": "How do I say \"What are you doing?\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#what-are-you-doing-aap-kyaa-kar-rahe-hain",
+        "hi/phrases#what-are-you-doing-aap-kyaa-kar-rahe-hain"
+      ],
+      "mention": ["आप", "क्या", "कर", "रहे", "हैं"]
+    },
+    {
+      "id": "beginner-hi-understand",
+      "question": "How do I say \"I don't understand\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa",
+        "hi/phrases#i-dont-understand-mujhe-samajh-nahin-aayaa"
+      ],
+      "mention": ["मुझे", "समझ", "नहीं", "आया"]
+    },
+    {
+      "id": "beginner-hi-repeat",
+      "question": "How do I say \"Please repeat\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#please-say-it-again-phir-se-boliye",
+        "hi/requests#say-it-again-please-phir-se-boliye",
+        "hi/requests*",
+        "hi/phrases#please*",
+        "course/hi/phrases#please-say*"
+      ],
+      "mention": ["फिर", "से", "बोलिए"]
+    },
+    {
+      "id": "beginner-hi-cost",
+      "question": "How do I ask \"How much does this cost?\" in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#how-much-does-this-cost-yah-kitne-kaa-hai",
+        "hi/sentence-patterns#how-much-is-kitne-kaa-hai",
+        "hi/shopping#how-much-is-this-yah-kitne-kaa-hai"
+      ],
+      "mention": ["यह", "कितने", "का", "है", "how much"]
+    },
+    {
+      "id": "beginner-hi-intro",
+      "question": "How do I introduce myself in Hindi?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#my-name-is-asha-meraa-naam-asha-hai",
+        "hi/conversation#introductions-aapse-milkar-khushee-huee",
+        "hi/examples#my-name-is-asha",
+        "hi/phrases#my-name-is-meraa-naam-hai",
+        "hi/phrases#introducing-yourself-name-home-town-and-age",
+        "hi/phrases#introduc*",
+        "hi/phrases#my-name*"
+      ],
+      "mention": ["मेरा", "नाम"]
+    },
+    {
+      "id": "beginner-hi-word",
+      "question": "What does पानी mean?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/vocabulary#course-vocabulary-drinks",
+        "course/hi/vocabulary#course-vocabulary-drinks-part-2",
+        "course/hi/phrases#i-want-water-mujhe-paani-chaahiye",
+        "hi/vocabulary#food-and-drink",
+        "hi/examples#i-want-water",
+        "course/hi/vocabulary#course-vocabulary-everyday-things*",
+        "course/hi/words*",
+        "course/hi/phrases*"
+      ],
+      "mention": ["पानी", "water"]
+    },
+    {
+      "id": "beginner-hi-example",
+      "previous": "How do I say \"I want water\" in Hindi?",
+      "question": "Give me another example.",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/hi/phrases#i-want-water-mujhe-paani-chaahiye",
+        "hi/examples#i-want-water",
+        "hi/sentence-patterns#i-want-mujhe-chaahiye",
+        "hi/sentence-patterns#i-want-to-main-chaahtaa-hoon",
+        "hi/examples*",
+        "course/hi/phrases*"
+      ],
+      "mention": ["चाहिए", "मुझे", "पानी", "चाहिए"]
+    },
+    {
+      "id": "beginner-hi-formal",
+      "question": "What is the difference between the formal and casual \"you\" in Hindi?",
+      "language": "hi",
+      "level": "elementary",
+      "expect": "answered",
+      "sources": [
+        "hi/beginner-guide#formal-and-informal-you",
+        "hi/grammar#three-forms-of-you",
+        "hi/requests#polite-casual-and-intimate-commands",
+        "hi/common-mistakes*",
+        "hi/grammar*",
+        "hi/beginner-guide*",
+        "hi/requests#polite*",
+        "hi/culture*"
+      ],
+      "mention": ["आप", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-hi-pronounce",
+      "question": "How do I pronounce नमस्ते?",
+      "language": "hi",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "hi/pronunciation#how-to-pronounce-and",
+        "hi/pronunciation#how-to-pronounce-and-2",
+        "hi/pronunciation#how-to-pronounce-and-3",
+        "hi/pronunciation#how-to-pronounce-and-4",
+        "course/hi/vocabulary#course-vocabulary-greetings",
+        "hi/phrases#hello-namaste",
+        "hi/pronunciation*",
+        "course/hi/words#hello*",
+        "hi/phrases#hello*",
+        "hi/phrases#greeting*"
+      ],
+      "mention": ["नमस्ते"]
+    },
+    {
+      "id": "beginner-te-hello",
+      "question": "How do I say \"Hello\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/phrases#hello-namaskaaram",
+        "course/te/vocabulary#course-vocabulary-greetings",
+        "course/te/words#hello*",
+        "te/phrases#hello*",
+        "te/phrases#greeting*"
+      ],
+      "mention": ["నమస్కారం"]
+    },
+    {
+      "id": "beginner-te-love",
+      "question": "How do I say \"I love you\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/emotions#i-love-you-nenu-ninnu-premistunnaanu",
+        "course/te/phrases#i-love-you-nenu-ninnu-premistunnaanu"
+      ],
+      "mention": ["నేను", "నిన్ను", "ప్రేమిస్తున్నాను"]
+    },
+    {
+      "id": "beginner-te-miss",
+      "question": "How do I say \"I miss you\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/emotions#i-miss-you-nuvvu-gurtostunnaavu",
+        "course/te/phrases#i-miss-you-nuvvu-gurtostunnaavu"
+      ],
+      "mention": ["నువ్వు", "గుర్తొస్తున్నావు"]
+    },
+    {
+      "id": "beginner-te-hungry",
+      "question": "How do I say \"I am hungry\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/food#i-am-hungry-naaku-aakaligaa-undi",
+        "course/te/phrases#i-am-hungry-naaku-aakaligaa-undi"
+      ],
+      "mention": ["నాకు", "ఆకలిగా", "ఉంది"]
+    },
+    {
+      "id": "beginner-te-thirsty",
+      "question": "How do I say \"I am thirsty\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/food#i-am-thirsty-naaku-daahangaa-undi",
+        "course/te/phrases#i-am-thirsty-naaku-daahangaa-undi"
+      ],
+      "mention": ["నాకు", "దాహంగా", "ఉంది"]
+    },
+    {
+      "id": "beginner-te-going",
+      "question": "How do I say \"Where are you going?\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/phrases#where-are-you-going-meeru-ekkadiki-veltunnaaru",
+        "course/te/phrases#where-are-you-going-meeru-ekkadiki-veltunnaaru"
+      ],
+      "mention": ["మీరు", "ఎక్కడికి", "వెళ్తున్నారు"]
+    },
+    {
+      "id": "beginner-te-doing",
+      "question": "How do I say \"What are you doing?\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/phrases#what-are-you-doing-meeru-em-chestunnaaru",
+        "course/te/phrases#what-are-you-doing-meeru-em-chestunnaaru"
+      ],
+      "mention": ["మీరు", "ఏం", "చేస్తున్నారు"]
+    },
+    {
+      "id": "beginner-te-understand",
+      "question": "How do I say \"I don't understand\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/phrases#i-dont-understand-naaku-artham-kaaledu",
+        "te/requests#i-dont-understand-naaku-artham-kaaledu",
+        "course/te/phrases#i-dont-understand-naaku-artham-kaaledu"
+      ],
+      "mention": ["నాకు", "అర్థం", "కాలేదు"]
+    },
+    {
+      "id": "beginner-te-repeat",
+      "question": "How do I say \"Please repeat\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/requests#say-it-again-please-mallee-cheppandi",
+        "course/te/phrases#please-say-it-again-mallee-cheppandi",
+        "te/requests*",
+        "te/phrases#please*",
+        "course/te/phrases#please-say*"
+      ],
+      "mention": ["మళ్ళీ", "చెప్పండి"]
+    },
+    {
+      "id": "beginner-te-cost",
+      "question": "How do I ask \"How much does this cost?\" in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/sentence-patterns#how-much-is-enta",
+        "te/shopping#how-much-is-this-idi-enta",
+        "course/te/phrases#how-much-does-this-cost-idi-enta"
+      ],
+      "mention": ["ఇది", "ఎంత", "how much"]
+    },
+    {
+      "id": "beginner-te-intro",
+      "question": "How do I introduce myself in Telugu?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/examples#my-name-is-asha",
+        "te/conversation#introductions-mimmalni-kalavadam-santosham",
+        "te/phrases#my-name-is-naa-peru",
+        "course/te/phrases#my-name-is-asha-naa-peru-asha",
+        "te/phrases#introduc*",
+        "te/phrases#my-name*"
+      ],
+      "mention": ["నా", "పేరు"]
+    },
+    {
+      "id": "beginner-te-word",
+      "question": "What does నీళ్ళు mean?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/examples#i-want-water",
+        "te/vocabulary#food-and-drink",
+        "course/te/vocabulary#course-vocabulary-drinks",
+        "course/te/vocabulary#course-vocabulary-drinks-part-2",
+        "course/te/phrases#i-want-water-naaku-neellu-kaavaali",
+        "course/te/vocabulary#course-vocabulary-everyday-things*",
+        "course/te/words*",
+        "course/te/phrases*"
+      ],
+      "mention": ["నీళ్ళు", "water"]
+    },
+    {
+      "id": "beginner-te-example",
+      "previous": "How do I say \"I want water\" in Telugu?",
+      "question": "Give me another example.",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/examples#i-want-water",
+        "te/sentence-patterns#i-want-naaku-kaavaali",
+        "te/sentence-patterns#i-want-to-do-something",
+        "course/te/phrases#i-want-water-naaku-neellu-kaavaali",
+        "te/examples*",
+        "course/te/phrases*"
+      ],
+      "mention": ["కావాలి", "నాకు", "నీళ్ళు", "కావాలి"]
+    },
+    {
+      "id": "beginner-te-formal",
+      "question": "What is the difference between the formal and casual \"you\" in Telugu?",
+      "language": "te",
+      "level": "elementary",
+      "expect": "answered",
+      "sources": [
+        "te/beginner-guide#formal-and-informal-you",
+        "te/common-mistakes#formal-and-casual-vs-and-polite-commands",
+        "te/requests#polite-commands",
+        "te/common-mistakes*",
+        "te/grammar*",
+        "te/beginner-guide*",
+        "te/requests#polite*",
+        "te/culture*"
+      ],
+      "mention": ["మీరు", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-te-pronounce",
+      "question": "How do I pronounce నమస్కారం?",
+      "language": "te",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "te/pronunciation#how-to-pronounce-common-telugu-phrases",
+        "te/phrases#hello-namaskaaram",
+        "course/te/vocabulary#course-vocabulary-greetings",
+        "te/pronunciation*",
+        "course/te/words#hello*",
+        "te/phrases#hello*",
+        "te/phrases#greeting*"
+      ],
+      "mention": ["నమస్కారం"]
+    },
+    {
+      "id": "beginner-ta-hello",
+      "question": "How do I say \"Hello\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/phrases#hello-vanakkam",
+        "course/ta/vocabulary#course-vocabulary-greetings",
+        "course/ta/words#hello*",
+        "ta/phrases#hello*",
+        "ta/phrases#greeting*"
+      ],
+      "mention": ["வணக்கம்"]
+    },
+    {
+      "id": "beginner-ta-love",
+      "question": "How do I say \"I love you\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/emotions#i-love-you-naan-unnaik-kaadhalikkiren",
+        "course/ta/phrases#i-love-you-naan-unnaik-kaadhalikkiren"
+      ],
+      "mention": ["நான்", "உன்னைக்", "காதலிக்கிறேன்"]
+    },
+    {
+      "id": "beginner-ta-miss",
+      "question": "How do I say \"I miss you\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/emotions#i-miss-you-un-ninaivaagave-irukkiradhu",
+        "course/ta/phrases#i-miss-you-un-ninaivaagave-irukkiradhu"
+      ],
+      "mention": ["உன்", "நினைவாகவே", "இருக்கிறது"]
+    },
+    {
+      "id": "beginner-ta-hungry",
+      "question": "How do I say \"I am hungry\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/food#i-am-hungry-enakkup-pasikkiradhu",
+        "course/ta/phrases#i-am-hungry-enakkup-pasikkiradhu"
+      ],
+      "mention": ["எனக்குப்", "பசிக்கிறது"]
+    },
+    {
+      "id": "beginner-ta-thirsty",
+      "question": "How do I say \"I am thirsty\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/food#i-am-thirsty-enakkuth-thaagamaaga-irukkiradhu",
+        "course/ta/phrases#i-am-thirsty-enakkuth-thaagamaaga-irukkiradhu"
+      ],
+      "mention": ["எனக்குத்", "தாகமாக", "இருக்கிறது"]
+    },
+    {
+      "id": "beginner-ta-going",
+      "question": "How do I say \"Where are you going?\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/phrases#where-are-you-going-enge-pogireergal",
+        "course/ta/phrases#where-are-you-going-neengal-enge-pogireergal"
+      ],
+      "mention": ["நீங்கள்", "எங்கே", "போகிறீர்கள்"]
+    },
+    {
+      "id": "beginner-ta-doing",
+      "question": "How do I say \"What are you doing?\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/phrases#what-are-you-doing-enna-seygireergal",
+        "course/ta/phrases#what-are-you-doing-neengal-enna-seygireergal"
+      ],
+      "mention": ["நீங்கள்", "என்ன", "செய்கிறீர்கள்"]
+    },
+    {
+      "id": "beginner-ta-understand",
+      "question": "How do I say \"I don't understand\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/phrases#i-dont-understand-enakku-puriyavillai",
+        "course/ta/phrases#i-dont-understand-enakkup-puriyavillai"
+      ],
+      "mention": ["எனக்குப்", "புரியவில்லை"]
+    },
+    {
+      "id": "beginner-ta-repeat",
+      "question": "How do I say \"Please repeat\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/requests#please-say-it-again",
+        "course/ta/phrases#once-more-one-more-time-innoru-murai",
+        "course/ta/phrases#please-say-it-again-meendum-sollungal",
+        "ta/requests*",
+        "ta/phrases#please*",
+        "course/ta/phrases#please-say*"
+      ],
+      "mention": ["மீண்டும்", "சொல்லுங்கள்"]
+    },
+    {
+      "id": "beginner-ta-cost",
+      "question": "How do I ask \"How much does this cost?\" in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/sentence-patterns#how-much-is-enna-vilai",
+        "ta/shopping#how-much-is-this-idhu-enna-vilai",
+        "course/ta/phrases#how-much-does-this-cost-idhu-enna-vilai"
+      ],
+      "mention": ["இது", "என்ன", "விலை", "how much"]
+    },
+    {
+      "id": "beginner-ta-intro",
+      "question": "How do I introduce myself in Tamil?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/conversation#introductions-ungalaich-chandhiththadhil-magizhchi",
+        "ta/examples#my-name-is-asha",
+        "ta/phrases#my-name-is-en-peyar",
+        "ta/phrases#introducing-yourself-name-age-and-home-town",
+        "course/ta/phrases#my-name-is-asha-en-peyar-asha",
+        "ta/phrases#introduc*",
+        "ta/phrases#my-name*"
+      ],
+      "mention": ["என்", "பெயர்"]
+    },
+    {
+      "id": "beginner-ta-word",
+      "question": "What does தண்ணீர் mean?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/examples#i-want-water",
+        "ta/vocabulary#food-and-drink",
+        "course/ta/vocabulary#course-vocabulary-drinks",
+        "course/ta/vocabulary#course-vocabulary-drinks-part-2",
+        "course/ta/phrases#i-want-water-enakkuth-thanneer-vendum",
+        "course/ta/vocabulary#course-vocabulary-everyday-things*",
+        "course/ta/words*",
+        "course/ta/phrases*"
+      ],
+      "mention": ["தண்ணீர்", "water"]
+    },
+    {
+      "id": "beginner-ta-example",
+      "previous": "How do I say \"I want water\" in Tamil?",
+      "question": "Give me another example.",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/examples#i-want-water",
+        "ta/sentence-patterns#i-want-enakku-vendum",
+        "ta/sentence-patterns#i-want-to-virumbugiren-and-aasai",
+        "course/ta/phrases#i-want-water-enakkuth-thanneer-vendum",
+        "ta/examples*",
+        "course/ta/phrases*"
+      ],
+      "mention": ["வேண்டும்", "எனக்குத்", "தண்ணீர்", "வேண்டும்"]
+    },
+    {
+      "id": "beginner-ta-formal",
+      "question": "What is the difference between the formal and casual \"you\" in Tamil?",
+      "language": "ta",
+      "level": "elementary",
+      "expect": "answered",
+      "sources": [
+        "ta/beginner-guide#formal-and-informal-you",
+        "ta/common-mistakes#using-nee-with-strangers-formal-vs-informal-you",
+        "ta/grammar#formal-and-casual-forms-you-commands-he-and-she",
+        "ta/requests#polite-commands-the-ending",
+        "ta/common-mistakes*",
+        "ta/grammar*",
+        "ta/beginner-guide*",
+        "ta/requests#polite*",
+        "ta/culture*"
+      ],
+      "mention": ["நீங்கள்", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-ta-pronounce",
+      "question": "How do I pronounce வணக்கம்?",
+      "language": "ta",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ta/pronunciation#pronouncing-common-tamil-phrases",
+        "ta/phrases#hello-vanakkam",
+        "course/ta/vocabulary#course-vocabulary-greetings",
+        "ta/pronunciation*",
+        "course/ta/words#hello*",
+        "ta/phrases#hello*",
+        "ta/phrases#greeting*"
+      ],
+      "mention": ["வணக்கம்"]
+    },
+    {
+      "id": "beginner-ml-hello",
+      "question": "How do I say \"Hello\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/phrases#hello-namaskaaram",
+        "course/ml/vocabulary#course-vocabulary-greetings",
+        "course/ml/words#hello*",
+        "ml/phrases#hello*",
+        "ml/phrases#greeting*"
+      ],
+      "mention": ["നമസ്കാരം"]
+    },
+    {
+      "id": "beginner-ml-love",
+      "question": "How do I say \"I love you\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/emotions#i-love-you-njaan-ninne-snehikkunnu",
+        "course/ml/phrases#i-love-you-njaan-ninne-snehikkunnu"
+      ],
+      "mention": ["ഞാൻ", "നിന്നെ", "സ്നേഹിക്കുന്നു"]
+    },
+    {
+      "id": "beginner-ml-miss",
+      "question": "How do I say \"I miss you\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/emotions#i-miss-you-ninne-miss-cheyyunnu",
+        "course/ml/phrases#i-miss-you-njaan-ninne-miss-cheyyunnu"
+      ],
+      "mention": ["ഞാൻ", "നിന്നെ", "മിസ്", "ചെയ്യുന്നു"]
+    },
+    {
+      "id": "beginner-ml-hungry",
+      "question": "How do I say \"I am hungry\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/food#i-am-hungry-enikku-vishakkunnu",
+        "course/ml/phrases#i-am-hungry-enikku-vishakkunnu"
+      ],
+      "mention": ["എനിക്ക്", "വിശക്കുന്നു"]
+    },
+    {
+      "id": "beginner-ml-thirsty",
+      "question": "How do I say \"I am thirsty\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/food#i-am-thirsty-enikku-daahikkunnu",
+        "course/ml/phrases#i-am-thirsty-enikku-daahikkunnu"
+      ],
+      "mention": ["എനിക്ക്", "ദാഹിക്കുന്നു"]
+    },
+    {
+      "id": "beginner-ml-going",
+      "question": "How do I say \"Where are you going?\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/phrases#where-are-you-going-ningal-evide-pokukayaanu",
+        "course/ml/phrases#where-are-you-going-ningal-evide-pokukayaanu"
+      ],
+      "mention": ["നിങ്ങൾ", "എവിടെ", "പോകുകയാണ്"]
+    },
+    {
+      "id": "beginner-ml-doing",
+      "question": "How do I say \"What are you doing?\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/phrases#what-are-you-doing-ningal-enthu-cheyyukayaanu",
+        "course/ml/phrases#what-are-you-doing-ningal-enthu-cheyyukayaanu"
+      ],
+      "mention": ["നിങ്ങൾ", "എന്ത്", "ചെയ്യുകയാണ്"]
+    },
+    {
+      "id": "beginner-ml-understand",
+      "question": "How do I say \"I don't understand\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/phrases#i-dont-understand-enikku-manassilaayilla",
+        "course/ml/phrases#i-dont-understand-enikku-manassilaayilla"
+      ],
+      "mention": ["എനിക്ക്", "മനസ്സിലായില്ല"]
+    },
+    {
+      "id": "beginner-ml-repeat",
+      "question": "How do I say \"Please repeat\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/requests#say-it-again-onnukoodi-parayaamo",
+        "course/ml/phrases#please-say-it-again-onnukoodi-parayaamo",
+        "ml/requests*",
+        "ml/phrases#please*",
+        "course/ml/phrases#please-say*"
+      ],
+      "mention": ["ഒന്നുകൂടി", "പറയാമോ"]
+    },
+    {
+      "id": "beginner-ml-cost",
+      "question": "How do I ask \"How much does this cost?\" in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/sentence-patterns#how-much-is-nu-ethrayaanu",
+        "ml/shopping#how-much-is-this-ithinu-ethrayaanu",
+        "course/ml/phrases#how-much-does-this-cost-ithinu-ethrayaanu"
+      ],
+      "mention": ["ഇതിന്", "എത്രയാണ്", "how much"]
+    },
+    {
+      "id": "beginner-ml-intro",
+      "question": "How do I introduce myself in Malayalam?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/examples#my-name-is-asha",
+        "ml/conversation#introductions-kandathil-santhosham",
+        "ml/phrases#my-name-is-ente-peru",
+        "ml/phrases#introducing-yourself-name-age-and-hometown",
+        "course/ml/phrases#my-name-is-asha-ente-peru-asha",
+        "ml/phrases#introduc*",
+        "ml/phrases#my-name*"
+      ],
+      "mention": ["എന്റെ", "പേര്"]
+    },
+    {
+      "id": "beginner-ml-word",
+      "question": "What does വെള്ളം mean?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/examples#i-want-water",
+        "ml/vocabulary#food-and-drink",
+        "course/ml/vocabulary#course-vocabulary-drinks",
+        "course/ml/vocabulary#course-vocabulary-drinks-part-2",
+        "course/ml/phrases#i-want-water-enikku-vellam-venam",
+        "course/ml/vocabulary#course-vocabulary-everyday-things*",
+        "course/ml/words*",
+        "course/ml/phrases*"
+      ],
+      "mention": ["വെള്ളം", "water"]
+    },
+    {
+      "id": "beginner-ml-example",
+      "previous": "How do I say \"I want water\" in Malayalam?",
+      "question": "Give me another example.",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/examples#i-want-water",
+        "ml/sentence-patterns#i-want-enikku-venam",
+        "course/ml/phrases#i-want-water-enikku-vellam-venam",
+        "ml/examples*",
+        "course/ml/phrases*"
+      ],
+      "mention": ["വേണം", "എനിക്ക്", "വെള്ളം", "വേണം"]
+    },
+    {
+      "id": "beginner-ml-formal",
+      "question": "What is the difference between the formal and casual \"you\" in Malayalam?",
+      "language": "ml",
+      "level": "elementary",
+      "expect": "answered",
+      "sources": [
+        "ml/beginner-guide#formal-and-informal-you",
+        "ml/common-mistakes#formal-and-casual-you-vs",
+        "ml/common-mistakes#formal-and-casual-commands-vs",
+        "ml/common-mistakes*",
+        "ml/grammar*",
+        "ml/beginner-guide*",
+        "ml/requests#polite*",
+        "ml/culture*"
+      ],
+      "mention": ["നിങ്ങൾ", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-ml-pronounce",
+      "question": "How do I pronounce നമസ്കാരം?",
+      "language": "ml",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "ml/pronunciation#pronouncing-common-phrases",
+        "ml/phrases#hello-namaskaaram",
+        "course/ml/vocabulary#course-vocabulary-greetings",
+        "ml/pronunciation*",
+        "course/ml/words#hello*",
+        "ml/phrases#hello*",
+        "ml/phrases#greeting*"
+      ],
+      "mention": ["നമസ്കാരം"]
+    },
+    {
+      "id": "beginner-kn-hello",
+      "question": "How do I say \"Hello\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/phrases#hello-namaskaara",
+        "course/kn/vocabulary#course-vocabulary-greetings",
+        "course/kn/words#hello*",
+        "kn/phrases#hello*",
+        "kn/phrases#greeting*"
+      ],
+      "mention": ["ನಮಸ್ಕಾರ"]
+    },
+    {
+      "id": "beginner-kn-love",
+      "question": "How do I say \"I love you\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/emotions#i-love-you-naanu-ninnannu-preetisuttene",
+        "course/kn/phrases#i-love-you-naanu-ninnannu-preetisuttene"
+      ],
+      "mention": ["ನಾನು", "ನಿನ್ನನ್ನು", "ಪ್ರೀತಿಸುತ್ತೇನೆ"]
+    },
+    {
+      "id": "beginner-kn-miss",
+      "question": "How do I say \"I miss you\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/emotions#i-miss-you-ninna-nenapu-tumbaa-aaguttide",
+        "course/kn/phrases#i-miss-you-ninna-nenapu-tumbaa-aaguttide"
+      ],
+      "mention": ["ನಿನ್ನ", "ನೆನಪು", "ತುಂಬಾ", "ಆಗುತ್ತಿದೆ"]
+    },
+    {
+      "id": "beginner-kn-hungry",
+      "question": "How do I say \"I am hungry\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/food#i-am-hungry-nanage-hasivaagide",
+        "course/kn/phrases#i-am-hungry-nanage-hasivaagide"
+      ],
+      "mention": ["ನನಗೆ", "ಹಸಿವಾಗಿದೆ"]
+    },
+    {
+      "id": "beginner-kn-thirsty",
+      "question": "How do I say \"I am thirsty\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/food#i-am-thirsty-nanage-baayaarikeyaagide",
+        "course/kn/phrases#i-am-thirsty-nanage-baayaarikeyaagide"
+      ],
+      "mention": ["ನನಗೆ", "ಬಾಯಾರಿಕೆಯಾಗಿದೆ"]
+    },
+    {
+      "id": "beginner-kn-going",
+      "question": "How do I say \"Where are you going?\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/phrases#where-are-you-going-neevu-ellige-hoguttiddeeri",
+        "course/kn/phrases#where-are-you-going-neevu-ellige-hoguttiddeeri"
+      ],
+      "mention": ["ನೀವು", "ಎಲ್ಲಿಗೆ", "ಹೋಗುತ್ತಿದ್ದೀರಿ"]
+    },
+    {
+      "id": "beginner-kn-doing",
+      "question": "How do I say \"What are you doing?\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/phrases#what-are-you-doing-neevu-enu-maaduttiddeeri",
+        "course/kn/phrases#what-are-you-doing-neevu-enu-maaduttiddeeri"
+      ],
+      "mention": ["ನೀವು", "ಏನು", "ಮಾಡುತ್ತಿದ್ದೀರಿ"]
+    },
+    {
+      "id": "beginner-kn-understand",
+      "question": "How do I say \"I don't understand\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/phrases#i-dont-understand-nanage-artha-aagalilla",
+        "kn/requests#i-dont-understand-please-speak-slowly-nidhaanavaagi-maatanaa",
+        "course/kn/phrases#i-dont-understand-nanage-artha-aagalilla"
+      ],
+      "mention": ["ನನಗೆ", "ಅರ್ಥ", "ಆಗಲಿಲ್ಲ"]
+    },
+    {
+      "id": "beginner-kn-repeat",
+      "question": "How do I say \"Please repeat\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/requests#please-say-it-again-innomme-heli",
+        "course/kn/phrases#please-say-it-again-dayavittu-innomme-heli",
+        "kn/requests*",
+        "kn/phrases#please*",
+        "course/kn/phrases#please-say*"
+      ],
+      "mention": ["ದಯವಿಟ್ಟು", "ಇನ್ನೊಮ್ಮೆ", "ಹೇಳಿ"]
+    },
+    {
+      "id": "beginner-kn-cost",
+      "question": "How do I ask \"How much does this cost?\" in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/sentence-patterns#how-much-is-eshtu",
+        "kn/shopping#how-much-is-this-idu-eshtu",
+        "course/kn/phrases#how-much-does-this-cost-idara-bele-eshtu"
+      ],
+      "mention": ["ಇದರ", "ಬೆಲೆ", "ಎಷ್ಟು", "how much"]
+    },
+    {
+      "id": "beginner-kn-intro",
+      "question": "How do I introduce myself in Kannada?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/conversation#introductions-nimmannu-bhetiyaagi-santoshavaayitu",
+        "kn/examples#my-name-is-asha",
+        "kn/phrases#my-name-is-nanna-hesaru",
+        "kn/phrases#introducing-yourself-fully-nanna-bagge",
+        "course/kn/phrases#my-name-is-asha-nanna-hesaru-asha",
+        "kn/phrases#introduc*",
+        "kn/phrases#my-name*"
+      ],
+      "mention": ["ನನ್ನ", "ಹೆಸರು"]
+    },
+    {
+      "id": "beginner-kn-word",
+      "question": "What does ನೀರು mean?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/vocabulary#food-and-drink",
+        "kn/examples#i-want-water",
+        "course/kn/vocabulary#course-vocabulary-drinks",
+        "course/kn/phrases#i-want-water-nanage-neeru-beku",
+        "course/kn/vocabulary#course-vocabulary-everyday-things*",
+        "course/kn/words*",
+        "course/kn/phrases*"
+      ],
+      "mention": ["ನೀರು", "water"]
+    },
+    {
+      "id": "beginner-kn-example",
+      "previous": "How do I say \"I want water\" in Kannada?",
+      "question": "Give me another example.",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/examples#i-want-water",
+        "kn/sentence-patterns#i-want-nanage-beku",
+        "course/kn/phrases#i-want-water-nanage-neeru-beku",
+        "kn/examples*",
+        "course/kn/phrases*"
+      ],
+      "mention": ["ಬೇಕು", "ನನಗೆ", "ನೀರು", "ಬೇಕು"]
+    },
+    {
+      "id": "beginner-kn-formal",
+      "question": "What is the difference between the formal and casual \"you\" in Kannada?",
+      "language": "kn",
+      "level": "elementary",
+      "expect": "answered",
+      "sources": [
+        "kn/beginner-guide#formal-and-informal-you",
+        "kn/common-mistakes#formal-vs-informal-you-vs-neevu-vs-neenu",
+        "kn/common-mistakes#formal-vs-casual-commands-vs-banni-vs-baa",
+        "kn/common-mistakes*",
+        "kn/grammar*",
+        "kn/beginner-guide*",
+        "kn/requests#polite*",
+        "kn/culture*"
+      ],
+      "mention": ["ನೀವು", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-kn-pronounce",
+      "question": "How do I pronounce ನಮಸ್ಕಾರ?",
+      "language": "kn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "kn/pronunciation#how-to-pronounce-common-kannada-phrases",
+        "kn/phrases#hello-namaskaara",
+        "course/kn/vocabulary#course-vocabulary-greetings",
+        "kn/pronunciation*",
+        "course/kn/words#hello*",
+        "kn/phrases#hello*",
+        "kn/phrases#greeting*"
+      ],
+      "mention": ["ನಮಸ್ಕಾರ"]
+    },
+    {
+      "id": "beginner-bn-hello",
+      "question": "How do I say \"Hello\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/bn/vocabulary#course-vocabulary-greetings",
+        "bn/phrases#hello-nomoshkar",
+        "course/bn/words#hello*",
+        "bn/phrases#hello*",
+        "bn/phrases#greeting*"
+      ],
+      "mention": ["নমস্কার"]
+    },
+    {
+      "id": "beginner-bn-love",
+      "question": "How do I say \"I love you\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/emotions#i-love-you-aami-tomaake-bhaalobaashi",
+        "course/bn/phrases#i-love-you-aami-tomaake-bhaalobaashi"
+      ],
+      "mention": ["আমি", "তোমাকে", "ভালোবাসি"]
+    },
+    {
+      "id": "beginner-bn-miss",
+      "question": "How do I say \"I miss you\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/emotions#i-miss-you-tomaar-kothaa-khub-mone-porchhe",
+        "course/bn/phrases#i-miss-you-tomaar-kothaa-khub-mone-porchhe"
+      ],
+      "mention": ["তোমার", "কথা", "খুব", "মনে", "পড়ছে"]
+    },
+    {
+      "id": "beginner-bn-hungry",
+      "question": "How do I say \"I am hungry\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/food#i-am-hungry-aamaar-khide-peyechhe",
+        "course/bn/phrases#i-am-hungry-aamaar-khide-peyechhe"
+      ],
+      "mention": ["আমার", "খিদে", "পেয়েছে"]
+    },
+    {
+      "id": "beginner-bn-thirsty",
+      "question": "How do I say \"I am thirsty\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/food#i-am-thirsty-aamaar-teshtaa-peyechhe",
+        "course/bn/phrases#i-am-thirsty-aamaar-teshtaa-peyechhe"
+      ],
+      "mention": ["আমার", "তেষ্টা", "পেয়েছে"]
+    },
+    {
+      "id": "beginner-bn-going",
+      "question": "How do I say \"Where are you going?\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/phrases#where-are-you-going-aapni-kothaay-jaachchhen",
+        "course/bn/phrases#where-are-you-going-aapni-kothaay-jaachchhen"
+      ],
+      "mention": ["আপনি", "কোথায়", "যাচ্ছেন"]
+    },
+    {
+      "id": "beginner-bn-doing",
+      "question": "How do I say \"What are you doing?\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "course/bn/phrases#what-are-you-doing-aapni-ki-korchhen",
+        "bn/everyday-life#what-are-you-doing-at-home-ki-korchho",
+        "bn/phrases#what-are-you-doing-aapni-ki-korchhen"
+      ],
+      "mention": ["আপনি", "কী", "করছেন"]
+    },
+    {
+      "id": "beginner-bn-understand",
+      "question": "How do I say \"I don't understand\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/phrases#i-dont-understand-aami-bujhte-paarchhi-naa",
+        "course/bn/phrases#i-dont-understand-aami-bujhte-paarchhi-naa"
+      ],
+      "mention": ["আমি", "বুঝতে", "পারছি", "না"]
+    },
+    {
+      "id": "beginner-bn-repeat",
+      "question": "How do I say \"Please repeat\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/requests#say-it-again-aarekbaar-bolun",
+        "course/bn/phrases#please-say-it-again-aarekbaar-bolun",
+        "bn/requests*",
+        "bn/phrases#please*",
+        "course/bn/phrases#please-say*"
+      ],
+      "mention": ["আরেকবার", "বলুন"]
+    },
+    {
+      "id": "beginner-bn-cost",
+      "question": "How do I ask \"How much does this cost?\" in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/sentence-patterns#how-much-is-koto",
+        "bn/shopping#how-much-does-this-cost-etaar-daam-koto",
+        "course/bn/phrases#how-much-does-this-cost-etaar-daam-koto"
+      ],
+      "mention": ["এটার", "দাম", "কত", "how much"]
+    },
+    {
+      "id": "beginner-bn-intro",
+      "question": "How do I introduce myself in Bengali?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/examples#my-name-is-asha",
+        "bn/conversation#introductions-aapnaar-shonge-dekhaa-hoye-bhaalo-laaglo",
+        "bn/phrases#my-name-is-aamaar-naam",
+        "bn/phrases#introducing-yourself-fully",
+        "course/bn/phrases#my-name-is-asha-aamaar-naam-asha",
+        "bn/phrases#introduc*",
+        "bn/phrases#my-name*"
+      ],
+      "mention": ["আমার", "নাম"]
+    },
+    {
+      "id": "beginner-bn-word",
+      "question": "What does জল mean?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/examples#i-want-water",
+        "course/bn/vocabulary#course-vocabulary-drinks",
+        "course/bn/vocabulary#course-vocabulary-drinks-part-2",
+        "bn/vocabulary#food-and-drink",
+        "course/bn/phrases#i-want-water-aamaar-jol-chaai",
+        "course/bn/vocabulary#course-vocabulary-everyday-things*",
+        "course/bn/words*",
+        "course/bn/phrases*"
+      ],
+      "mention": ["জল", "water"]
+    },
+    {
+      "id": "beginner-bn-example",
+      "previous": "How do I say \"I want water\" in Bengali?",
+      "question": "Give me another example.",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/examples#i-want-water",
+        "bn/sentence-patterns#i-want-aamaar-chaai",
+        "bn/sentence-patterns#i-want-to-do-aami-te-chaai",
+        "course/bn/phrases#i-want-water-aamaar-jol-chaai",
+        "bn/examples*",
+        "course/bn/phrases*"
+      ],
+      "mention": ["চাই", "আমার", "জল", "চাই"]
+    },
+    {
+      "id": "beginner-bn-formal",
+      "question": "What is the difference between the formal and casual \"you\" in Bengali?",
+      "language": "bn",
+      "level": "elementary",
+      "expect": "answered",
+      "sources": [
+        "bn/beginner-guide#formal-and-informal-you",
+        "bn/grammar#three-levels-of-you",
+        "bn/requests#polite-commands-three-forms",
+        "bn/common-mistakes*",
+        "bn/grammar*",
+        "bn/beginner-guide*",
+        "bn/requests#polite*",
+        "bn/culture*"
+      ],
+      "mention": ["আপনি", "polite", "formal", "respect"]
+    },
+    {
+      "id": "beginner-bn-pronounce",
+      "question": "How do I pronounce নমস্কার?",
+      "language": "bn",
+      "level": "beginner",
+      "expect": "answered",
+      "sources": [
+        "bn/pronunciation#pronouncing-common-phrases",
+        "course/bn/vocabulary#course-vocabulary-greetings",
+        "bn/phrases#hello-nomoshkar",
+        "bn/pronunciation*",
+        "course/bn/words#hello*",
+        "bn/phrases#hello*",
+        "bn/phrases#greeting*"
+      ],
+      "mention": ["নমস্কার"]
     },
     {
       "id": "oos-capital",

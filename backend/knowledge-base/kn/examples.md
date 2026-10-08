@@ -36,7 +36,7 @@ Kannada: ನಾನು ಮನೆಗೆ ಹೋಗುತ್ತಿದ್ದೇನೆ
 
 <!-- topic: negation; level: elementary -->
 
-Kannada: ನನಗೆ ಕನ್ನಡ ಚೆನ್ನಾಗಿ ಬರುವುದಿಲ್ಲ (nanage kannada chennaagi baruvudilla). Word by word: ನನಗೆ (nanage) = to me, ಕನ್ನಡ (kannada) = Kannada, ಚೆನ್ನಾಗಿ (chennaagi) = well, ಬರುವುದಿಲ್ಲ (baruvudilla) = does not come. Kannada says a language "comes" to you: ನನಗೆ ಸ್ವಲ್ಪ ಕನ್ನಡ ಬರುತ್ತದೆ (nanage swalpa kannada baruttade) = I know a little Kannada.
+Kannada: ನನಗೆ ಕನ್ನಡ ಚೆನ್ನಾಗಿ ಬರುವುದಿಲ್ಲ (nanage kannada chennaagi baruvudilla). Word by word: ನನಗೆ (nanage) = to me, ಕನ್ನಡ (kannada) = Kannada, ಚೆನ್ನಾಗಿ (chennaagi) = well, ಬರುವುದಿಲ್ಲ (baruvudilla) = does not come. Kannada says a language "comes" to you: ನನಗೆ ಸ್ವಲ್ಪ ಕನ್ನಡ ಬರುತ್ತದೆ (nanage svalpa kannada baruttade) = I know a little Kannada.
 
 ## "Will you come?" — ನೀನು ಬರುತ್ತೀಯಾ?
 

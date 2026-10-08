@@ -24,7 +24,7 @@ Hindi vowels are called स्वर (svar). The vowel letters are: अ (a), आ
 
 <!-- topic: consonants -->
 
-Hindi consonants are called व्यंजन (vyanjan). They are arranged by where the sound is made in the mouth: क ख ग घ ङ (throat), च छ ज झ ञ (palate), ट ठ ड ढ ण (retroflex, tongue curled back), त थ द ध न (dental, tongue at the teeth), प फ ब भ म (lips), then य र ल व श ष स ह. Each of the first five rows goes plain, aspirated, voiced, voiced-aspirated, nasal. Hindi also uses ड़ (ra) and ढ़ (rha), two flapped sounds, and the combined letters क्ष (ksha), त्र (tra) and ज्ञ (gya).
+Hindi consonants are called व्यंजन (vyanjan). They are arranged by where the sound is made in the mouth: क ख ग घ ङ (throat), च छ ज झ ञ (palate), ट ठ ड ढ ण (retroflex, tongue curled back), त थ द ध न (dental, tongue at the teeth), प फ ब भ म (lips), then य र ल व श ष स ह. Each of the first five rows goes plain, aspirated, voiced, voiced-aspirated, nasal. Hindi also uses ड़ and ढ़, two flapped sounds (like a quick r made with the tongue curled back; Vachan writes them d and dh, as in लड़का, ladkaa, boy), and the combined letters क्ष (ksha), त्र (tra) and ज्ञ (gya).
 
 ## Vowel signs — मात्रा (maatraa)
 

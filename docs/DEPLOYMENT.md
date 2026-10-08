@@ -44,6 +44,8 @@ Never put secrets in Vercel or in any `NEXT_PUBLIC_*` variable.
    DATABASE_URL='<neon url>' npm run db:deploy
    DATABASE_URL='<neon url>' NODE_ENV=production npm run db:seed
    ```
+   An existing database that still has the old course is upgraded (learner data kept) with
+   `DATABASE_URL='<neon url>' NODE_ENV=production npm run db:seed:sync`.
 3. **Render** — **New → Blueprint** → choose the repository. It reads `render.yaml` and asks for
    `DATABASE_URL`, `CORS_ORIGIN` and `GEMINI_API_KEY`. Each build also applies new migrations.
 4. **Vercel** — import the repository, set **Root Directory** to `frontend`, add `BACKEND_URL`
@@ -59,6 +61,14 @@ Never put secrets in Vercel or in any `NEXT_PUBLIC_*` variable.
 ### Updating
 
 `git push` — Vercel and Render rebuild automatically, and Render applies new migrations first.
+
+When the course content changed (new lessons, words or notes), also update the data from your
+computer — learner accounts and progress are kept:
+
+```bash
+DATABASE_URL='<neon url>' NODE_ENV=production npm run db:seed:sync
+DATABASE_URL='<neon url>' npm run rag:index -w backend
+```
 
 ### Free plan limits
 

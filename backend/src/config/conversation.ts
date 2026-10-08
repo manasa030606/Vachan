@@ -38,7 +38,7 @@ export const SCENARIOS: Record<ScenarioId, Scenario> = {
     goal: "Greet your partner, say your name, ask their name and where they are from.",
     retrievalQuery: "introductions hello my name is what is your name where are you from",
     topic: "introductions",
-    vocabularyTopics: ["Greetings", "Introductions", "Phrases"],
+    vocabularyTopics: ["Greetings", "Introductions"],
   },
   restaurant: {
     id: "restaurant",
@@ -48,7 +48,7 @@ export const SCENARIOS: Record<ScenarioId, Scenario> = {
     goal: "Order something to eat or drink, ask for water, and ask for the bill.",
     retrievalQuery: "restaurant waiter I want food tea water please the bill",
     topic: "restaurant",
-    vocabularyTopics: ["Food & drink", "Numbers", "Greetings"],
+    vocabularyTopics: ["Restaurant", "Food", "Drinks"],
   },
   shopping: {
     id: "shopping",
@@ -58,7 +58,7 @@ export const SCENARIOS: Record<ScenarioId, Scenario> = {
     goal: "Ask how much something costs, ask for a lower price, and buy one or two.",
     retrievalQuery: "shopping how much is this price too expensive I want two",
     topic: "shopping",
-    vocabularyTopics: ["Numbers", "Food & drink", "Greetings"],
+    vocabularyTopics: ["Shopping", "Numbers", "Colours"],
   },
   travel: {
     id: "travel",
@@ -68,7 +68,7 @@ export const SCENARIOS: Record<ScenarioId, Scenario> = {
     goal: "Ask for a ticket to a town, ask the time of the bus and the fare.",
     retrievalQuery: "travel bus stand ticket when is the bus does this bus go",
     topic: "travel",
-    vocabularyTopics: ["Numbers", "Greetings"],
+    vocabularyTopics: ["Travel", "Transport", "Time"],
   },
   directions: {
     id: "directions",
@@ -78,7 +78,7 @@ export const SCENARIOS: Record<ScenarioId, Scenario> = {
     goal: "Ask where a place is, understand left / right / straight, and say thank you.",
     retrievalQuery: "directions where is it left right go straight near far",
     topic: "directions",
-    vocabularyTopics: ["Greetings"],
+    vocabularyTopics: ["Directions", "Places"],
   },
   everyday: {
     id: "everyday",
@@ -88,7 +88,7 @@ export const SCENARIOS: Record<ScenarioId, Scenario> = {
     goal: "Ask how your friend is, answer their questions, and talk about family and food.",
     retrievalQuery: "everyday conversation how are you I am fine have you eaten family",
     topic: "everyday-conversation",
-    vocabularyTopics: ["Greetings", "Family", "Food & drink", "Phrases"],
+    vocabularyTopics: ["Conversation", "Greetings", "Feelings", "Daily routine"],
   },
 };
 

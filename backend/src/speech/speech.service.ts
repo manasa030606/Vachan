@@ -287,9 +287,11 @@ export async function listSpeakingPhrases(userId: string, language?: LanguageCod
   const items = await prisma.vocabularyItem.findMany({
     where: { language: { code: context.languageCode }, kind: { in: ["WORD", "PHRASE"] } },
     include: {
+      // The first published lesson that teaches the word (used to group the list by lesson).
       lessons: {
+        where: { isPublished: true },
         select: { title: true, sortOrder: true, unit: { select: { sortOrder: true } } },
-        orderBy: { sortOrder: "asc" },
+        orderBy: [{ unit: { sortOrder: "asc" } }, { sortOrder: "asc" }],
         take: 1,
       },
     },
@@ -303,7 +305,7 @@ export async function listSpeakingPhrases(userId: string, language?: LanguageCod
   const bestById = new Map(best.map((b) => [b.vocabularyItemId, b]));
   // Sort key: unit, then lesson; words that are in no lesson go last.
   const order = (item: (typeof items)[number]) =>
-    (item.lessons[0]?.unit.sortOrder ?? 99) * 100 + (item.lessons[0]?.sortOrder ?? 99);
+    (item.lessons[0]?.unit.sortOrder ?? 999) * 1000 + (item.lessons[0]?.sortOrder ?? 999);
 
   return {
     language: { code: context.languageCode, name: context.languageName },
@@ -318,6 +320,7 @@ export async function listSpeakingPhrases(userId: string, language?: LanguageCod
         meaning: item.meaning,
         topic: item.topic,
         lesson: item.lessons[0]?.title ?? null,
+        unit: item.lessons[0]?.unit.sortOrder ?? null,
         bestScore: bestById.get(item.id)?._max.contentScore ?? null,
         attempts: bestById.get(item.id)?._count._all ?? 0,
       })),

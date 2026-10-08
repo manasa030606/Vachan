@@ -9,11 +9,12 @@ can ask an AI tutor that answers only from Vachan's own notes (retrieval-augment
 
 ## Features
 
-- **Lessons** — 16 lessons per language, from the alphabet to simple sentences, with 7 exercise types. Answers are checked on the server.
-- **Placement test** — 12 questions that recommend where to start.
+- **Lessons** — 16 units and 95 lessons per language (570 in total), from the alphabet to everyday conversations, with about 1,340 exercises of 7 types per language. Answers are checked on the server.
+- **Vocabulary** — about 560 words and phrases per language, each with script, romanization, meaning and usage notes (formal/casual forms, alternatives).
+- **Placement test** — 18 questions that recommend where to start.
 - **Gamification** — XP, levels, daily goal, streaks, hearts and badges.
 - **Review** — every mistake is saved and can be practised again.
-- **AI tutor** — answers questions using a RAG knowledge base and shows its sources.
+- **AI tutor** — answers questions using a RAG knowledge base (about 880 notes per language: grammar, sentence patterns, phrases, dialogues, common mistakes and the course itself) and shows its sources.
 - **Speaking practice** — listen to phrases, record yourself, and get feedback from speech-to-text.
 - **Role-play** — short AI conversations in everyday situations (restaurant, shopping, travel…).
 - **Admin dashboard** — manage all content and the knowledge base without touching code, plus learning analytics.
@@ -57,7 +58,7 @@ npm install
 cp backend/.env.example backend/.env           # then set DATABASE_URL and JWT_SECRET
 cp frontend/.env.example frontend/.env.local
 npm run db:migrate                             # create the tables
-npm run db:seed                                # load the courses
+npm run db:seed                                # load the courses (16 units, 95 lessons per language)
 npm run rag:index -w backend                   # build the AI tutor's knowledge base
 npm run dev                                    # http://localhost:3000
 ```
@@ -72,6 +73,8 @@ Full steps, including the AI key and troubleshooting: [docs/SETUP.md](docs/SETUP
 | `npm run check`                             | Format check, typecheck, lint, tests, build   |
 | `npm run test:all -w backend`               | All backend integration tests                 |
 | `npm run db:studio`                         | Browse the database                           |
+| `npm run db:seed:sync`                      | Update existing courses, keeping learner data |
+| `npm run content:stats -w backend`          | Print course and knowledge-base numbers       |
 | `npm run admin:grant -w backend -- <email>` | Give an account access to the admin dashboard |
 
 ## Documentation

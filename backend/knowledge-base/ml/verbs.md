@@ -43,3 +43,51 @@ The Malayalam future tense ends in -ഉം (-um) and again stays the same for ev
 <!-- topic: imperative -->
 
 Malayalam commands have an informal and a polite form. Informal: വാ (vaa, come), ഇരിക്ക് (irikku, sit), കഴിക്ക് (kazhikku, eat), പറ (para, tell), പോ (po, go). Polite (ending -ഊ, -oo): വരൂ (varoo, please come), ഇരിക്കൂ (irikkoo, please sit), കഴിക്കൂ (kazhikkoo, please eat), പറയൂ (parayoo, please tell). An even softer request is a question ending in -ആമോ? (-aamo?): പറയാമോ? (parayaamo?, could you tell?). Use the polite forms with elders, strangers and teachers.
+
+## Common verbs: come, go, eat, drink
+
+<!-- topic: common-verbs; level: beginner -->
+
+Four everyday Malayalam verbs in present / past / future / polite command (casual command in brackets). വരുക (varuka, come): വരുന്നു (varunnu) / വന്നു (vannu) / വരും (varum) / വരൂ (varoo) [വാ, vaa]. പോകുക (pokuka, go): പോകുന്നു (pokunnu) / പോയി (poyi) / പോകും (pokum) / പോകൂ (pokoo) [പോ, po]. കഴിക്കുക (kazhikkuka, eat): കഴിക്കുന്നു (kazhikkunnu) / കഴിച്ചു (kazhichchu) / കഴിക്കും (kazhikkum) / കഴിക്കൂ (kazhikkoo) [കഴിക്ക്, kazhikku]. കുടിക്കുക (kudikkuka, drink): കുടിക്കുന്നു (kudikkunnu) / കുടിച്ചു (kudichchu) / കുടിക്കും (kudikkum) / കുടിക്കൂ (kudikkoo) [കുടിക്ക്, kudikku]. Example: അവൾ ഇന്നലെ വന്നു (aval innale vannu, she came yesterday).
+
+Also asked as: past tense of come and go in Malayalam, how to conjugate eat in Malayalam, drink in Malayalam past and future
+
+## Common verbs: give, take, say, do
+
+<!-- topic: common-verbs; level: elementary -->
+
+More everyday Malayalam verbs, in present / past / future / polite command. തരുക (tharuka, give to me): തരുന്നു (tharunnu) / തന്നു (thannu) / തരും (tharum) / തരൂ (tharoo) [casual താ, thaa]. കൊടുക്കുക (kodukkuka, give to someone else): കൊടുക്കുന്നു (kodukkunnu) / കൊടുത്തു (koduthu) / കൊടുക്കും (kodukkum) / കൊടുക്കൂ (kodukkoo). എടുക്കുക (edukkuka, take): എടുക്കുന്നു / എടുത്തു (eduthu) / എടുക്കും / എടുക്കൂ (edukkoo). പറയുക (parayuka, say / tell): പറയുന്നു / പറഞ്ഞു (paranju) / പറയും / പറയൂ (parayoo) [പറ, para]. ചെയ്യുക (cheyyuka, do): ചെയ്യുന്നു / ചെയ്തു (cheythu) / ചെയ്യും / ചെയ്യൂ (cheyyoo).
+
+Also asked as: past tense of give in Malayalam, how to say said in Malayalam, did in Malayalam, conjugation of common Malayalam verbs
+
+## Common verbs: see, sit, sleep, buy
+
+<!-- topic: common-verbs; level: elementary -->
+
+Further everyday Malayalam verbs, in present / past / future. കാണുക (kaanuka, see / meet): കാണുന്നു (kaanunnu) / കണ്ടു (kandu) / കാണും (kaanum). ഇരിക്കുക (irikkuka, sit): ഇരിക്കുന്നു (irikkunnu) / ഇരുന്നു (irunnu) / ഇരിക്കും (irikkum); command ഇരിക്കൂ (irikkoo). ഉറങ്ങുക (uranguka, sleep): ഉറങ്ങുന്നു (urangunnu) / ഉറങ്ങി (urangi) / ഉറങ്ങും (urangum). വാങ്ങുക (vaanguka, buy): വാങ്ങുന്നു (vaangunnu) / വാങ്ങി (vaangi) / വാങ്ങും (vaangum). കേൾക്കുക (kelkkuka, hear): കേൾക്കുന്നു / കേട്ടു (kettu) / കേൾക്കും. Example: ഞാൻ ഒരു സിനിമ കണ്ടു (njaan oru cinema kandu, I saw a film).
+
+Also asked as: past tense of see in Malayalam, how to say slept in Malayalam, bought in Malayalam, sat in Malayalam
+
+## Must and have to — -അണം (-anam)
+
+<!-- topic: modal-verbs; level: intermediate -->
+
+To say "must / have to / need to" in Malayalam, add -അണം (-anam) to the verb stem: പോകണം (pokanam, have to go), വരണം (varanam, must come), പഠിക്കണം (padikkanam, must study). With എനിക്ക് (enikku) it also means "I want to": എനിക്ക് വീട്ടിൽ പോകണം (enikku veettil pokanam, I want / need to go home). The negative is -ഏണ്ട (-enda, no need to): പോകേണ്ട (pokenda, you needn't go). In invitations -അണം sounds warm, not bossy: വീട്ടിലേക്ക് വരണം (veettilekku varanam, you must come home).
+
+Also asked as: how to say have to in Malayalam, must in Malayalam, I need to go in Malayalam, I want to go home in Malayalam
+
+## Can and can't — പറ്റും / പറ്റില്ല (pattum / pattilla)
+
+<!-- topic: modal-verbs; level: intermediate -->
+
+For "can / be able to", Malayalam puts the verb in its -ആൻ (-aan, "to") form and adds പറ്റും (pattum, is possible) or പറ്റില്ല (pattilla, is not possible), with the person in the dative: എനിക്ക് നാളെ വരാൻ പറ്റും (enikku naale varaan pattum, I can come tomorrow); എനിക്ക് വരാൻ പറ്റില്ല (enikku varaan pattilla, I can't come). For skills, use അറിയാം (ariyaam, know how): എനിക്ക് നീന്താൻ അറിയാം (enikku neenthaan ariyaam, I can swim). "Can you…?" is often a soft -ആമോ? (-aamo?) question: വരാമോ? (varaamo?, can you come?).
+
+Also asked as: how to say can in Malayalam, I can't come in Malayalam, how to say able to, can you in Malayalam
+
+## Negative present — -ഉന്നില്ല (-unnilla)
+
+<!-- topic: negation -->
+
+To say something is not happening in Malayalam, change -ഉന്നു (-unnu) to -ഉന്നില്ല (-unnilla): ഞാൻ വരുന്നില്ല (njaan varunnilla, I'm not coming), അവൾ കഴിക്കുന്നില്ല (aval kazhikkunnilla, she isn't eating), മഴ പെയ്യുന്നില്ല (mazha peyyunnilla, it isn't raining). For "I don't (usually)" Malayalam prefers the future negative -ഇല്ല: ഞാൻ ഇറച്ചി കഴിക്കില്ല (njaan irachchi kazhikkilla, I don't eat meat). Like all Malayalam verb forms, these never change for the person.
+
+Also asked as: how to say I am not coming in Malayalam, present negative in Malayalam, I don't eat in Malayalam

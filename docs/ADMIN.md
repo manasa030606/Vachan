@@ -53,11 +53,11 @@ published. Everything new starts unpublished, so a whole unit can be prepared be
 
 Notes come from three places:
 
-| Source            | Where the text lives               | What you can do here              |
-| ----------------- | ---------------------------------- | --------------------------------- |
-| Dashboard note    | The database                       | Everything: edit, publish, delete |
-| File              | `backend/knowledge-base/*.md`      | Publish, unpublish, re-index      |
-| Course vocabulary | Generated from the vocabulary list | Publish, unpublish, re-index      |
+| Source         | Where the text lives                                                 | What you can do here              |
+| -------------- | -------------------------------------------------------------------- | --------------------------------- |
+| Dashboard note | The database                                                         | Everything: edit, publish, delete |
+| File           | `backend/knowledge-base/*.md`                                        | Publish, unpublish, re-index      |
+| Course content | Generated from the course words and phrases (with their usage notes) | Publish, unpublish, re-index      |
 
 Workflow: **write** (saved as a draft, never searched) → **preview chunks** → **publish** (indexed and
 searchable) → edit later → **re-index**.

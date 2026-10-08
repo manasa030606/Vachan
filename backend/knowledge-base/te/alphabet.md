@@ -18,7 +18,7 @@ Telugu is written in the Telugu script, an abugida that grew out of the ancient 
 
 <!-- topic: vowels -->
 
-Telugu vowels are called అచ్చులు (achchulu). The main ones are: అ (a), ఆ (aa), ఇ (i), ఈ (ii / ee), ఉ (u), ఊ (uu / oo), ఋ (ru), ఎ (e), ఏ (ee), ఐ (ai), ఒ (o), ఓ (oo), ఔ (au). Two extra signs follow them: అం (am, the anusvara, a nasal "m/n" sound) and అః (ah, the visarga). Short and long vowels are different letters, so ఎ (short e) and ఏ (long ee), ఒ (short o) and ఓ (long oo) must not be mixed up. Beginners usually start with అ ఆ ఇ ఈ ఉ ఊ.
+Telugu vowels are called అచ్చులు (achchulu). The main ones are: అ (a), ఆ (aa), ఇ (i), ఈ (ii / ee), ఉ (u), ఊ (uu / oo), ఋ (ru), ఎ (e), ఏ (ee), ఐ (ai), ఒ (o), ఓ (oo), ఔ (au). Two extra signs follow them: అం (am, the anusvara, a nasal "m/n" sound) and అః (ah, the visarga). Short and long vowels are different letters, so ఎ (short e) and ఏ (long e), ఒ (short o) and ఓ (long o) must not be mixed up. Note: Vachan's romanization writes both ఎ and ఏ as "e" and both ఒ and ఓ as "o" (as in నేను, nenu and పేరు, peru), and keeps "ee" for ఈ and "oo" for ఊ — so check the Telugu letter for e/o length. Beginners usually start with అ ఆ ఇ ఈ ఉ ఊ.
 
 ## Consonants — హల్లులు (hallulu)
 

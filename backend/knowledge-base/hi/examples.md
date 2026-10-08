@@ -36,7 +36,7 @@ Hindi: मैं घर जा रहा हूँ (main ghar jaa rahaa hoon). W
 
 <!-- topic: negation; level: elementary -->
 
-Hindi: मुझे हिंदी ठीक से नहीं आती (mujhe Hindi theek se nahin aatee). Word by word: मुझे (mujhe) = to me, हिंदी (Hindi) = Hindi, ठीक से (theek se) = properly / well, नहीं (nahin) = not, आती (aatee) = comes. Hindi says a language "comes" to you: मुझे हिंदी आती है (mujhe Hindi aatee hai) = I know Hindi. The verb is आती (feminine) because हिंदी is a feminine noun.
+Hindi: मुझे हिंदी ठीक से नहीं आती (mujhe hindee theek se nahin aatee). Word by word: मुझे (mujhe) = to me, हिंदी (hindee) = Hindi, ठीक से (theek se) = properly / well, नहीं (nahin) = not, आती (aatee) = comes. Hindi says a language "comes" to you: मुझे हिंदी आती है (mujhe hindee aatee hai) = I know Hindi. The verb is आती (feminine) because हिंदी is a feminine noun.
 
 ## "Ram's book is on the table" — राम की किताब मेज़ पर है
 

@@ -18,7 +18,7 @@ Kannada is written in the Kannada script, an abugida that grew out of the ancien
 
 <!-- topic: vowels -->
 
-Kannada vowels are called ಸ್ವರಗಳು (swaragalu). The main ones are: ಅ (a), ಆ (aa), ಇ (i), ಈ (ee), ಉ (u), ಊ (oo), ಋ (ru), ಎ (e), ಏ (ee), ಐ (ai), ಒ (o), ಓ (oo), ಔ (au). Two extra signs follow them, called ಯೋಗವಾಹಕಗಳು (yogavaahakagalu): ಅಂ (am, the anusvara, a nasal "m/n" sound) and ಅಃ (ah, the visarga). Short and long vowels are different letters, so ಎ (short e) and ಏ (long e), ಒ (short o) and ಓ (long o) must not be mixed up. Beginners usually start with ಅ ಆ ಇ ಈ ಉ ಊ.
+Kannada vowels are called ಸ್ವರಗಳು (swaragalu). The main ones are: ಅ (a), ಆ (aa), ಇ (i), ಈ (ee), ಉ (u), ಊ (oo), ಋ (ru), ಎ (e), ಏ (e, long), ಐ (ai), ಒ (o), ಓ (o, long), ಔ (au). Two extra signs follow them, called ಯೋಗವಾಹಕಗಳು (yogavaahakagalu): ಅಂ (am, the anusvara, a nasal "m/n" sound) and ಅಃ (ah, the visarga). Short and long vowels are different letters, so ಎ (short e) and ಏ (long e), ಒ (short o) and ಓ (long o) must not be mixed up. Beginners usually start with ಅ ಆ ಇ ಈ ಉ ಊ.
 
 ## Consonants — ವ್ಯಂಜನಗಳು (vyanjanagalu)
 
@@ -37,3 +37,5 @@ When a vowel follows a consonant, Kannada writes a vowel sign instead of the ful
 <!-- topic: conjuncts; level: elementary -->
 
 When two consonants come together with no vowel between them, Kannada writes the second consonant as a small form, usually below the first. This small form is called an ಒತ್ತು (ottu), and the combined letter an ಒತ್ತಕ್ಷರ (ottakshara). Examples: ಅಮ್ಮ (amma, mother) has ಮ under ಮ; ಅಪ್ಪ (appa, father) has ಪ under ಪ; ಸ್ನೇಹಿತ (snehita, friend) has ನ under ಸ; ಕ್ಷ (ksha) appears in ಕ್ಷಮಿಸಿ (kshamisi, sorry). A ರ before another consonant is written as a mark after it, called ಅರ್ಕಾವೊತ್ತು (arkaavottu), as in ಅರ್ಥ (artha, meaning). A consonant with no vowel at all is shown with the halant mark ್, as in ಕ್ (k).
+
+Also asked as: what is ottakshara, what is an ottu, how are double consonants written in Kannada, Kannada conjunct consonants, letters written below other letters
