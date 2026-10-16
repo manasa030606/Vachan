@@ -72,7 +72,9 @@ DATABASE_URL='<neon url>' npm run rag:index -w backend
 
 ### Free plan limits
 
-- Render sleeps after 15 minutes without visitors; the first request then takes 30–60 seconds.
+- The `vachan-api-keep-warm` Render cron job pings `/api/health` every 15 minutes to keep the free backend awake. Render schedules use UTC; this interval has no timezone adjustment. A delayed run can still let the backend sleep briefly.
+- Render charges a minimum of $1/month for each cron job service.
+- Without the keep-warm cron job, Render sleeps after 15 minutes without visitors; the first request then takes 30–60 seconds.
 - Render's 512 MB of memory is too small for the embedding model, so the AI tutor's knowledge-base
   search is off there (`RAG_ENABLED=false`). Speech and role-play work.
 

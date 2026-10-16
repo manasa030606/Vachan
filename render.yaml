@@ -39,3 +39,13 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+
+  # Ping the free web service every 15 minutes to match Render's idle timeout.
+  - type: cron
+    name: vachan-api-keep-warm
+    runtime: node
+    plan: 0.5c-512mb
+    region: singapore
+    schedule: "*/15 * * * *"
+    buildCommand: "true"
+    startCommand: curl --fail --silent --show-error --max-time 30 https://vachan-api.onrender.com/api/health
