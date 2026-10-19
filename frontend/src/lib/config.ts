@@ -3,23 +3,21 @@
 // so NEVER put secrets (API keys, passwords) in a NEXT_PUBLIC_ variable.
 //
 // Where does the browser send API requests?
-//   - Local development: NEXT_PUBLIC_API_URL=http://localhost:4000 (frontend/.env.local)
-//   - Deployed (Vercel): leave NEXT_PUBLIC_API_URL unset. The browser then calls
-//     "/api/..." on the website's own domain, and next.config.ts forwards those requests
-//     to the backend (BACKEND_URL). Same domain = the login cookie is a normal first-party
-//     cookie, so login works in every browser (including Safari).
+//   - Local development: directly to NEXT_PUBLIC_API_URL (normally http://localhost:4000).
+//   - Production: always to "/api/..." on the frontend's own domain. next.config.ts uses
+//     NEXT_PUBLIC_API_URL as the server-side rewrite destination. Keeping browser requests
+//     same-origin makes the httpOnly login cookie first-party, even when the frontend and
+//     backend are deployed on different domains.
 
 function resolveApiUrl(): string {
+  // Never expose the backend as the browser request target in production. Although
+  // NEXT_PUBLIC_API_URL is available in the client bundle, it is used by next.config.ts
+  // to configure the Vercel rewrite instead.
+  if (process.env.NODE_ENV === "production") return "";
+
   const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
-  console.log("[API CONFIG]", {
-    nodeEnv: process.env.NODE_ENV,
-    configured: Boolean(configured),
-    apiUrl: configured || "<missing>",
-  });
   if (configured) return configured.replace(/\/+$/, "");
-  console.log("CHECK3", configured);
-  // Production build without NEXT_PUBLIC_API_URL → same-origin "/api" (proxied by Next.js).
-  return process.env.NODE_ENV === "production" ? "" : "http://localhost:4000";
+  return "http://localhost:4000";
 }
 
 export const API_URL = resolveApiUrl();
