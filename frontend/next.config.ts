@@ -6,7 +6,7 @@ import type { NextConfig } from "next";
 // requests to https://<frontend>/api/... are forwarded to <BACKEND_URL>/api/...
 // The browser only ever talks to the frontend's domain, so the httpOnly login cookie is
 // first-party and no cross-site cookie/CORS problems appear. See docs/DEPLOYMENT.md.
-const backendUrl = process.env.BACKEND_URL?.trim().replace(/\/+$/, "");
+const backendUrl = process.env.NEXT_PUBLIC_API_URL?.trim().replace(/\/+$/, "");
 
 // Security headers sent with every page.
 //   frame-ancestors / X-Frame-Options  no clickjacking (the app can't be framed)
