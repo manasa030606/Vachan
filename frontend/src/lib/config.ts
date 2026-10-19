@@ -10,7 +10,7 @@
 //     cookie, so login works in every browser (including Safari).
 
 function resolveApiUrl(): string {
-  const configured = process.env.VITE_API_URL?.trim();
+  const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
   console.log("CHECK2", configured);
   if (configured) return configured.replace(/\/+$/, "");
   console.log("CHECK3", configured);
