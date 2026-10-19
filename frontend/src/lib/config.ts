@@ -11,7 +11,9 @@
 
 function resolveApiUrl(): string {
   const configured = process.env.BACKEND_URL?.trim();
+  console.log("CHECK2", configured);
   if (configured) return configured.replace(/\/+$/, "");
+  console.log("CHECK3", configured);
   // Production build without NEXT_PUBLIC_API_URL → same-origin "/api" (proxied by Next.js).
   return process.env.NODE_ENV === "production" ? "" : "http://localhost:4000";
 }

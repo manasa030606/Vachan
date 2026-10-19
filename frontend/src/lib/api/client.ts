@@ -49,6 +49,7 @@ const timeoutError = () =>
 async function send(path: string, { method = "GET", body, timeoutMs }: RequestOptions) {
   const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   try {
+    console.log("CHECK1", API_URL);
     return await fetch(`${API_URL}/api${path}`, {
       method,
       credentials: "include",
